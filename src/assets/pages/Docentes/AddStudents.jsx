@@ -62,11 +62,11 @@ const AgregarAlumnos = () => {
         const sheetName = workbook.SheetNames[0];
         const sheet = workbook.Sheets[sheetName];
 
-        const listaDeAlumnos = sheet['A1'].v;
-        const periodo = sheet['B2'].v;
-        const carrera = sheet['B3'].v;
-        const cuatrimestre = sheet['B4'].v;
-        const grupo = sheet['B5'].v;
+        const listaDeAlumnos = sheet['A5'].v;
+        const periodo = sheet['C7'].v;
+        const carrera = sheet['A5'].v;
+        const cuatrimestre = sheet['C8'].v;
+        const grupo = sheet['C9'].v;
 
         setPeriodo(periodo);
         setCarrera(carrera);
@@ -79,7 +79,7 @@ const AgregarAlumnos = () => {
         console.log('Grupo:', grupo);
 
         // Obtener datos de los alumnos
-        const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1, range: 7 });
+        const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1, range: 12 });
         // Procesar los datos para obtener un array de objetos
         const alumnosData = jsonData.map((fila) => {
             return {
@@ -88,11 +88,11 @@ const AgregarAlumnos = () => {
                 CUATRIMESTRE: cuatrimestre,
                 GRUPO: grupo,
                 MATRICULA: fila[0],
-                NOMBRE: fila[1],
+                NOMBRE: fila[3],
                 APELLIDOMATERNO: fila[2],
-                APELLIDOPATERNO: fila[3],
-                CORREO: fila[4],
-                PASSWORD: fila[5],                
+                APELLIDOPATERNO: fila[1],
+                CORREO: fila[4]+"@uthh.edu.mx",
+                PASSWORD: fila[4],                
             };
         });
         setAlumnosUpload(alumnosData);

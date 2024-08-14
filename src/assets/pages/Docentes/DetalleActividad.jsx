@@ -1,22 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import  Components from '../../components/Components'
-const {TitlePage, ContentTitle, Paragraphs, TitleSection, LoadingButton} = Components;
-import { Checkbox, Table, Alert, Tooltip, Badge, ToggleSwitch, Card} from 'flowbite-react';
+const {TitlePage, ContentTitle, Paragraphs, TitleSection, LoadingButton, SelectInput} = Components;
+import {Card} from 'flowbite-react';
 import { useAuth } from '../../server/authUser'; // Importar el hook de autenticación
 import * as XLSX from 'xlsx';
+import { useForm } from 'react-hook-form';
 
 const DetalleActividad = () => {
   const { vchClvMateria, chrGrupo, intPeriodo, intNumeroActi } = useParams();
   const [actividad, setActividad] = useState([]);
   const { isAuthenticated, userData } = useAuth(); 
-  const [rubricaData, setRubricaData] = useState(null);
   const [practicas, setPracticas] = useState([]);
-  const [detallepracticas, setdetallePracticas] = useState([]);
   const [file, setFile] = useState(null);
+  const [practicasToInsert, setPracticasToInsert] = useState([]);
+  const [practicasServer, setPracticasServer] = useState([]);
+  const {register, handleSubmit, trigger, formState: { errors }} = useForm();
 
-  useEffect(() => {
-    const fetchActividad = async () => 
+
+  const fetchActividad = async () => 
     {
       const requestData = 
       {
@@ -55,13 +57,27 @@ const DetalleActividad = () => {
         // Manejar el error, mostrar mensaje al usuario, etc.
       }
     };
-
+    
+  useEffect(() => {
     fetchActividad();
-  }, [vchClvMateria, chrGrupo, intPeriodo, intNumeroActi]);
+  }, [vchClvMateria, chrGrupo, intPeriodo, intNumeroActi, ]);
+
+
+
+  const craerJsonRubricaSelect = (count) => {
+    const datosPracticas = Array.from({ length: count }, (_, index) => ({
+      fkActividadGlobal: intNumeroActi,
+      vchNombre: `Práctica ${index + 1}` // Puedes personalizar el nombre según tus necesidades
+    }));
+    setPracticasServer(datosPracticas)
+    console.log("Datos de prácticas:", datosPracticas);
+  
+  };
 
   const handleFileUpload = (event) => {
     const uploadedFile = event.target.files[0];
     setFile(uploadedFile);
+    processFile(uploadedFile);
   };
 
   const processFile = (file) => {
@@ -79,20 +95,22 @@ const DetalleActividad = () => {
           const practicasData = jsonData[17].slice(12, 21); // M18 a U18
           const rubros = jsonData.slice(18, 24).map(row => row[4]); // E19 a E24
           const valores = jsonData.slice(18, 24).map(row => row[11]); // L19 a L24
+          const datosPracticas = practicasData.map((nombre, index) => ({
+            numero: index + 1,
+            nombre: nombre
+          }));
 
+
+          setPracticasToInsert(datosPracticas);
           const rubrica = rubros.map((rubro, index) => ({
             vchClaveCriterio: `C${index + 1}`,
             vchCriterio: `Criterio ${index + 1}`,
             vchDescripcion: rubro,
             intValor: valores[index]
           }));
+          console.log("datos del excel", datosPracticas)
 
-          const practicas = practicasData.map((nombre, index) => ({
-            fkActividadGlobal: intNumeroActi,
-            vchNombre: nombre
-          }));
-
-          resolve({ practicas, detalles: rubrica });
+          resolve({ practicasServer, detalles: rubrica });
         } catch (error) {
           reject(error);
         }
@@ -117,6 +135,7 @@ const DetalleActividad = () => {
       console.log(result);
 
       if (result.done) {
+        fetchActividad()
         alert("Datos agregados correctamente.");
       } else {
         alert("Error al agregar los datos.");
@@ -155,18 +174,36 @@ const DetalleActividad = () => {
       <section className="h-full rounded-lg bg-white p-4 shadow dark:bg-gray-800 sm:p-6 xl:p-8">
         <TitleSection label="Subir Rúbricas" />
         <div className="w-full flex flex-col items-start">
-            <input 
-              type="file" 
-              className="block w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 cursor-pointer dark:text-gray-400 focus:outline-none dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400" 
-              onChange={handleFileUpload}
-            />
-            <div className="flex items-center m-2">
-            <LoadingButton
-              className="max-w-32 max-h-11" // Clase de Tailwind CSS para definir un ancho máximo
-              loadingLabel="Cargando..."
-              normalLabel="Agregar"
-              onClick={handleAddData}
-            />
+          <input 
+            type="file" 
+            className="block w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 cursor-pointer dark:text-gray-400 focus:outline-none dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400" 
+            onChange={handleFileUpload}
+          />
+          <div className="flex flex-col md:flex-row items-center gap-4 m-2">
+            <div className="flex flex-1 items-center">
+              <SelectInput
+                id="numero"
+                labelSelect="Seleccionar hasta qué práctica insertar"
+                label="Número de Prácticas recuperados del excel"
+                name="nombre"
+                options={practicasToInsert}
+                errorMessage="No cumples con el patrón de contraseña"
+                errors={errors}
+                register={register}
+                trigger={trigger}
+                onChange={(e) => craerJsonRubricaSelect(Number(e.target.value))}
+                pattern=""
+                className="flex-1"
+              />
+            </div>
+            <div className="flex-shrink-0">
+              <LoadingButton
+                className="max-w-xs h-11" // Clase de Tailwind CSS para definir un ancho máximo
+                loadingLabel="Cargando..."
+                normalLabel="Agregar"
+                onClick={handleAddData}
+              />
+            </div>
           </div>
         </div>
       </section>

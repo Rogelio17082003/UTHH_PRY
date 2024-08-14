@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../server/authUser'; // Importa el hook de autenticación
 import { useParams } from 'react-router-dom';
+import { Card} from 'flowbite-react';
 
 const GruposMaterias = () => { 
   const {userData} = useAuth(); // Obtén el estado de autenticación del contexto
@@ -71,14 +72,24 @@ console.log("datods: ", requestData)
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold mb-4">Grupos inscritos en la Materia</h1>
-      <div className="grid grid-cols-3 gap-4">
-
-      {materias.map((materia) => (
-    <a href={`/Admin/Materias/detalleMateria/${vchClvMateria}/${materia.chrGrupo}/${intPeriodo}`}>
-    <div key={materia.chrGrupo} className="bg-white shadow-md rounded-md p-4 flex justify-content-center">
-            <h2 className="text-lg font-bold mb-2">{materia.chrGrupo}</h2>
-          </div>
-        </a>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        {materias.map((materia) => (
+          <Card
+            key={materia.chrGrupo}
+            href={`/Admin/Materias/detalleMateria/${vchClvMateria}/${materia.chrGrupo}/${intPeriodo}`}
+            className="max-w-sm rounded-lg overflow-hidden shadow-lg transform transition duration-300 hover:scale-105"
+            theme={{
+              root: {
+                children: "p-0",
+              }
+            }}
+          >
+            <div className="relative h-40">
+              <div className="pt-5 pb-6 px-4 flex justify-center items-center h-full">
+                <h3 className="text-xl font-bold text-gray-900 text-center">{materia.chrGrupo}</h3>
+              </div>
+            </div>
+          </Card>
         ))}
       </div>
     </div>

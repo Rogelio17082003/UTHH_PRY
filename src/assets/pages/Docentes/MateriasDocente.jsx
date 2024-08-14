@@ -7,20 +7,15 @@ import { useNavigate} from 'react-router-dom';
 import { Checkbox, Table, Alert, Tooltip, Badge, ToggleSwitch, Card} from 'flowbite-react';
 import { FaUser, FaCog, FaRegUser, FaRegEdit, FaRegEye, FaRegTrashAlt, FaEnvelope, FaCheck, FaTimes, FaEye, FaEyeSlash  } from 'react-icons/fa'; // Importa los iconos de FontAwesome
 import { IoMdAdd, IoMdCreate, IoMdTrash } from 'react-icons/io';
-import { HiOutlineSearch, HiOutlineExclamationCircle } from "react-icons/hi";
+import { FaRegFrown } from 'react-icons/fa';
 import { Label, TextInput, Button, Select, Modal } from "flowbite-react"; // Importamos el componente Button
 import * as XLSX from 'xlsx';
 import  Components from '../../components/Components'
-const { LoadingButton, CustomInput, CustomInputPassword, CustomRepeatPassword} = Components;
+const { LoadingButton, TitlePage} = Components;
 import { useAuth } from '../../server/authUser'; // Importa el hook de autenticación
 
 const Materias = () => { 
   const {userData} = useAuth(); // Obtén el estado de autenticación del contexto
-  const [carrera, setCarrera] = useState('');
-  const [materia, setMateria] = useState('');
-  const [periodo, setPeriodo] = useState('');
-  const [grado, setGrado] = useState('');
-  const [grupo, setGrupo] = useState('');
   const [materias, setMaterias] = useState([]);
   const [actividades, setActividades] = useState([]);
   const [alertMessage, setAlertMessage] = useState(null);
@@ -30,56 +25,6 @@ const Materias = () => {
   const [data, setData] = useState([]);
   const [header, setHeader] = useState([]);
   const [info, setInfo] = useState({});
-  
-  const onloadNaterias = async () => {
-    try {
-        
-      const response = await fetch('https://robe.host8b.me/WebServices/cargarMaterias.php', {
-          method: 'POST',
-          headers: {
-              'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            matriculaDocent: userData.vchMatricula
-          }),
-      });
-
-      const result = await response.json();
-  console.log(result);
-      if (result.done) {
-        setMaterias(result.message);
-
-        } else {
-
-          
-          console.error('Error en el registro:', result.message);
-
-          if (result.debug_info) {
-              console.error('Información de depuración:', result.debug_info);
-          }
-          if (result.errors) {
-              result.errors.forEach(error => {
-                  console.error('Error específico:', error);
-              });
-          }
-          setServerErrorMessage(result.message || 'Error en el servidor.');
-      }
-      
-  } catch (error) {
-      console.error('Error 500', error);
-      setTimeout(() => {
-          alert('¡Ay caramba! Encontramos un pequeño obstáculo en el camino, pero estamos trabajando para superarlo. Gracias por tu paciencia mientras solucionamos este problemita.'); 
-        }, 2000);
-  } finally {
-      setIsLoading(false);
-  }
-  };
-
-  useEffect(() => {
-    {
-      onloadNaterias()
-    }
-  }, []);
 
   const handleFileUpload = (event) => {
     const file = event.target.files[0];
@@ -361,6 +306,8 @@ const Materias = () => {
   
       if (result.done) 
       {
+        onloadNaterias(); // Llamar a la función para recargar las materias
+
         setAlertMessage({ type: 'success', text: 'Datos de estudiantes registrados correctamente' });
         console.log('Datos recibidos php:', result);
       }
@@ -382,6 +329,52 @@ const Materias = () => {
       setFile(null);
     }
   };
+
+  const onloadNaterias = async () => 
+    {
+      try 
+      {
+        const response = await fetch('https://robe.host8b.me/WebServices/cargarMaterias.php', 
+        {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              matriculaDocent: userData.vchMatricula
+            }),
+        });
+        const result = await response.json();
+        console.log(result);
+        if (result.done) 
+        {
+          setMaterias(result.message);
+        } 
+        else 
+        {
+          console.log('Error en el registro:', result.message);
+        }
+      } 
+      catch (error) 
+      {
+        console.error('Error 500', error);
+        setTimeout(() => 
+        {
+          alert('¡Ay caramba! Encontramos un pequeño obstáculo en el camino, pero estamos trabajando para superarlo. Gracias por tu paciencia mientras solucionamos este problemita.'); 
+        }, 2000);
+      } 
+      finally 
+      {
+        setIsLoading(false);
+      }
+    };
+  
+    useEffect(() => 
+    {
+      {
+        onloadNaterias()
+      }
+    }, []);
 
   const sendToDatabase = async () => {
     const actividadesData = actividades.map((activity, index) => {
@@ -543,52 +536,48 @@ const Materias = () => {
             Añadir Materias con actividades
         </Button> 
       </div>
-
-      <h1 className="text-2xl font-bold mb-4">Materias Asociadas</h1>
-      <div className="grid grid-cols-3 gap-4">
-
-      {materias.map((materia) => (
-    /*<a href={`/Admin/Materias/gruposMaterias/${materia.vchClvMateria}/${materia.intPeriodo}`}>
-    <div key={materia.vchClvMateria} className="bg-white shadow-md rounded-md p-4">
-            <h2 className="text-lg font-bold mb-2">{materia.vchClvMateria}</h2>
-            <p className="text-gray-600">{materia.vchNomMateria}</p>
-            <p className="text-sm text-gray-500 mt-2">
-              Cuatrimestre: {materia.intClvCuatrimestre}vo Cuatrimestre | Carrera: {materia.intClvCuatrimestre} ! Periodo: {materia.intPeriodo}
-            </p>
-          </div>
-        </a>
-        */
-
-        <>
-          <Card
-            key={materia.vchClvMateria}
-            href={`/Admin/Materias/gruposMaterias/${materia.vchClvMateria}/${materia.intPeriodo}`}
-            className="max-w-sm rounded-lg overflow-hidden shadow-lg p-0"
-            theme={{
-              root: {
-                children: "p-0",
-              }
-            }}
-          >
-            <div className="relative h-60 ">
-              <div className="bg-gray-200 Fotter p-2 h-1/2 flex flex-col items-center">
-                <div className="relative w-full flex justify-center">
-              
+      <TitlePage label="Materias Asociadas" />
+      {materias.length > 0 ? 
+      (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+          {materias.map((materia) => (
+            <Card
+              key={materia.vchClvMateria}
+              href={`/Admin/Materias/gruposMaterias/${materia.vchClvMateria}/${materia.intPeriodo}`}
+              className="max-w-sm rounded-lg overflow-hidden shadow-lg transform transition duration-300 hover:scale-105"
+              theme={{
+                root: {
+                  children: "p-0",
+                }
+              }}
+            >
+              <div className="relative h-60">
+                <div className="bg-gray-200 p-2 h-1/2 flex flex-col items-center justify-center">
+                  <div className="relative w-full flex justify-center">
+                    {/* Puedes agregar algo aquí si lo necesitas */}
+                  </div>
+                </div>
+                <div className="pt-5 pb-6 px-4">
+                  <h3 className="text-xl font-bold text-gray-900 text-center">{materia.vchNomMateria}</h3>
+                  <p className="text-sm text-gray-500 text-center">{materia.vchClvMateria}: {materia.vchNomMateria} {materia.intHoras} Horas</p>
+                  <p className="mt-1 text-sm text-gray-500 text-center">
+                    <strong>Periodo:</strong> {materia.intPeriodo}
+                  </p>
                 </div>
               </div>
-              <div className="pt-5 pb-6 px-4">
-                <h3 className="text-xl font-bold text-gray-900 text-center">{materia.vchNomMateria}</h3>
-                <p className="text-sm text-gray-500 text-center">{materia.vchClvMateria}: {materia.vchNomMateria} {materia.intHoras} Horas</p>
-                <p className="mt-1 text-sm text-gray-500 text-center">
-                  <strong>Periodo:</strong> {materia.intPeriodo}
-                </p>
-              </div>
-            </div>
-          </Card>
-</>
-        ))}
-      </div>
+            </Card>
+          ))}
+        </div>
+      ) 
+      : 
+      (
+        <div className="flex flex-col items-center justify-center h-64">
+          <FaRegFrown className="text-gray-500 text-6xl" />
+          <p className="text-gray-500 text-lg mt-4">No hay clases agregadas. Añade una clase para empezar.</p>
+        </div>
+      )}
     </div>
+
   );
 };
 
