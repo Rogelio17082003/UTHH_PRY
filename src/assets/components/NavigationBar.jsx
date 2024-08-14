@@ -13,6 +13,13 @@ const NavigationBar = ({ isSidebarOpen, toggleSidebar }) => {
   const { isAuthenticated, userData, logout } = useAuth(); // Obtén el estado de autenticación del contexto
   const [showMenu, setShowMenu] = useState(false);
 
+  const profileImageUrl = isAuthenticated && userData?.vchFotoPerfil
+    ? `https://robe.host8b.me/assets/imagenes/${userData.vchFotoPerfil}`
+    : 'https://robe.host8b.me/assets/imagenes/userProfile.png'; // Enlace alternativo cuando vchFotoPerfil es null o usuario no está autenticado
+
+// Usar profileImageUrl para el src de la imagen
+<img src={profileImageUrl} alt="Perfil" />
+
   const toggleMenu = () => {
     setShowMenu(!showMenu);
   };
@@ -62,17 +69,19 @@ const NavigationBar = ({ isSidebarOpen, toggleSidebar }) => {
             <Dropdown
                 arrowIcon={false}
                 inline
-                label={<Avatar alt="User settings" img="https://flowbite.com/docs/images/people/profile-picture-5.jpg" rounded />}
+                label={<Avatar alt="User settings" 
+                  img={profileImageUrl}
+                  rounded />}
             >
                 <Dropdown.Header>
                 <span className="block text-sm">{userData.vchNombre}</span>
                 <span className="block truncate text-sm font-medium">{userData.roles}</span>
                 <span className="block text-sm">{userData.vchCorreoElectronico}</span>
                 </Dropdown.Header>
-                <Dropdown.Item href="/ProfilePage">Mi Perfil</Dropdown.Item>
-                <Dropdown.Item>Ajustes</Dropdown.Item>
+                <Dropdown.Item href="/mi-perfil">Mi Perfil</Dropdown.Item>
+                {/*<Dropdown.Item>Ajustes</Dropdown.Item>
                 <Dropdown.Item href="/ResultadosCalificaciones">Busqueda Sencilla</Dropdown.Item>
-                <Dropdown.Item href="/BusquedaAvanzada">Busqueda Avanzada</Dropdown.Item>
+                <Dropdown.Item href="/BusquedaAvanzada">Busqueda Avanzada</Dropdown.Item>*/}
                 <Dropdown.Divider />
                 <Dropdown.Item onClick={logout}>Cerrar Sesion</Dropdown.Item>
             </Dropdown>
@@ -111,7 +120,7 @@ const NavigationBar = ({ isSidebarOpen, toggleSidebar }) => {
             </div>
     
             <div className="nav__section nav__button">
-              <Button className={`button  ${showMenu ? "button-menu-active" : "button-menu-disable"}`} onClick={() => navigate('/login')} variant="outlined">
+              <Button className={`button  ${showMenu ? "button-menu-active" : "button-menu-disable"}`} onClick={() => navigate('/inicio-sesion')} variant="outlined">
                 <HiUserCircle className="mr-2" /> Iniciar Sesión
               </Button>
             </div>

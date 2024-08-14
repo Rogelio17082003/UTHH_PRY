@@ -1,7 +1,7 @@
 // SideNav.js
 import React from 'react';
 import { Sidebar } from 'flowbite-react';
-import { HiChartPie, HiInbox, HiShoppingBag, HiUser } from 'react-icons/hi';
+import { HiUserGroup, HiBookOpen} from 'react-icons/hi';
 import { useAuth } from '../../server/authUser'; // Importar el hook de autenticación
 
 const SideNav = ({ isSidebarOpen, toggleSidebar }) => { 
@@ -17,29 +17,31 @@ const SideNav = ({ isSidebarOpen, toggleSidebar }) => {
       }}>
         <Sidebar.Items >
             <Sidebar.ItemGroup>
-            {isAuthenticated && userData.roles !=null? 
+            {isAuthenticated && userData.intRol !=null? 
             (
               <div>
-              <Sidebar.Item href="#" icon={HiChartPie}>
+              {/*<Sidebar.Item href="#" icon={HiChartPie}>
                 Panel de Administración
               </Sidebar.Item>
               <Sidebar.Collapse icon={HiShoppingBag} label="Docentes">
                 <Sidebar.Item href="/Admin/Teachers">Administrar Docentes</Sidebar.Item>
-                <Sidebar.Item href="#">Shipping</Sidebar.Item>
-              </Sidebar.Collapse>
-              <Sidebar.Item href="/Admin/Students" icon={HiInbox}>
-              Alumnos
+              </Sidebar.Collapse>*/}
+              <Sidebar.Item href="/alumnos" icon={HiUserGroup}>
+                Alumnos
               </Sidebar.Item>
-              <Sidebar.Item href="/Admin/Materias" icon={HiUser}>
-              Materias
+              <Sidebar.Item href="/docentes" icon={HiUserGroup}>
+                Docentes
+              </Sidebar.Item>
+              <Sidebar.Item href="/" icon={HiBookOpen}>
+                Materias
               </Sidebar.Item>
               </div>
             )
             :
             (<div>
-              <Sidebar.Collapse icon={HiShoppingBag} label="Materias Inscritas">
-                <Sidebar.Item href="/Materias">Materias</Sidebar.Item>
-                <Sidebar.Item href="/calendario-actividades">calendario de Actividades</Sidebar.Item>
+              <Sidebar.Collapse icon={HiBookOpen} label="Materias Inscritas">
+                <Sidebar.Item href="/">Materias</Sidebar.Item>
+                {/*<Sidebar.Item href="/calendario-actividades">calendario de Actividades</Sidebar.Item>*/}
               </Sidebar.Collapse>
             </div>
             )}

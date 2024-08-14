@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
-import { useAuth } from '../server/authUser'; // Importa el hook de autenticación
-import  Components from '../components/Components'
+import { useAuth } from '../../server/authUser'; // Importa el hook de autenticación
+import  Components from '../../components/Components'
 const {TitlePage, ContentTitle, Paragraphs, Link} = Components;
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import format from 'date-fns/format';

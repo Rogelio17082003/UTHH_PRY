@@ -163,7 +163,7 @@ const LoginPage = () => {
           </h1>
           <p className="text-sm text-gray-600 mb-4">
             Inicie su sitio web en segundos. ¿No tienes una cuenta?{' '}
-            <a href="/register" style={{ color: primaryColor }}>
+            <a href="/registro" style={{ color: primaryColor }}>
               Inscribirse
             </a>
           </p>
@@ -211,7 +211,7 @@ const LoginPage = () => {
                   Acuérdate de mí
                 </label>
               </div>
-              <a href="/recover-password" style={{ color: primaryColor }}>
+              <a href="/recuperar-contrasena" style={{ color: primaryColor }}>
                 ¿Olvidaste tu contraseña?
               </a>
             </div>

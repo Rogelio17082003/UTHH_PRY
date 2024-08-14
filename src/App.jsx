@@ -1,40 +1,34 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './assets/server/authUser';
 import Layout from './assets/components/Layout';
 import HomePage from './assets/pages/HomePage';
 import LoginPage from './assets/pages/LoginPage';
 import RegisterPage from './assets/pages/RegisterPage';
-import BusquedaAvanzada from './assets/pages/Admin/BusquedaAvanzada';
-//import ResultadosCalificacioness from './assets/pages/ResultadosCalificacioness';
+import ProfilePage from './assets/pages/ProfileUser';
 import EmailForm from './assets/pages/EmailForm';
 import ResetPassword from './assets/pages/ResetPassword';
 import ResetPasswordCode from './assets/pages/ResetPasswordCode';
-import AdminHome from './assets/pages/Admin/AdminHome';
-import Error404 from './assets/pages/Error404';
-import ProfilePage from './assets/pages/ProfileUser';
-import { AuthProvider, useAuth } from './assets/server/authUser';
-import AgregarAlumnos from './assets/pages/Docentes/AddStudents';
-import Docentes from './assets/pages/Docentes/Teachers';
-import MateriasAlum from './assets/pages/Admin/Mate';
-import Materias from './assets/pages/Docentes/MateriasDocente';
-import DetalleMateria from './assets/pages/Docentes/detalleMateria';
-import DetalleMateriaAlumno from './assets/pages/detalleMaterias';
-import GruposMaterias from './assets/pages/Docentes/gruposMaterias';
-import DetalleActividad from './assets/pages/Docentes/DetalleActividad';
-import Laplace from './assets/pages/Admin/Laplace';
-import MyCalendar from './assets/pages/Calendar';
-import ResultadosCalificaciones from './assets/pages/ResultadosCalificaciones';
-import Notificaciones from './assets/pages/Notificaciones';
-import DetallePractica from './assets/pages/Docentes/DetallePractica';
 import PrivacyPolicy from './assets/pages/Terminos';
+import Error404 from './assets/pages/Error404';
+//PAGINAS ALUMNO
+import ActividadesAlumno from './assets/pages/PaginasAlumnos/ActividadesAlumno';
+import DetalleActividadAlumno from './assets/pages/PaginasAlumnos/DetalleActividadAlumno';
+import DetallePracticaAlumno from './assets/pages/PaginasAlumnos/DetallePracticaAlumno';
+
+//PAGINAS DOCENTE
+import Docentes from './assets/pages/PaginasDocentes/Teachers';
+import Alumnos from './assets/pages/PaginasDocentes/Alumnos';
+import GruposMateriasDocente from './assets/pages/PaginasDocentes/GruposMateriaDocente';
+import ActividadesDocente from './assets/pages/PaginasDocentes/ActividadesDocente';
+import DetalleActividadDocente from './assets/pages/PaginasDocentes/DetalleActividadDocente';
+import DetallePracticaDocente from './assets/pages/PaginasDocentes/DetallePracticaDocente';
 
 // Importa los estilos de react-toastify
 import 'react-toastify/dist/ReactToastify.css';
 import './main'
 // Importa el ToastContainer y el método toast
 import { ToastContainer, toast } from 'react-toastify';
-
-
 
 import './App.css';
 
@@ -44,29 +38,29 @@ function App() {
     <AuthProvider>
       <Router>
         <Routes>
+          {/*PAGINAS PARA TODOS */}
           <Route path="/" element={<Layout><HomePage /></Layout>} />
-          <Route path="/login" element={<IsAuthenticated><LoginPage/></IsAuthenticated>} />
-          <Route path="/Terminos" element={<Layout><PrivacyPolicy/></Layout>} />
-          <Route path="/register" element={<IsAuthenticated><RegisterPage /></IsAuthenticated>} />
-          <Route path="/BusquedaAvanzada" element={<Layout><BusquedaAvanzada /></Layout>} />
-          <Route path="/recover-password" element={<Layout><EmailForm /></Layout>} />
-          <Route path="/Materias" element={<Layout><MateriasAlum /></Layout>} />
-          <Route path="/calendario-actividades" element={<Layout><MyCalendar/></Layout>} />
+          <Route path="/inicio-sesion" element={<IsAuthenticated><LoginPage/></IsAuthenticated>} />
+          <Route path="/registro" element={<IsAuthenticated><RegisterPage /></IsAuthenticated>} />
+          <Route path="/recuperar-contrasena" element={<Layout><EmailForm /></Layout>} />
           <Route path="/restablecer-contrasena/:matricula/:token/" element={<Layout><ResetPassword /></Layout>} />
+          <Route path="/mi-perfil/" element={<PrivateRouteUser><Layout><ProfilePage/></Layout></PrivateRouteUser>} />
           <Route path="/reset-password-code/:codigo/" element={<Layout><ResetPasswordCode/></Layout>} />
-          <Route path="/ProfilePage/" element={<PrivateRouteUser><Layout><ProfilePage/></Layout></PrivateRouteUser>} />
-          <Route path="/Notificaciones/" element={<Layout><Notificaciones/></Layout>} />
-          <Route path="/Admin/" element={<Layout><AdminHome/></Layout>} />
-          <Route path="/ResultadosCalificaciones" element={<PrivateRoute><Layout><ResultadosCalificaciones/></Layout></PrivateRoute>} />
-          <Route path="/Admin/Students" element={<PrivateRoute><Layout><AgregarAlumnos/></Layout></PrivateRoute>} />
+
+          {/*PAGINAS PARA Alumnos */}
+          <Route path="/actividades/:vchClvMateria/:chrGrupo/:intPeriodo" element={<PrivateRouteUser><Layout><ActividadesAlumno/></Layout></PrivateRouteUser>} />
+          <Route path="/actividades/detalleActividad/:vchClvMateria/:chrGrupo/:intPeriodo/:intNumeroActi/:intIdActividadCurso" element={<PrivateRouteUser><Layout><DetalleActividadAlumno/></Layout></PrivateRouteUser>} />
+          <Route path="/actividades/detalleActividad/detallePractica/:vchClvMateria/:chrGrupo/:intPeriodo/:intNumeroActi/:intNumeroPractica" element={<PrivateRouteUser><Layout><DetallePracticaAlumno/></Layout></PrivateRouteUser>} />
+          {/*PAGINAS PARA Docentes */}
+          <Route path="/alumnos" element={<PrivateRoute><Layout><Alumnos/></Layout></PrivateRoute>} />
+          <Route path="/docentes" element={<PrivateRoute><Layout><Docentes/></Layout></PrivateRoute>} />
           <Route path="/Admin/Teachers" element={<Layout><Docentes/></Layout>} />
-          <Route path="/Admin/Laplace" element={<Layout><Laplace/></Layout>} />
-          <Route path="/Materias/detalleMateria/:vchClvMateria/:chrGrupo/:intPeriodo" element={<Layout><DetalleMateriaAlumno/></Layout>} />
-          <Route path="/Admin/Materias" element={<Layout><Materias/></Layout>} />
-          <Route path="/Admin/Materias/gruposMaterias/:vchClvMateria/:intPeriodo" element={<Layout><GruposMaterias/></Layout>} />
-          <Route path="/Admin/Materias/detalleMateria/:vchClvMateria/:chrGrupo/:intPeriodo" element={<Layout><DetalleMateria/></Layout>} />
-          <Route path="/Admin/Materias/detalleActividad/:vchClvMateria/:chrGrupo/:intPeriodo/:intNumeroActi" element={<Layout><DetalleActividad/></Layout>} />
-          <Route path="/Admin/Detalle/:vchClvMateria/:chrGrupo/:intPeriodo/:intNumeroActi/:intNumeroPractica" element={<Layout><DetallePractica/></Layout>} />
+          <Route path="/gruposMaterias/:vchClvMateria/:intPeriodo" element={<PrivateRoute><Layout><GruposMateriasDocente/></Layout></PrivateRoute>} />
+          <Route path="/gruposMaterias/actividades/:vchClvMateria/:chrGrupo/:intPeriodo" element={<PrivateRoute><Layout><ActividadesDocente/></Layout></PrivateRoute>} />
+          <Route path="/gruposMaterias/actividades/detalleActividad/:vchClvMateria/:chrGrupo/:intPeriodo/:intNumeroActi/:intIdActividadCurso" element={<PrivateRoute><Layout><DetalleActividadDocente/></Layout></PrivateRoute>} />
+          <Route path="/gruposMaterias/actividades/detalleActividad/detallePractica/:vchClvMateria/:chrGrupo/:intPeriodo/:intNumeroActi/:intNumeroPractica" element={<PrivateRoute><Layout><DetallePracticaDocente/></Layout></PrivateRoute>} />
+
+          <Route path="/Terminos" element={<Layout><PrivacyPolicy/></Layout>} />
           <Route path="/*"element={<Layout><Error404/></Layout>}/>
         </Routes>
       </Router>

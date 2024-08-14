@@ -1,11 +1,13 @@
 // SideNav.js
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../server/authUser'; // Importa el hook de autenticación
-import { Card, Button } from 'flowbite-react';
+import { useParams } from 'react-router-dom';
+import { Card} from 'flowbite-react';
 
-const MateriasAlum = () => { 
+const GruposMaterias = () => { 
   const {userData} = useAuth(); // Obtén el estado de autenticación del contexto
   const [materias, setMaterias] = useState([]);
+  const { vchClvMateria, chrGrupo, intPeriodo } = useParams();
 
   const onloadNaterias = async () => {
     try {
@@ -15,11 +17,21 @@ const MateriasAlum = () => {
           headers: {
               'Content-Type': 'application/json',
           },
+
           body: JSON.stringify({
-            matriculaAlumn: userData.vchMatricula
+            clvMateria:vchClvMateria,
+            matriculaDocent: userData.vchMatricula,
+            chrGrupo: chrGrupo,
+            periodo:intPeriodo
           }),
       });
-
+      const requestData = {
+        clvMateria: vchClvMateria,
+        matriculaDocent: userData.vchMatricula,
+        chrGrupo: chrGrupo,
+        periodo: intPeriodo
+      };
+console.log("datods: ", requestData)
       const result = await response.json();
   console.log(result);
       if (result.done) {
@@ -59,39 +71,29 @@ const MateriasAlum = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold mb-4">Materias Asociadas</h1>
-      <div className="grid grid-cols-3 gap-4">
-
-      {materias.map((materia) => (
-        <Card
-        key={materia.vchClvMateria}
-        href={`/Materias/detalleMateria/${materia.vchClvMateria}/${userData.dataEstudiante.chrGrupo}/${materia.intPeriodo}`}
-        className="max-w-sm rounded-lg overflow-hidden shadow-lg"
-      >
-        <div className="flex justify-end px-4 pt-4">
-          {/* Aquí puedes agregar un menú desplegable si es necesario */}
-        </div>
-        <div className="flex flex-col items-center pb-6 px-4">
-          <img alt="User settings" 
-            src="https://flowbite.com/docs/images/people/profile-picture-5.jpg" 
-            className="w-24 h-24 rounded-full shadow-lg mb-3" 
-            data-testid="flowbite-avatar-img"
-          />
-          
-          <h3 className="mb-1 text-xl font-medium text-gray-900">{materia.vchNombre} {materia.vchAPaterno} {materia.vchAMaterno}</h3>
-          <p className="text-sm text-gray-500">{materia.vchClvMateria}: {materia.vchNomMateria} {materia.intHoras} Horas</p>
-          <p className="mt-1 text-sm text-gray-500">{materia.intClvCuatrimestre}{materia.chrGrupo}</p>
-          {/* Supongo que "Carrera" debería mostrar la carrera relacionada a la materia */}
-          <p className="mt-1 text-sm text-gray-500">
-            <strong>Periodo:</strong> {materia.vchPeriodo}
-          </p>
-        </div>
-      </Card>
-
+      <h1 className="text-2xl font-bold mb-4">Grupos inscritos en la Materia</h1>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        {materias.map((materia) => (
+          <Card
+            key={materia.chrGrupo}
+            href={`/materias/gruposMaterias/detalleMateria/${vchClvMateria}/${materia.chrGrupo}/${intPeriodo}`}
+            className="max-w-sm rounded-lg overflow-hidden shadow-lg transform transition duration-300 hover:scale-105"
+            theme={{
+              root: {
+                children: "p-0",
+              }
+            }}
+          >
+            <div className="relative h-40">
+              <div className="pt-5 pb-6 px-4 flex justify-center items-center h-full">
+                <h3 className="text-xl font-bold text-gray-900 text-center">{materia.chrGrupo}</h3>
+              </div>
+            </div>
+          </Card>
         ))}
       </div>
     </div>
   );
 };
 
-export default MateriasAlum;
+export default GruposMaterias;

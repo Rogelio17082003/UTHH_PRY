@@ -192,7 +192,7 @@ return (
                 </h1>
                 <p className="text-sm text-gray-600 mb-4">
                     Inicie su sitio web en segundos. Ya tienes una cuenta?{' '}
-                    <a href="/login" style={{ color: primaryColor }}>
+                    <a href="/inicio-sesion" style={{ color: primaryColor }}>
                         Iniciar Sesion
                     </a>
                 </p>

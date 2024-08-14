@@ -9,7 +9,7 @@ import { Tabs } from "flowbite-react";
 import { MdDescription, MdAssignment } from "react-icons/md";
 import { FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
 
-const { TitlePage, Paragraphs, TitleSection, LoadingButton, CustomInputOnchange, ContentTitle } = Components;
+const { TitlePage, Paragraphs, TitleSection, LoadingButton, CustomInputOnchange, ContentTitle, FloatingLabelInput } = Components;
 
 const DetallePractica = () => {
   const { intNumeroPractica } = useParams();
@@ -266,9 +266,11 @@ const DetallePractica = () => {
                 <TitleSection label="Instrucciones" />
                 <Paragraphs label={detalleActividad.vchInstrucciones} />
               </div>
+              {isAuthenticated && userData.roles != null && (
               <div className="grid grid-cols-1 gap-1 md:mb-0 rounded-lg bg-white p-4 shadow dark:bg-gray-800 sm:p-6 xl:p-8">
                 <div className="flex justify-between items-center">
                   <TitleSection label="Rúbrica de Evaluación" />
+                  
                   {isEditing ? (
                     <div className="flex gap-2">
                       <Tooltip content="Guardar" placement="left">
@@ -327,6 +329,7 @@ const DetallePractica = () => {
                     </div>
                   </div>
                 ))}
+
                 <div className="mt-6 flex justify-between items-center">
                   <div className="text-muted-foreground">Puntaje Total</div>
                   <div className="flex items-center gap-2">
@@ -337,6 +340,8 @@ const DetallePractica = () => {
                   </div>
                 </div>
               </div>
+        )}
+
             </div>
             <div className="md:w-1/4 md:flex flex-col">
               <div className="mb-4 rounded-lg bg-white p-4 shadow dark:bg-gray-800 sm:p-6 xl:p-8">
@@ -361,29 +366,29 @@ const DetallePractica = () => {
             </div>
           </div>
         </Tabs.Item>
+        {isAuthenticated && userData.roles != null && (
         <Tabs.Item title="Trabajos de los Alumnos" icon={MdAssignment}>
           <div className="flex flex-col md:flex-row gap-4">
             <div className='md:w-5/12 md:flex flex-col gap-y-4'>
               <div className="mb-4 md:mb-0 rounded-lg bg-white p-4 shadow dark:bg-gray-800 sm:p-6 xl:p-8">
                 <TitleSection label="Lista de Alumnos Calificados" />
-{/* Botón de seleccionar el alumno y mandar la matrícula */}
-{alumnos.map((alumno) => (
-  <div
-    className={`flex items-center justify-between cursor-pointer p-2 hover:bg-gray-100 dark:hover:bg-gray-700 ${alumno.TieneCalificacion ? 'text-green-500' : 'text-red-500'}`}
-    key={alumno.AlumnoMatricula}
-    onClick={() => handleAlumnoSelect(alumno.AlumnoMatricula)}
-  >
-    <Paragraphs
-      label={`${alumno.AlumnoMatricula} ${alumno.AlumnoNombre} ${alumno.AlumnoApellidoPaterno} ${alumno.AlumnoApellidoMaterno}`}
-    />
-    {alumno.TieneCalificacion ? (
-      <FaCheckCircle className="ml-2 text-lg" />
-    ) : (
-      <FaTimesCircle className="ml-2 text-lg" />
-    )}
-  </div>
-))}
-
+                {/* Botón de seleccionar el alumno y mandar la matrícula */}
+                {alumnos.map((alumno) => (
+                  <div
+                    className={`flex items-center justify-between cursor-pointer p-2 hover:bg-gray-100 dark:hover:bg-gray-700 ${alumno.TieneCalificacion ? 'text-green-500' : 'text-red-500'}`}
+                    key={alumno.AlumnoMatricula}
+                    onClick={() => handleAlumnoSelect(alumno.AlumnoMatricula)}
+                  >
+                    <Paragraphs
+                      label={`${alumno.AlumnoMatricula} ${alumno.AlumnoNombre} ${alumno.AlumnoApellidoPaterno} ${alumno.AlumnoApellidoMaterno}`}
+                    />
+                    {alumno.TieneCalificacion ? (
+                      <FaCheckCircle className="ml-2 text-lg" />
+                    ) : (
+                      <FaTimesCircle className="ml-2 text-lg" />
+                    )}
+                  </div>
+                ))}
               </div>
             </div>
             <div className="md:w-7/12 md:flex flex-col">
@@ -435,6 +440,7 @@ const DetallePractica = () => {
             </div>
           </div>
         </Tabs.Item>
+        )}
       </Tabs>
     </section>
   );

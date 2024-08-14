@@ -129,18 +129,18 @@ const registrarEstudiantes = async (alumnosData) =>
 
     if (result.done) 
     {
-      setAlertMessage({ type: 'success', text: 'Datos de estudiantes registrados correctamente' });
+      setAlertMessage({ type: 'info', text: 'Datos de estudiantes registrados correctamente' });
       console.log('Datos recibidos php:', result);
     }
     else
     {                
-      setAlertMessage({ type: 'error', text: 'Error al registrar estudiantes. Inténtalo de nuevo.' });
-      console.log('Datos recibidos php:', result);
+      setAlertMessage({ type: 'failure', text:  result.message+' Inténtalo de nuevo.' });
+      console.log('Datos recibidos php:', result.message);
     }
   } 
   catch (error) 
   {
-    setAlertMessage({ type: 'error', text: 'Error al conectar con el servidor. Inténtalo de nuevo más tarde.' });
+    setAlertMessage({ type: 'failure', text: 'Error al conectar con el servidor. Inténtalo de nuevo más tarde.' });
     console.error(error);
   }
   finally 
@@ -391,7 +391,7 @@ const registrarEstudiantes = async (alumnosData) =>
   return (
     <section className='flex flex-col'>
       {alertMessage && (
-        <Alert type={alertMessage.type} onClose={() => setAlertMessage(null)}>
+        <Alert color={alertMessage.type} onDismiss={() => setAlertMessage(null)}>
           {alertMessage.text}
         </Alert>
       )}

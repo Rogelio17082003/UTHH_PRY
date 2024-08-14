@@ -11,6 +11,9 @@ export default defineConfig({
     mimeTypes: {
       'application/javascript': ['js', 'jsx']
     }
+  },
+  optimizeDeps: {
+    exclude: ['xlsx-style']
   }
 });
 

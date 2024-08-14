@@ -10,9 +10,9 @@ import { IoMdAdd, IoMdCreate, IoMdTrash } from 'react-icons/io';
 import { FaRegFrown } from 'react-icons/fa';
 import { Label, TextInput, Button, Select, Modal } from "flowbite-react"; // Importamos el componente Button
 import * as XLSX from 'xlsx';
-import  Components from '../../components/Components'
+import  Components from '../../../components/Components'
 const { LoadingButton, TitlePage} = Components;
-import { useAuth } from '../../server/authUser'; // Importa el hook de autenticación
+import { useAuth } from '../../../server/authUser'; // Importa el hook de autenticación
 
 const Materias = () => { 
   const {userData} = useAuth(); // Obtén el estado de autenticación del contexto
@@ -543,7 +543,7 @@ const Materias = () => {
           {materias.map((materia) => (
             <Card
               key={materia.vchClvMateria}
-              href={`/Admin/Materias/gruposMaterias/${materia.vchClvMateria}/${materia.intPeriodo}`}
+              href={`/materias/gruposMaterias/${materia.vchClvMateria}/${materia.intPeriodo}`}
               className="max-w-sm rounded-lg overflow-hidden shadow-lg transform transition duration-300 hover:scale-105"
               theme={{
                 root: {

@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../server/authUser'; // Importa el hook de autenticación
+import { useAuth } from '../../server/authUser'; // Importa el hook de autenticación
 import { useParams } from 'react-router-dom';
 import { Tabs, Accordion } from "flowbite-react";
 import { HiAdjustments, HiClipboardList, HiUserCircle } from "react-icons/hi";
 import { MdDashboard } from "react-icons/md";
-import  Components from '../components/Components'
+import  Components from '../../components/Components'
 const {TitlePage, ContentTitle, Paragraphs, Link} = Components;
 
 const DetalleMateria = () => { 
@@ -84,7 +84,7 @@ const DetalleMateria = () => {
                   </Accordion.Content>
                   <Accordion.Content>
                     <Link 
-                      to={`/Admin/Materias/detalleActividad/${vchClvMateria}/${chrGrupo}/${intPeriodo}/${actividad.intClvActividad}`}
+                      to={`/materias/actividades/detalleActividad/${vchClvMateria}/${chrGrupo}/${intPeriodo}/${actividad.intClvActividad}`}
                       children="Ver Mas"
                     />
                   </Accordion.Content>

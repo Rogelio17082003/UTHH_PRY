@@ -322,7 +322,7 @@ const Materias = () => {
         <>
           <Card
             key={materia.vchClvMateria}
-            href={`/Admin/Materias/gruposMaterias/${materia.vchClvMateria}/${materia.intPeriodo}`}
+            href={`/materias/gruposMaterias/:vchClvMateria/:intPeriodo/${materia.vchClvMateria}/${materia.intPeriodo}`}
             className="max-w-sm rounded-lg overflow-hidden shadow-lg p-0"
             theme={{
               root: {
@@ -340,7 +340,7 @@ const Materias = () => {
                 <h3 className="text-xl font-bold text-gray-900 text-center">{materia.vchNomMateria}</h3>
                 <p className="text-sm text-gray-500 text-center">{materia.vchClvMateria}: {materia.vchNomMateria} {materia.intHoras} Horas</p>
                 <p className="mt-1 text-sm text-gray-500 text-center">
-                  <strong>Periodo:</strong> {materia.intPeriodo}
+                  <strong>Periossdo:</strong> {materia.intPeriodo}
                 </p>
               </div>
             </div>

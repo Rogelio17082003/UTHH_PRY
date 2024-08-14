@@ -30,7 +30,7 @@ const Docentes = () => {
   const [alumnosUpload, setAlumnosUpload] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const [openModalDelete, setOpenModalDelete] = useState(false);
-  const [openModalEdit, setOpenModalEdit] = useState(true);
+  const [openModalEdit, setOpenModalEdit] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [alertMessage, setAlertMessage] = useState(null);
   const [activeMenu, setActiveMenu] = useState(null);
@@ -646,16 +646,17 @@ const registrarEstudiantes = async (alumnosData) =>
       </Modal>
       <h1 className="m-3 text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl">Docentes</h1>
       <div className="w-full mb-4 md:mb-0 rounded-lg bg-white p-4 shadow dark:bg-gray-800 sm:p-6 xl:p-8 grid gap-4">
-        <div className="mb-2 block">
+        {/*<div className="mb-2 block">
           <Label htmlFor="email4" value="Buscar docente" />
-        </div>
+        </div>*/}
         <div className="flex items-center">
-          <TextInput id="email4" type="email" icon={HiOutlineSearch} placeholder="Matricula del Docente" required />
+          {/*<TextInput id="email4" type="email" icon={HiOutlineSearch} placeholder="Matricula del Docente" required />*/}
           <Button icon={IoMdAdd} className="ml-2" onClick={() => setOpenModal(true)}>
             <IoMdAdd className="mr-2 h-5 w-5" />
             Añadir Docentes
           </Button> 
         </div>
+        {/*
         <div>
           <h3 className="mb-2 text-base font-bold text-gray-900 dark:text-white">Consultar Docentes</h3>
           <div className='grid grid-cols-2 grid-rows-2 gap-4'>
@@ -715,6 +716,7 @@ const registrarEstudiantes = async (alumnosData) =>
             </div>
           </div>
         </div>
+        */}
         <div className="overflow-x-auto">
           <Table hoverable>
             <Table.Head>

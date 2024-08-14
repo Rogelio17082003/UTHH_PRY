@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import  Components from '../../components/Components'
+import  Components from '../../../components/Components'
 const {TitlePage, ContentTitle, Paragraphs, TitleSection, LoadingButton} = Components;
 import { Checkbox, Table, Alert, Tooltip, Badge, ToggleSwitch, Card, Button} from 'flowbite-react';
-import { useAuth } from '../../server/authUser'; // Importar el hook de autenticación
+import { useAuth } from '../../../server/authUser'; // Importar el hook de autenticación
 import { FaEdit, FaSave, FaTimes } from 'react-icons/fa';
 
 
