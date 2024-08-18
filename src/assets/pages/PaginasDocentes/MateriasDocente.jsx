@@ -7,7 +7,7 @@ import {FaRegFrown } from 'react-icons/fa';
 import {Button, Modal } from "flowbite-react"; // Importamos el componente Button
 import * as XLSX from 'xlsx';
 import  Components from '../../components/Components'
-const {LoadingButton, TitlePage} = Components;
+const {LoadingButton, TitlePage, Paragraphs} = Components;
 import {useAuth } from '../../server/authUser'; // Importa el hook de autenticación
 
 const MateriasDocente = () => { 
@@ -464,7 +464,7 @@ const MateriasDocente = () => {
         (
             <div className="flex flex-col items-center justify-center h-64">
             <FaRegFrown className="text-gray-500 text-6xl" />
-            <p className="text-gray-500 text-lg mt-4">No hay clases agregadas. Añade una clase para empezar.</p>
+            <Paragraphs label="No hay clases agregadas. Añade una clase para empezar." />
             </div>
         )}
         </div>

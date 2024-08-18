@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { Label, TextInput, Button, Select, Modal } from "flowbite-react"; // Importamos el componente Button
-
+import { HiOutlineExclamationCircle } from 'react-icons/hi';
 
 const TitlePage = ({ label }) => 
 {   
@@ -72,35 +72,28 @@ const LoadingButton = ({ isLoading, normalLabel, loadingLabel, className, ...res
     );
 };
 
-const FloatingLabelInput = ({
-    id,
-    label,
-    value,
-    onChange,
-    placeholder = '',
-    className = '',
-    ...props
-  }) => {
+const FloatingLabelInput = ({id, label, value, onChange, placeholder = '', className = '', ...props}) => 
+{
     return (
-      <div className={`relative ${className}`}>
-        <input
-          type="text"
-          id={id}
-          className="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border-1 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-          placeholder={placeholder}
-          value={value}
-          onChange={onChange}
-          {...props}
-        />
-        <label
-          htmlFor={id}
-          className="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white dark:bg-gray-900 px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1"
-        >
-          {label}
-        </label>
-      </div>
+        <div className={`relative ${className}`}>
+            <input
+            type="text"
+            id={id}
+            className="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border-1 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+            placeholder={placeholder}
+            value={value}
+            onChange={onChange}
+            {...props}
+            />
+            <label
+            htmlFor={id}
+            className="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white dark:bg-gray-900 px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1"
+            >
+            {label}
+            </label>
+        </div>
     );
-  };
+};
 
 const CustomInput = ({ label, value, name, errors, register, trigger, errorMessage, pattern }) => 
 {
@@ -385,6 +378,34 @@ const SelectInput =  ({ id, label, labelSelect, name, option, options, errors, r
     );
 };
 
+const ConfirmDeleteModal = ({ open, onClose, onConfirm, message }) => {
+    return (
+        <Modal show={open} size="md" onClose={onClose} popup>
+            <div className="fixed inset-0 flex items-center justify-center z-50">
+                <div className="relative w-full max-w-lg mx-4 bg-white rounded-lg shadow-lg">
+                    <Modal.Header />
+                    <Modal.Body>
+                        <div className="text-center">
+                            <HiOutlineExclamationCircle className="mx-auto mb-4 h-14 w-14 text-gray-400 dark:text-gray-200" />
+                            <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
+                                <span dangerouslySetInnerHTML={{ __html: message }} />
+                            </h3>
+                            <div className="flex justify-center gap-4">
+                                <Button color="failure" onClick={onConfirm}>
+                                    Sí, estoy seguro
+                                </Button>
+                                <Button color="gray" onClick={onClose}>
+                                    No, cancelar
+                                </Button>
+                            </div>
+                        </div>
+                    </Modal.Body>
+                </div>
+            </div>
+        </Modal>
+    );
+};
+
 export default {
     TitlePage,  
     TitleSection, 
@@ -397,5 +418,6 @@ export default {
     CustomInputPassword, 
     CustomRepeatPassword,
     CustomInputOnchange,
-    SelectInput
+    SelectInput,
+    ConfirmDeleteModal
 };

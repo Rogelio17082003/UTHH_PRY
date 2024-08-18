@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import Components from '../../components/Components';
 import { Tooltip } from 'flowbite-react';
 import { useAuth } from '../../server/authUser';
-import { FaEdit, FaSave, FaTimes } from 'react-icons/fa';
+import { FaEdit, FaSave, FaTimes, FaPlus, FaTrash} from 'react-icons/fa';
 import { useForm } from 'react-hook-form';
 import { Tabs } from "flowbite-react";
 import { MdDescription, MdAssignment } from "react-icons/md";
@@ -44,7 +44,7 @@ const DetallePracticaDocente = () => {
         alert('El puntaje total no puede exceder de 10 puntos.');
         return;
         }
-
+console.log("datos rubrica",editedData);
         try {
         const response = await fetch('https://robe.host8b.me/WebServices/cargarMaterias.php', {
             method: 'POST',
@@ -141,8 +141,6 @@ const DetallePracticaDocente = () => {
         }
     };
     
-    
-
     const handleCalificarClick = async () => {
         if (!selectedAlumnoMatricula) {
         alert('Selecciona un alumno antes de calificar.');
@@ -174,7 +172,6 @@ const DetallePracticaDocente = () => {
         }
     };
     
-
     const onloadAlumnos = async () => {
         try {
         const response = await fetch('https://robe.host8b.me/WebServices/accionesAlumnos.php', {
@@ -303,94 +300,130 @@ const DetallePracticaDocente = () => {
         );
     };
 
+    const handleAddRubro = () => {
+        const newRubro = {
+          // Otros campos necesarios para el rubro
+        };
+        setEditedData([...editedData, newRubro]);
+    };
+
+    // Función para eliminar un rubro por índice
+    const handleDeleteRubro = (index) => {
+        const updatedData = editedData.filter((_, i) => i !== index);
+        setEditedData(updatedData);
+    };
+
     return (
         <section className='w-full flex flex-col'>
         <TitlePage label={detalleActividad.vchNombre} />
         <Paragraphs className="ml-3" label={detalleActividad.vchDescripcion} />
         <Tabs>
             <Tabs.Item title="Instrucciones" icon={MdDescription}>
-            <div className="flex flex-col md:flex-row gap-4">
-                <div className='md:w-full md:flex flex-col gap-y-4'>
-                <div className="mb-4 md:mb-0 rounded-lg bg-white p-4 shadow dark:bg-gray-800 sm:p-6 xl:p-8">
-                    <TitleSection label="Instrucciones" />
-                    <Paragraphs label={detalleActividad.vchInstrucciones} />
-                </div>
-                <div className="grid grid-cols-1 gap-1 md:mb-0 rounded-lg bg-white p-4 shadow dark:bg-gray-800 sm:p-6 xl:p-8">
-                    <div className="flex justify-between items-center">
-                    <TitleSection label="Rúbrica de Evaluación" />
-                    
-                    {isEditing ? (
-                        <div className="flex gap-2">
-                        <Tooltip content="Guardar" placement="left">
-                            <FaSave className="text-gray-500 cursor-pointer" onClick={handleSaveClick} />
-                        </Tooltip>
-                        <Tooltip content="Cancelar" placement="left">
-                            <FaTimes className="text-gray-500 cursor-pointer" onClick={handleCancelClick} />
-                        </Tooltip>
+                <div className="flex flex-col md:flex-row gap-4">
+                    <div className='md:w-full md:flex flex-col gap-y-4'>
+                        <div className="mb-4 md:mb-0 rounded-lg bg-white p-4 shadow dark:bg-gray-800 sm:p-6 xl:p-8">
+                            <TitleSection label="Instrucciones" />
+                            <Paragraphs label={detalleActividad.vchInstrucciones} />
                         </div>
-                    ) : (
-                        <Tooltip content="Editar" placement="left">
-                        <FaEdit className="text-gray-500 cursor-pointer" onClick={handleEditClick} />
-                        </Tooltip>
-                    )}
-                    </div>
-                    {editedData.map((rubrica, index) => (
-                    <div key={index} className="space-y-4">
-                        <div className="grid grid-cols-2 items-center">
-                        <div className="text-muted-foreground">
+                        <div className="grid grid-cols-1 gap-1 md:mb-0 rounded-lg bg-white p-4 shadow dark:bg-gray-800 sm:p-6 xl:p-8">
+                            <div className="flex justify-between items-center">
+                            <TitleSection label="Rúbrica de Evaluación" />
+                            
                             {isEditing ? (
-                            <CustomInputOnchange
-                                label={`Rubro ${index + 1}`}
-                                type="text"
-                                name={`vchRubro_${index}`}
-                                value={rubrica.vchDescripcion || ''}
-                                errors={errors}
-                                register={register}
-                                trigger={trigger}
-                                onChange={(value) => handleInputChange(index, 'vchDescripcion', value)}
-                            />
+                                <div className="flex gap-2">
+                                <Tooltip content="Guardar" placement="left">
+                                    <FaSave className="text-gray-500 cursor-pointer" onClick={handleSaveClick} />
+                                </Tooltip>
+                                <Tooltip content="Cancelar" placement="left">
+                                    <FaTimes className="text-gray-500 cursor-pointer" onClick={handleCancelClick} />
+                                </Tooltip>
+                                </div>
                             ) : (
-                            <p>{rubrica.vchDescripcion}</p>
+                                <Tooltip content="Editar" placement="left">
+                                <FaEdit className="text-gray-500 cursor-pointer" onClick={handleEditClick} />
+                                </Tooltip>
                             )}
-                        </div>
-                        <div className="flex items-center justify-end gap-2">
-                            {isEditing ? (
-                            <CustomInputOnchange
-                                label={`Valor ${index + 1}`}
-                                type="number"
-                                name={`intValor_${index}`}
-                                value={rubrica.intValor || ''}
-                                pattern={/^[0-9]+$/}
-                                errorMessage="El valor debe ser un número"
-                                errors={errors}
-                                register={register}
-                                trigger={trigger}
-                                onChange={(value) => handleInputChange(index, 'intValor', value)}
-                            />
-                            ) : (
-                            <span className="font-semibold">{rubrica.intValor}</span>
+                            </div>
+                            
+                            {editedData.map((rubrica, index) => (
+                            <div key={index} className="space-y-4">
+                                <div className="grid grid-cols-2 items-center">
+                                <div className="text-muted-foreground">
+                                    {isEditing ? (
+                                    <CustomInputOnchange
+                                        label={`Rubro ${index + 1}`}
+                                        type="text"
+                                        name={`vchRubro_${index}`}
+                                        value={rubrica.vchDescripcion || ''}
+                                        errors={errors}
+                                        register={register}
+                                        trigger={trigger}
+                                        onChange={(value) => handleInputChange(index, 'vchDescripcion', value)}
+                                    />
+                                    ) : (
+                                    <p>{rubrica.vchDescripcion}</p>
+                                    )}
+                                </div>
+                                <div className="flex items-center justify-end gap-2">
+                                    {isEditing ? (
+                                    <>
+                                    <CustomInputOnchange
+                                        label={`Valor ${index + 1}`}
+                                        type="number"
+                                        name={`intValor_${index}`}
+                                        value={rubrica.intValor || ''}
+                                        pattern={/^[0-9]+$/}
+                                        errorMessage="El valor debe ser un número"
+                                        errors={errors}
+                                        register={register}
+                                        trigger={trigger}
+                                        onChange={(value) => handleInputChange(index, 'intValor', value)}
+                                    />
+                                    <Tooltip content="Eliminar rubro">
+                                        <button
+                                        type="button"
+                                        className="text-red-500 hover:text-red-700"
+                                        onClick={() => handleDeleteRubro(index)}
+                                        >
+                                        <FaTrash />
+                                        </button>
+                                    </Tooltip>
+                                    </>
+                                    ) : (
+                                    <span className="font-semibold">{rubrica.intValor}</span>
+                                    )}
+                                    {isAuthenticated && !userData.roles && !isEditing && (
+                                    <span className="text-muted-foreground">/{rubrica.intValor}</span>
+                                    )}
+                                </div>
+                                </div>
+                            </div>
+                            ))}
+                            {isEditing && (
+                                <Tooltip content="Agregar nuevo rubro">
+                                    <button
+                                    type="button"
+                                    className="mt-4 flex items-center justify-center px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                                    onClick={handleAddRubro}
+                                    >
+                                    <FaPlus className="mr-2" />
+                                    Agregar Rubro
+                                    </button>
+                                </Tooltip>
                             )}
-                            {isAuthenticated && !userData.roles && !isEditing && (
-                            <span className="text-muted-foreground">/{rubrica.intValor}</span>
-                            )}
-                        </div>
-                        </div>
-                    </div>
-                    ))}
 
-                    <div className="mt-6 flex justify-between items-center">
-                    <div className="text-muted-foreground">Puntaje Total</div>
-                    <div className="flex items-center gap-2">
-                        {isAuthenticated && !userData.roles && (
-                        <span className="text-muted-foreground">{puntajeTotal}</span>
-                        )}
-                        <span className="font-semibold text-2xl">{puntajeTotal}</span>
-                    </div>
+                            <div className="mt-6 flex justify-between items-center">
+                            <div className="text-muted-foreground">Puntaje Total</div>
+                            <div className="flex items-center gap-2">
+                                {isAuthenticated && !userData.roles && (
+                                <span className="text-muted-foreground">{puntajeTotal}</span>
+                                )}
+                                <span className="font-semibold text-2xl">{puntajeTotal}</span>
+                            </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-
-                </div>
-            </div>
             </Tabs.Item>
             <Tabs.Item title="Trabajos de los Alumnos" icon={MdAssignment}>
             <div className="flex flex-col md:flex-row gap-4">

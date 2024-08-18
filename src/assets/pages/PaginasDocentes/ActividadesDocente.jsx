@@ -570,52 +570,72 @@ const ActividadesDocente = () => {
     };
 
     return (
-        <section className='w-full flex flex-col'>
-        <TitlePage label="Trabajo de clase" />
-        <div className="mb-4 md:mb-0 rounded-lg bg-white p-4 shadow dark:bg-gray-800 sm:p-6 xl:p-8">
-            <Tabs aria-label="Tabs with underline" style="underline">
-            <Tabs.Item active title="Actividades" icon={HiClipboardList}>
-                {Object.entries(groupedActivities).map(([parcial, activities]) => (
-                <div key={parcial}>
-                    
-                    <TitleSection label={'Parcial '+ parcial} />
-                    <button onClick={() => fetchAndGenerateExcel(parcial)} disabled={loading}>
-                    {loading ? 'Generando Excel...' : `Generar Excel ${'Parcial ' + parcial}`}
-                    </button>
-                    <Accordion collapseAll>
-                    {activities.map((actividad) => (
-                        <Accordion.Panel key={actividad.intClvActividad}>
-                        <Accordion.Title>
-                            <ContentTitle label={actividad.vchNomActivi} />
-                        </Accordion.Title>
-                        <Accordion.Content>
-                            <Paragraphs label={actividad.vchDescripcion} />
-                            <Paragraphs label={`Valor: ${actividad.fltValor} puntos`} />
-                        </Accordion.Content>
-                        <Accordion.Content>
-                            <Link
-                            to={`/gruposMaterias/actividades/detalleActividad/${vchClvMateria}/${chrGrupo}/${intPeriodo}/${actividad.intClvActividad}/${actividad.intIdActividadCurso}`}
-                            children="Ver Más"
-                            />
-                        </Accordion.Content>
-                        </Accordion.Panel>
+        <section className="w-full flex flex-col">
+            <TitlePage label="Trabajo de clase" />
+            <div className="mb-4 md:mb-0 rounded-lg bg-white p-4 shadow dark:bg-gray-800 sm:p-6 xl:p-8">
+                <Tabs aria-label="Tabs with underline" style="underline">
+                    <Tabs.Item 
+                    active 
+                    title="Actividades" 
+                    icon={HiClipboardList}
+                    className="w-full sm:w-auto" // Hacer que el tab ocupe todo el ancho en móviles
+                    >
+                    {Object.entries(groupedActivities).map(([parcial, activities]) => (
+                        <div key={parcial}>
+                        <TitleSection label={`Parcial ${parcial}`} />
+                        <button 
+                            onClick={() => fetchAndGenerateExcel(parcial)} 
+                            disabled={loading}
+                            className="mt-2 w-full sm:w-auto px-4 py-2 bg-blue-600 text-white rounded-md"
+                        >
+                            {loading ? 'Generando Excel...' : `Generar Excel ${parcial}`}
+                        </button>
+                        <Accordion collapseAll>
+                            {activities.map((actividad) => (
+                            <Accordion.Panel key={actividad.intClvActividad}>
+                                <Accordion.Title>
+                                <ContentTitle label={actividad.vchNomActivi} />
+                                </Accordion.Title>
+                                <Accordion.Content>
+                                <Paragraphs label={actividad.vchDescripcion} />
+                                <Paragraphs label={`Valor: ${actividad.fltValor} puntos`} />
+                                </Accordion.Content>
+                                <Accordion.Content>
+                                <Link
+                                    to={`/gruposMaterias/actividades/detalleActividad/${vchClvMateria}/${chrGrupo}/${intPeriodo}/${actividad.intClvActividad}/${actividad.intIdActividadCurso}`}
+                                    className="text-blue-500 underline"
+                                >
+                                    Ver Más
+                                </Link>
+                                </Accordion.Content>
+                            </Accordion.Panel>
+                            ))}
+                        </Accordion>
+                        </div>
                     ))}
-                    </Accordion>
-                </div>
-                ))}
-            </Tabs.Item>
-            <Tabs.Item title="Alumnos" icon={HiUserGroup}>
-                <TitlePage label="Alumnos" />
-                <div className="p-4">
-                {alumnos.map((alumnos) => (
-                    <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }} key={alumnos.AlumnoMatricula}>
-                    <Paragraphs className="mb-0" label={`${alumnos.AlumnoMatricula} - ${alumnos.AlumnoNombre} ${alumnos.AlumnoApellidoPaterno} ${alumnos.AlumnoApellidoMaterno}`} />
+                    </Tabs.Item>
+                    <Tabs.Item 
+                    title="Alumnos" 
+                    icon={HiUserGroup}
+                    className="w-full sm:w-auto" // Hacer que el tab ocupe todo el ancho en móviles
+                    >
+                    <TitlePage label="Alumnos" />
+                    <div className="p-4">
+                        {alumnos.map((alumnos) => (
+                        <div 
+                            key={alumnos.AlumnoMatricula} 
+                            className="flex items-center mb-2"
+                        >
+                            <Paragraphs 
+                            className="mb-0" 
+                            label={`${alumnos.AlumnoMatricula} - ${alumnos.AlumnoNombre} ${alumnos.AlumnoApellidoPaterno} ${alumnos.AlumnoApellidoMaterno}`} 
+                            />
+                        </div>
+                        ))}
                     </div>
-                ))}
-                </div>
-            </Tabs.Item>
-            </Tabs>
-        </div>
+                    </Tabs.Item>
+                </Tabs>
+            </div>
         </section>
     );
 };

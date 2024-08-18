@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import  Components from '../../components/Components'
-const {TitlePage, ContentTitle, Paragraphs, TitleSection, LoadingButton, SelectInput, FloatingLabelInput} = Components;
+const {TitlePage, ContentTitle, Paragraphs, TitleSection, LoadingButton, SelectInput, FloatingLabelInput, ConfirmDeleteModal} = Components;
 import {Card} from 'flowbite-react';
 import * as XLSX from 'xlsx';
 import { useForm } from 'react-hook-form';
-import { FaRegFrown } from 'react-icons/fa';
-import { Pagination } from "flowbite-react";
+import { FaRegFrown, FaEllipsisV, FaEdit, FaInfoCircle, FaTrash } from 'react-icons/fa';
+import { Pagination, Tooltip  } from "flowbite-react";
 
 const DetalleActividadDocente = () => {
     const { vchClvMateria, chrGrupo, intPeriodo, intNumeroActi, intIdActividadCurso } = useParams();
@@ -17,7 +17,23 @@ const DetalleActividadDocente = () => {
     const [practicasCount, setPracticasCount] = useState(0);
     const [arregloPracticas, setArregloPracticas] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
-    
+    const [isMenuOpen, setIsMenuOpen] = useState(null);
+    const [openModalDelete, setOpenModalDelete] = useState(false);
+
+    const handleConfirmDelete = () => {
+        // Lógica para eliminar al estudiante
+        setOpenModalDelete(false);
+    };
+
+    const toggleActionsMenu = (idPractica) => {
+        if (isMenuOpen === idPractica) {
+        // Si el mismo menú está abierto, ciérralo
+        setIsMenuOpen(null);
+        } else {
+        // Abre el menú clickeado y cierra los demás
+        setIsMenuOpen(idPractica);
+        }
+    };
 
     const fetchActividad = async () => 
         {
@@ -206,162 +222,218 @@ const DetalleActividadDocente = () => {
 
     return (
         <section className='w-full flex flex-col'>
-        <div className="m-3 flex flex-col">
-        <TitlePage label={actividad.Nombre_Actividad} />
-        <Paragraphs label={actividad.Descripcion_Actividad} />
-        </div>
-        <div className="flex flex-col md:flex-row">
-        <div className='md:w-1/2 md:mr-4 flex flex-col gap-y-4 mb-3'>
-            <section className="h-full rounded-lg bg-white p-4 shadow dark:bg-gray-800 sm:p-6 xl:p-8">
-            <TitleSection label="Subir Rúbricas" />
-            <div className="w-full flex flex-col gap-4 p-4">
-                <div className="w-full">
-                <input
-                    type="file"
-                    className="block w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 cursor-pointer dark:text-gray-400 focus:outline-none dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400"
-                    onChange={handleFileUpload}
-                />
-                </div>
-                {file && (
-                <>
-                <div className="w-full flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                <div className="flex-1">
-                    <SelectInput
-                    id="value"
-                    labelSelect="Seleccionar cuantas practicas deseas insertar:"
-                    label="Número de Prácticas"
-                    name="value"
-                    options={numPracticasInsert}
-                    errors={errors}
-                    register={register}
-                    trigger={trigger}
-                    onChange={handleSelectChange}
-                    pattern=""
-                    className="w-full"
-                    />
-                </div>
-                </div>
+            <ConfirmDeleteModal
+                open={openModalDelete}
+                onClose={() => setOpenModalDelete(false)}
+                onConfirm={handleConfirmDelete}
+                message="¿Estás seguro de que deseas eliminar a esta práctica?<br />También se eliminarán las calificaciones."
+            />
 
-                <div className="w-full flex flex-col gap-4 md:gap-6 mt-4">
-                <ul className="space-y-4">
-                    {currentItems.map((practica, index) => {
-                    // Calcula el índice global para las prácticas
-                    const globalIndex = (currentPage - 1) * itemsPerPage + index + 1;
-                    return (
-                        <li key={globalIndex} className="space-y-4">
-                        <FloatingLabelInput
-                            id={`titulo_${globalIndex}`}
-                            label={`Título ${globalIndex} (Obligatorio)`}
-                            value={practica.titulo}
-                            onChange={(e) => handleInputChange(index + (currentPage - 1) * itemsPerPage, 'titulo', e.target.value)}
-                        />
-                        <FloatingLabelInput
-                            id={`descripcion_${globalIndex}`}
-                            label={`Descripción ${globalIndex} (Obligatorio)`}
-                            value={practica.descripcion}
-                            onChange={(e) => handleInputChange(index + (currentPage - 1) * itemsPerPage, 'descripcion', e.target.value)}
-                        />
-                        <FloatingLabelInput
-                            id={`instrucciones_${globalIndex}`}
-                            label={`Instrucciones ${globalIndex} (Opcional)`}
-                            value={practica.instrucciones}
-                            onChange={(e) => handleInputChange(index + (currentPage - 1) * itemsPerPage, 'instrucciones', e.target.value)}
-                        />
-                        </li>
-                    );
-                    })}
-                </ul>
-                {currentItems.length > 0 && (
-                    <>
-                    <Pagination
-                        currentPage={currentPage}
-                        layout="pagination"
-                        onPageChange={onPageChange}
-                        totalPages={totalPages}
-                        previousLabel="Anterior"
-                        nextLabel="Siguiente"
-                        showIcons={true}
-                    />
-                    </>
-                )}
-                </div>
-
-                {currentItems.length > 0 && (
-                <>
-                <div className="w-full flex justify-center md:justify-end mt-4">
-                <LoadingButton
-                    className="w-full md:w-auto h-11"
-                    loadingLabel="Cargando..."
-                    normalLabel="Agregar"
-                    onClick={handleAddData}
-                />
-                </div>
-                </>
-                )}
-                </>
-                )}
+            <div className="m-3 flex flex-col">
+            <TitlePage label={actividad.Nombre_Actividad} />
+            <Paragraphs label={actividad.Descripcion_Actividad} />
             </div>
-            </section>
-        </div>
-        <div className='md:w-1/2 flex flex-col gap-y-4'>
-            <section className="rounded-lg bg-white p-4 shadow dark:bg-gray-800 sm:p-6 xl:p-8">
-            <TitleSection label="Detalles de la Actividad" />
-            <address className="text-sm font-normal not-italic text-gray-500 dark:text-gray-400 mt-3">
-                <div>
-                <ContentTitle label="Fecha de Solicitud: " />
-                <Paragraphs label={actividad.Fecha_Solicitud} />
+
+            <div className="flex flex-col md:flex-row">
+                <div className='md:w-1/2 md:mr-4 flex flex-col gap-y-4 mb-3'>
+                    <section className="h-full rounded-lg bg-white p-4 shadow dark:bg-gray-800 sm:p-6 xl:p-8">
+                    <TitleSection label="Subir Rúbricas" />
+                    <div className="w-full flex flex-col gap-4 p-4">
+                        <div className="w-full">
+                        <input
+                            type="file"
+                            className="block w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 cursor-pointer dark:text-gray-400 focus:outline-none dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400"
+                            onChange={handleFileUpload}
+                        />
+                        </div>
+                        {file && (
+                        <>
+                        <div className="w-full flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                        <div className="flex-1">
+                            <SelectInput
+                            id="value"
+                            labelSelect="Seleccionar cuantas practicas deseas insertar:"
+                            label="Número de Prácticas"
+                            name="value"
+                            options={numPracticasInsert}
+                            errors={errors}
+                            register={register}
+                            trigger={trigger}
+                            onChange={handleSelectChange}
+                            pattern=""
+                            className="w-full"
+                            />
+                        </div>
+                        </div>
+
+                        <div className="w-full flex flex-col gap-4 md:gap-6 mt-4">
+                        <ul className="space-y-4">
+                            {currentItems.map((practica, index) => {
+                            // Calcula el índice global para las prácticas
+                            const globalIndex = (currentPage - 1) * itemsPerPage + index + 1;
+                            return (
+                                <li key={globalIndex} className="space-y-4">
+                                <FloatingLabelInput
+                                    id={`titulo_${globalIndex}`}
+                                    label={`Título ${globalIndex} (Obligatorio)`}
+                                    value={practica.titulo}
+                                    onChange={(e) => handleInputChange(index + (currentPage - 1) * itemsPerPage, 'titulo', e.target.value)}
+                                />
+                                <FloatingLabelInput
+                                    id={`descripcion_${globalIndex}`}
+                                    label={`Descripción ${globalIndex} (Obligatorio)`}
+                                    value={practica.descripcion}
+                                    onChange={(e) => handleInputChange(index + (currentPage - 1) * itemsPerPage, 'descripcion', e.target.value)}
+                                />
+                                <FloatingLabelInput
+                                    id={`instrucciones_${globalIndex}`}
+                                    label={`Instrucciones ${globalIndex} (Opcional)`}
+                                    value={practica.instrucciones}
+                                    onChange={(e) => handleInputChange(index + (currentPage - 1) * itemsPerPage, 'instrucciones', e.target.value)}
+                                />
+                                </li>
+                            );
+                            })}
+                        </ul>
+                        {currentItems.length > 0 && (
+                            <>
+                            <Pagination
+                                currentPage={currentPage}
+                                layout="pagination"
+                                onPageChange={onPageChange}
+                                totalPages={totalPages}
+                                previousLabel="Anterior"
+                                nextLabel="Siguiente"
+                                showIcons={true}
+                            />
+                            </>
+                        )}
+                        </div>
+
+                        {currentItems.length > 0 && (
+                        <>
+                        <div className="w-full flex justify-center md:justify-end mt-4">
+                        <LoadingButton
+                            className="w-full md:w-auto h-11"
+                            loadingLabel="Cargando..."
+                            normalLabel="Agregar"
+                            onClick={handleAddData}
+                        />
+                        </div>
+                        </>
+                        )}
+                        </>
+                        )}
+                    </div>
+                    </section>
                 </div>
-                <div>
-                <ContentTitle label="Fecha de Entrega: " />
-                <Paragraphs label={actividad.Fecha_Entrega} />
-                </div>
-                <div>
-                <ContentTitle label="Valor de la Actividad: " />
-                <Paragraphs label={actividad.Valor_Actividad} />
-                </div>
-                <div>
-                <ContentTitle label="Clave de Instrumento:" />
-                <Paragraphs label={actividad.Clave_Instrumento} />
-                </div>
-                <div>
-                <ContentTitle label="Modalidad:" />
-                <Paragraphs label={actividad.Modalidad} />
-                </div>
-            </address>
-            </section>
-        </div>
-        </div>
-        <div className="container mt-8">
-        <TitlePage label="Practicas" />
-        <>
-    {practicas ? (
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {practicas.map((practica) => (
-            <Card
-            key={practica.idPractica}
-            href={`/gruposMaterias/actividades/detalleActividad/detallePractica/${vchClvMateria}/${chrGrupo}/${intPeriodo}/${intNumeroActi}/${practica.idPractica}`}
-            className="rounded-lg overflow-hidden shadow-lg p-0"
-            theme={{ root: { children: "p-0" } }}
-            >
-            <div className="relative h-36">
-                <div className="pt-5 pb-6 px-4">
-                <h3 className="text-xl font-bold text-gray-900 text-center">{practica.vchNombre}</h3>
-                <p className="text-sm text-gray-500 text-center">{practica.vchDescripcion}</p>
+                <div className='md:w-1/2 flex flex-col gap-y-4'>
+                    <section className="rounded-lg bg-white p-4 shadow dark:bg-gray-800 sm:p-6 xl:p-8">
+                    <TitleSection label="Detalles de la Actividad" />
+                    <address className="text-sm font-normal not-italic text-gray-500 dark:text-gray-400 mt-3">
+                        <div>
+                        <ContentTitle label="Fecha de Solicitud: " />
+                        <Paragraphs label={actividad.Fecha_Solicitud} />
+                        </div>
+                        <div>
+                        <ContentTitle label="Fecha de Entrega: " />
+                        <Paragraphs label={actividad.Fecha_Entrega} />
+                        </div>
+                        <div>
+                        <ContentTitle label="Valor de la Actividad: " />
+                        <Paragraphs label={actividad.Valor_Actividad} />
+                        </div>
+                        <div>
+                        <ContentTitle label="Clave de Instrumento:" />
+                        <Paragraphs label={actividad.Clave_Instrumento} />
+                        </div>
+                        <div>
+                        <ContentTitle label="Modalidad:" />
+                        <Paragraphs label={actividad.Modalidad} />
+                        </div>
+                    </address>
+                    </section>
                 </div>
             </div>
-            </Card>
-        ))}
-        </section>
-    ) : (
-        <section className="flex flex-col items-center justify-center w-full h-64">
-        <FaRegFrown className="text-gray-500 text-6xl" />
-        <div className="text-center text-gray-500 dark:text-gray-400">
-            No hay actividades o prácticas disponibles.
-        </div>
-        </section>
-    )}
-    </>
-        </div>
+
+            <div className="container mt-8">
+                <TitlePage label="Practicas" />
+                <>
+                {practicas ? (
+                    <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {practicas.map((practica) => (
+                    <div className=" bg-white relative rounded-lg overflow-hidden shadow-lg p-0 cursor-pointer">
+                        <div className="absolute top-2 right-2 z-10">
+                            <Tooltip content="Acciones" placement="left">
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation(); // Evita que el clic en el botón de menú active el clic en el enlace
+                                        toggleActionsMenu(practica.idPractica); // Alterna la visibilidad del menú
+                                    }}
+                                    className="p-2 bg-white rounded-full hover:bg-gray-100 focus:outline-none"
+                                >
+                                    <FaEllipsisV className="text-gray-600" />
+                                </button>
+                            </Tooltip>
+                            {isMenuOpen === practica.idPractica && (
+                                <div className="absolute top-8 right-0 z-20 w-32 bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600">
+                                    <ul className="py-1 text-sm">
+                                        <li>
+                                            <button
+                                                type="button"
+                                                onClick={(e) => {
+                                                    e.stopPropagation(); // Evita que el clic en el botón de menú active el clic en el enlace
+                                                    // Aquí puedes abrir el modal para editar
+                                                    console.log('Editar');
+                                                }}
+                                                className="flex w-full items-center py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white text-gray-700 dark:text-gray-200"
+                                            >
+                                                <FaEdit className="w-4 h-4 mr-2" aria-hidden="true" />
+                                                Editar
+                                            </button>
+                                        </li>
+                                        <li>
+                                            <button
+                                                type="button"
+                                                onClick={(e) => {
+                                                    e.stopPropagation(); // Evita que el clic en el botón de menú active el clic en el enlace
+                                                    setOpenModalDelete(true); // Maneja el clic para abrir el modal de eliminar
+                                                    console.log('Eliminar');
+                                                }}
+                                                className="flex w-full items-center py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 text-red-500 dark:hover:text-red-400"
+                                            >
+                                                <FaTrash className="w-4 h-4 mr-2" aria-hidden="true" />
+                                                Eliminar
+                                            </button>
+                                        </li>
+                                    </ul>
+                                </div>
+                            )}
+                        </div>
+                        <a
+                            href={`/gruposMaterias/actividades/detalleActividad/detallePractica/${vchClvMateria}/${chrGrupo}/${intPeriodo}/${intNumeroActi}/${practica.idPractica}`}
+                            className="block h-36"
+                        >
+                            <div className="relative h-full">
+                                <div className="pt-5 pb-6 px-4">
+                                    <h3 className="text-xl font-bold text-gray-900 text-center">{practica.vchNombre}</h3>
+                                    <p className="text-sm text-gray-500 text-center">{practica.vchDescripcion}</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    ))}
+                    </section>
+                ) : (
+                    <section className="flex flex-col items-center justify-center w-full h-64">
+                        <FaRegFrown className="text-gray-500 text-6xl" />
+                        <div className="text-center text-gray-500 dark:text-gray-400">
+                            No hay actividades o prácticas disponibles.
+                        </div>
+                    </section>
+                )}
+                </>
+            </div>
         </section>
     );
 };

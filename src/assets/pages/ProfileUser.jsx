@@ -324,7 +324,8 @@ const PerfilUsuario = () => {
 
               </div>
               <div className='ml-px	'>
-                <h2 className="text-xl font-bold dark:text-white">{userData.vchNombre} {userData.vchAPaterno} {userData.vchAMaterno}</h2>
+              <TitleSection label={`${userData.vchNombre} ${userData.vchAPaterno} ${userData.vchAMaterno}`} />
+              <h2 className="text-xl font-bold dark:text-white"></h2>
                 <ul className="mt-2 space-y-1">
                   <li className="flex items-center text-sm font-normal text-gray-500 dark:text-gray-400">
                     <FaUserTag className="mr-2 text-lg text-gray-900 dark:text-gray-100" />

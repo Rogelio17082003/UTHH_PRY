@@ -9,12 +9,6 @@ function FooterSection() {
         <div className="w-full">
           <div className="grid w-full justify-between sm:flex sm:justify-between md:flex md:grid-cols-1">
             <div>
-            {/*  <Footer.Brand
-                href="https://robe.host8b.me"
-                src={SecondaryLogo}
-                alt="UTHH Logo"
-                name="UTHH VIRTUAL"
-    />*/}
               <img
                   src={SecondaryLogo}
                   alt="Company Logo"
