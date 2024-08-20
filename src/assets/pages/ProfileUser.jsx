@@ -329,7 +329,7 @@ const PerfilUsuario = () => {
                 <ul className="mt-2 space-y-1">
                   <li className="flex items-center text-sm font-normal text-gray-500 dark:text-gray-400">
                     <FaUserTag className="mr-2 text-lg text-gray-900 dark:text-gray-100" />
-                    {userData.roles} {userData.vchMatricula}
+                    {userData.vchNombreRol} {userData.vchMatricula}
                   </li>
                 </ul>
               </div>

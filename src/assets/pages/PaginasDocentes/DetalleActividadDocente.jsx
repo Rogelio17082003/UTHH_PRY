@@ -339,7 +339,7 @@ const DetalleActividadDocente = () => {
                     popup
                 >
                     <Modal.Header />
-                    <Modal.Body>
+                    <Modal.Body >
                         <div className="space-y-6 px-6 py-4">
                             <TitleSection label="Editar Práctica" />
                             
@@ -355,24 +355,24 @@ const DetalleActividadDocente = () => {
                                 value={selectedPracticeForEdit.vchDescripcion || ''}
                                 onChange={(e) => handleInputChangePracticas('vchDescripcion', e.target.value)}
                             />
-                            <FloatingLabelInput
+                            {/*<FloatingLabelInput
                                 id="edit_instrucciones"
                                 label="Instrucciones"
                                 value={selectedPracticeForEdit.vchInstrucciones || ''}
                                 onChange={(e) => handleInputChangePracticas('vchInstrucciones', e.target.value)}
-                            />
-                                <div className="my-4">
-      <label className="block text-sm font-medium text-gray-700">
-        Instrucciones
-      </label>
-      <ReactQuill
-        theme="snow"
-        value={value}
-        onChange={setValue}
-        placeholder="Escribe las instrucciones aquí..."
-      />
-    </div>
-
+                            />*/}
+                            <div className="my-4">
+                                <label className="block text-sm font-medium text-gray-700">
+                                    Instrucciones
+                                </label>
+                                <ReactQuill
+                                    theme="snow"
+                                    value={selectedPracticeForEdit.vchInstrucciones|| ''}
+                                    onChange={(value) => handleInputChangePracticas('vchInstrucciones', value)}
+                                    placeholder={`Instrucciones (Opcional)`}
+                                />
+                            </div>
+                            
                             <div className="flex justify-center gap-4 mt-6 h-10">
                                 <LoadingButton
                                     className="w-36"
@@ -469,12 +469,25 @@ const DetalleActividadDocente = () => {
                                             value={practica.descripcion}
                                             onChange={(e) => handleInputChange(index + (currentPage - 1) * itemsPerPage, 'descripcion', e.target.value)}
                                         />
+                                        {/*
                                         <FloatingLabelInput
                                             id={`instrucciones_${globalIndex}`}
                                             label={`Instrucciones ${globalIndex} (Opcional)`}
                                             value={practica.instrucciones}
                                             onChange={(e) => handleInputChange(index + (currentPage - 1) * itemsPerPage, 'instrucciones', e.target.value)}
-                                        />
+                                        />*/}
+                                        <div className="my-4">
+                                            <label className="block text-sm font-medium text-gray-700">
+                                                Instrucciones
+                                            </label>
+                                            <ReactQuill
+                                                theme="snow"
+                                                value={practica.instrucciones|| ''}
+                                                onChange={(value) => handleInputChange(index + (currentPage - 1) * itemsPerPage, 'instrucciones', value)}
+                                                placeholder={`Instrucciones ${globalIndex} (Opcional)`}
+                                            />
+                                        </div>
+ 
                                         </li>
                                     );
                                     })}

@@ -94,7 +94,7 @@ const Alumnos = () => {
                     CORREO: fila[4]+"@uthh.edu.mx",
                     PASSWORD: fila[4],                
                 };
-            });
+            }).filter((fila) => fila.MATRICULA && fila.NOMBRE && fila.APELLIDOPATERNO && fila.APELLIDOMATERNO && fila.CORREO && fila.PASSWORD);
             setAlumnosUpload(alumnosData);
             console.log('Datos del archivo Excel:', alumnosData);
         };

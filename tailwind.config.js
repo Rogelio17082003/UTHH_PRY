@@ -11,6 +11,8 @@ export default {
         primary: '#009944',
         secondary: '#23262d',
       },
+      
+      
       // Asegúrate de incluir configuraciones para hover si es necesario
       backgroundColor: theme => ({
         ...theme('colors'),
@@ -19,6 +21,7 @@ export default {
     },
   },
   plugins: [
+    require('@tailwindcss/typography'),
     require('flowbite/plugin'),
   ],
 };

@@ -1,6 +1,6 @@
 import React, { useState, useEffect  } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
-import { Label, TextInput, Button, Select, Modal } from "flowbite-react"; // Importamos el componente Button
+import { Label, TextInput, Button, Select, Modal, Tooltip } from "flowbite-react"; // Importamos el componente Button
 import { HiOutlineExclamationCircle } from 'react-icons/hi';
 import { FaInfoCircle, FaCheckCircle, FaExclamationCircle } from "react-icons/fa"; // Importa íconos de react-icons
 import { AiOutlineClose } from 'react-icons/ai';
@@ -46,30 +46,37 @@ const Link = ({ to, children }) => {
     );
 };
 
+
 const IconButton = ({ message, className = '', Icon, ...rest }) => {
     return (
-        <Button
-            theme={{
-                color: {
-                    primary: "bg-primary hover:bg-secondary",
-                    gray: "bg-purple-500 hover:bg-gray-800",
-                },
-            }}
-            type="submit"
-            color="primary" // Aplica el color base
-            className={`
-                bg-primary hover:bg-secondary text-white rounded-md 
-                px-1 py-1 md:px-1 md:py-1  // Padding para pantallas pequeñas y medianas
-                text-sm md:text-base       // Tamaño de texto ajustado para pantallas pequeñas
-                w-full md:w-auto           // Botón ocupa todo el ancho en pantallas pequeñas
-                ${className} 
-            `} 
-            {...rest}
-            variant="outlined"
-        >
-            {Icon && <Icon className="mr-2" />} {/* Renderiza el icono si está presente */}
-            {message}
-        </Button>
+        <Tooltip content={message} className="block md:hidden">
+            <Button
+                theme={{
+                    color: {
+                        primary: "bg-primary hover:bg-secondary",
+                        gray: "bg-purple-500 hover:bg-gray-800",
+                    },
+                }}
+                type="submit"
+                color="primary"
+                className={`
+                    bg-primary hover:bg-secondary text-white 
+                    rounded-full md:rounded-md  // Redondeado en móviles, bordes normales en pantallas grandes
+                    p-2 md:px-2 md:py-2         // Ajusta el padding para pantallas pequeñas y grandes
+                    text-sm md:text-base        // Tamaño de texto ajustado para pantallas pequeñas
+                    w-12 h-12 md:w-auto md:h-auto // Botón cuadrado en móviles y de tamaño automático en pantallas grandes
+                    flex items-center justify-center // Centrar contenido
+                    ${className} 
+                `}
+                {...rest}
+                variant="outlined"
+            >
+                {Icon && <Icon className="text-lg" />} {/* Tamaño del icono */}
+                <span className="hidden md:inline"> {/* Texto oculto en móviles y visible en pantallas medianas y grandes */}
+                    {message}
+                </span>
+            </Button>
+        </Tooltip>
     );
 };
 
