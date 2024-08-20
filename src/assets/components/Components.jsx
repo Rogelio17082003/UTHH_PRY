@@ -1,12 +1,14 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect  } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { Label, TextInput, Button, Select, Modal } from "flowbite-react"; // Importamos el componente Button
 import { HiOutlineExclamationCircle } from 'react-icons/hi';
+import { FaInfoCircle, FaCheckCircle, FaExclamationCircle } from "react-icons/fa"; // Importa íconos de react-icons
+import { AiOutlineClose } from 'react-icons/ai';
 
 const TitlePage = ({ label }) => 
 {   
     return (
-        <h1 className="m-3 text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl">{label}</h1>
+        <h1 className="mb-3 text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl">{label}</h1>
     )
 }
 
@@ -44,11 +46,46 @@ const Link = ({ to, children }) => {
     );
 };
 
+const IconButton = ({ message, className = '', Icon, ...rest }) => {
+    return (
+        <Button
+            theme={{
+                color: {
+                    primary: "bg-primary hover:bg-secondary",
+                    gray: "bg-purple-500 hover:bg-gray-800",
+                },
+            }}
+            type="submit"
+            color="primary" // Aplica el color base
+            className={`
+                bg-primary hover:bg-secondary text-white rounded-md 
+                px-1 py-1 md:px-1 md:py-1  // Padding para pantallas pequeñas y medianas
+                text-sm md:text-base       // Tamaño de texto ajustado para pantallas pequeñas
+                w-full md:w-auto           // Botón ocupa todo el ancho en pantallas pequeñas
+                ${className} 
+            `} 
+            {...rest}
+            variant="outlined"
+        >
+            {Icon && <Icon className="mr-2" />} {/* Renderiza el icono si está presente */}
+            {message}
+        </Button>
+    );
+};
+
+
 const LoadingButton = ({ isLoading, normalLabel, loadingLabel, className, ...rest }) => {
     return (
         <Button
+        theme={{
+
+            color: {
+                gray: "bg-purple-500 hover:bg-gray-800",
+            },
+          }}
             type="submit"
-            className={`button w-full p-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 ${className}`} // Agregar la clase className aquí
+            color="primary" // Esto aplica el color base
+            className={`bg-primary hover:bg-secondary w-full p-3 text-white rounded-md  ${className}`} // Agregar la clase className aquí
             disabled={isLoading}
             {...rest}
             >
@@ -406,12 +443,73 @@ const ConfirmDeleteModal = ({ open, onClose, onConfirm, message }) => {
     );
 };
 
+const InfoAlert = ({ message, type, isVisible, onClose }) => {
+    useEffect(() => {
+        if (isVisible) {
+            const timer = setTimeout(() => {
+                onClose();
+            }, 1900);
+            return () => clearTimeout(timer);
+        }
+    }, [isVisible, onClose]);
+
+    if (!isVisible) return null;
+
+    // Estilos y colores según el tipo de alerta
+    let bgColor, textColor, progressColor, Icon;
+    switch (type) {
+        case "success":
+            bgColor = "bg-green-50 dark:bg-gray-800";
+            textColor = "text-green-800 dark:text-green-400";
+            progressColor = "bg-green-500";
+            Icon = FaCheckCircle;
+            break;
+        case "error":
+            bgColor = "bg-red-50 dark:bg-gray-800";
+            textColor = "text-red-800 dark:text-red-400";
+            progressColor = "bg-red-500";
+            Icon = FaExclamationCircle;
+            break;
+        case "info":
+        default:
+            bgColor = "bg-blue-50 dark:bg-gray-800";
+            textColor = "text-blue-800 dark:text-blue-400";
+            progressColor = "bg-blue-500";
+            Icon = FaInfoCircle;
+            break;
+    }
+
+    return (
+        <div
+            id="alert-1"
+            className={`alert-slide flex items-center p-4 mb-4 rounded-lg shadow-lg ${bgColor} ${textColor}`}
+            role="alert"
+        >
+            <Icon className="flex-shrink-0 w-4 h-4" aria-hidden="true" />
+            <div className="ms-3 text-sm font-medium">{message}</div>
+            <button
+                type="button"
+                className={`ms-auto -mx-1.5 -my-1.5 ${bgColor} ${textColor} rounded-lg focus:ring-2 p-1.5 hover:bg-opacity-75 inline-flex items-center justify-center h-8 w-8`}
+                onClick={onClose}
+                aria-label="Close"
+            >
+                <AiOutlineClose className="w-3 h-3" />
+            </button>
+            {/* Barra de progreso con animación */}
+            <div
+                className={`progress-bar absolute bottom-0 left-0 h-1 ${progressColor}`}
+            ></div>
+        </div>
+    );
+};
+
 export default {
     TitlePage,  
     TitleSection, 
     ContentTitle, 
     Paragraphs, 
     Link,
+    IconButton,
     LoadingButton, 
     FloatingLabelInput,
     CustomInput, 
@@ -419,5 +517,6 @@ export default {
     CustomRepeatPassword,
     CustomInputOnchange,
     SelectInput,
-    ConfirmDeleteModal
+    ConfirmDeleteModal,
+    InfoAlert
 };

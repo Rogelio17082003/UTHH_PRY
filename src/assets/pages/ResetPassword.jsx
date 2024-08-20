@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form';
 import { useParams } from 'react-router-dom';
 import { Alert, Card } from 'flowbite-react';
 import  Components from '../components/Components'
-const { CustomInputPassword, CustomRepeatPassword, LoadingButton} = Components;
+const { CustomInputPassword, CustomRepeatPassword, LoadingButton, TitlePage, InfoAlert} = Components;
 
 const PasswordValidationItem = ({ isValid, text }) => (
   <li className="flex items-center mb-1">
@@ -98,16 +98,17 @@ const ResetPassword = () => {
   return (
     <div className="min-h-screen flex items-center justify-center">
       <div className="max-w-md w-full p-6 space-y-6 bg-white rounded-md shadow-lg">
-        {serverResponse && (
-          <Alert
-            className="flex items-center justify-center"
-            color={serverResponse.includes('éxito') ? 'success' : 'failure'}
-            icon={HiInformationCircle}
-          >
-            <span className="font-medium">{serverResponse}</span>
-          </Alert>
-        )}
-        <h2 className="text-2xl font-extrabold text-center text-gray-900">Restablecer Contraseña</h2>
+
+        <InfoAlert
+            message={serverResponse}
+            type={serverResponse.includes('éxito') ? 'success' : 'error'}
+            isVisible={!!serverResponse}
+            onClose={() => {
+              setServerResponse('');
+            }}
+        />
+          
+        <TitlePage label={"Restablecer Contraseña"}/>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="mb-5 relative">
             <CustomInputPassword

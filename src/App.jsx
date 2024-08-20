@@ -42,8 +42,8 @@ function App() {
           <Route path="/" element={<Layout><HomePage /></Layout>} />
           <Route path="/inicio-sesion" element={<IsAuthenticated><LoginPage/></IsAuthenticated>} />
           <Route path="/registro" element={<IsAuthenticated><RegisterPage /></IsAuthenticated>} />
-          <Route path="/recuperar-contrasena" element={<Layout><EmailForm /></Layout>} />
-          <Route path="/restablecer-contrasena/:matricula/:token/" element={<Layout><ResetPassword /></Layout>} />
+          <Route path="/recuperar-contrasena" element={<IsAuthenticated><Layout><EmailForm /></Layout></IsAuthenticated>} />
+          <Route path="/restablecer-contrasena/:matricula/:token/" element={<IsAuthenticated><Layout><ResetPassword /></Layout></IsAuthenticated>} />
           <Route path="/mi-perfil/" element={<PrivateRouteUser><Layout><ProfilePage/></Layout></PrivateRouteUser>} />
           <Route path="/reset-password-code/:codigo/" element={<Layout><ResetPasswordCode/></Layout>} />
 
@@ -91,6 +91,25 @@ function PrivateRoute({ children }) {
   // Si pasa la validación, muestra el contenido de la ruta
   return children;
 }
+
+
+function PrivateRouteAdmin({ children }) {
+  const { isAuthenticated, userData } = useAuth();
+
+  // Validación: Usuario no autenticado
+  if (!isAuthenticated) {
+    return <Navigate to="/" />;
+  }
+  
+  // Validación: Usuario autenticado pero sin rol
+  if (isAuthenticated && userData.vchNombreRol!="Administrador") {
+    return <Navigate to="/" />;
+  }
+
+  // Si pasa la validación, muestra el contenido de la ruta
+  return children;
+}
+
 
 
 function PrivateRouteUser({ children }) {

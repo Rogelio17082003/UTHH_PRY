@@ -2,49 +2,70 @@ import React from 'react';
 import { Link, useLocation, useParams } from 'react-router-dom';
 import { Breadcrumb } from 'flowbite-react';
 import { HiHome } from 'react-icons/hi';
+import { AuthProvider, useAuth } from '../server/authUser';
 
 const BreadcrumbNav = () => {
+    const { isAuthenticated, userData } = useAuth();
     const location = useLocation();
-    const { id, vchClvMateria, chrGrupo, intPeriodo, intNumeroActi, intNumeroPractica } = useParams();
+    const { id, vchClvMateria, chrGrupo, intPeriodo, intNumeroActi, intNumeroPractica, intIdActividadCurso } = useParams();
     
     const getBreadcrumbs = () => {
         const path = location.pathname;
         const breadcrumbs = [];
+
+
         // Conditional paths
         if (path.includes('/mi-perfil')) {
             breadcrumbs.push({ path: '/mi-perfil', alias: 'Mi Perfil' });
         }
-
         if (path.includes('/recuperar-contrasena')) {
             breadcrumbs.push({ path: '/recuperar-contrasena', alias: 'Recuperar Contraseña' });
         }
-        
-        if (path.includes(`/actividades/${vchClvMateria}/${chrGrupo}/${intPeriodo}`)) {
-            breadcrumbs.push({ path: `/materias/actividades/${vchClvMateria}/${chrGrupo}/${intPeriodo}`, alias: 'Actividades' });
-        }
-        if (path.includes(`/actividades/detalleActividad/${vchClvMateria}/${chrGrupo}/${intPeriodo}/${intNumeroActi}`)) {
-            breadcrumbs.push({ path: `/actividades/${vchClvMateria}/${chrGrupo}/${intPeriodo}`, alias: 'Actividades' });
-            breadcrumbs.push({ path: `/actividades/detalleActividad/${vchClvMateria}/${chrGrupo}/${intPeriodo}/${intNumeroActi}`, alias: 'Detalle de la Actividad' });
-        }
-        if (path.includes(`/actividades/detalleActividad/detallePractica/${vchClvMateria}/${chrGrupo}/${intPeriodo}/${intNumeroActi}/${intNumeroPractica}`)) {
-            breadcrumbs.push({ path: `/actividades/${vchClvMateria}/${chrGrupo}/${intPeriodo}`, alias: 'Actividades' });
-            breadcrumbs.push({ path: `/actividades/detalleActividad/${vchClvMateria}/${chrGrupo}/${intPeriodo}/${intNumeroActi}`, alias: 'Detalle de la Actividad' });
-            breadcrumbs.push({ path: `/actividades/detalleActividad/detallePractica/${vchClvMateria}/${chrGrupo}/${intPeriodo}/${intNumeroActi}/${intNumeroPractica}`, alias: 'Detalle de la Practica' });
-        }
 
-        //Docentes
-        if (path.includes(`/gruposMaterias/${vchClvMateria}/${intPeriodo}`)) {
-            breadcrumbs.push({ path: `/gruposMaterias/${vchClvMateria}/${intPeriodo}`, alias: 'Grupos' });
+        if (isAuthenticated && !userData.intRol) {
+
+            if (path.includes(`/actividades/${vchClvMateria}/${chrGrupo}/${intPeriodo}`)) {
+                breadcrumbs.push({ path: `/actividades/${vchClvMateria}/${chrGrupo}/${intPeriodo}`, alias: 'Actividades' });
+            }
+            if (path.includes(`/actividades/detalleActividad/${vchClvMateria}/${chrGrupo}/${intPeriodo}/${intNumeroActi}`)) {
+                breadcrumbs.push({ path: `/actividades/${vchClvMateria}/${chrGrupo}/${intPeriodo}`, alias: 'Actividades' });
+                breadcrumbs.push({ path: `/actividades/detalleActividad/${vchClvMateria}/${chrGrupo}/${intPeriodo}/${intNumeroActi}`, alias: 'Detalle de la Actividad' });
+            }
+            if (path.includes(`/actividades/detalleActividad/detallePractica/${vchClvMateria}/${chrGrupo}/${intPeriodo}/${intNumeroActi}/${intNumeroPractica}`)) {
+                breadcrumbs.push({ path: `/actividades/${vchClvMateria}/${chrGrupo}/${intPeriodo}`, alias: 'Actividades' });
+                breadcrumbs.push({ path: `/actividades/detalleActividad/${vchClvMateria}/${chrGrupo}/${intPeriodo}/${intNumeroActi}`, alias: 'Detalle de la Actividad' });
+                breadcrumbs.push({ path: `/actividades/detalleActividad/detallePractica/${vchClvMateria}/${chrGrupo}/${intPeriodo}/${intNumeroActi}/${intNumeroPractica}`, alias: 'Detalle de la Practica' });
+            }
         }
-        if (path.includes(`/gruposMaterias/actividades/${vchClvMateria}/${chrGrupo}/${intPeriodo}`)) {
-            breadcrumbs.push({ path: `/gruposMaterias/${vchClvMateria}/${intPeriodo}`, alias: 'Grupos' });
-            breadcrumbs.push({ path: `/gruposMaterias/actividades/${vchClvMateria}/${chrGrupo}/${intPeriodo}`, alias: 'Actividades' });
-        }
-        if (path.includes(`/gruposMaterias/actividades/detalleActividad/${vchClvMateria}/${chrGrupo}/${intPeriodo}/${intNumeroActi}`)) {
-            breadcrumbs.push({ path: `/gruposMaterias/${vchClvMateria}/${intPeriodo}`, alias: 'Grupos' });
-            breadcrumbs.push({ path: `/gruposMaterias/actividades/${vchClvMateria}/${chrGrupo}/${intPeriodo}`, alias: 'Actividades' });
-        }
-        
+        if (isAuthenticated && userData.intRol) {
+
+            //Docentes
+            if (path.includes(`/alumnos`)) {
+                breadcrumbs.push({ path: `/alumnos`, alias: 'Alumnos' });
+            }
+            if (path.includes(`/docentes`)) {
+                breadcrumbs.push({ path: `/docentes`, alias: 'Docentes' });
+            }
+            if (path.includes(`/gruposMaterias/${vchClvMateria}/${intPeriodo}`)) {
+                breadcrumbs.push({ path: `/gruposMaterias/${vchClvMateria}/${intPeriodo}`, alias: 'Grupos' });
+            }
+            if (path.includes(`/gruposMaterias/actividades/${vchClvMateria}/${chrGrupo}/${intPeriodo}`)) {
+                breadcrumbs.push({ path: `/gruposMaterias/${vchClvMateria}/${intPeriodo}`, alias: 'Grupos' });
+                breadcrumbs.push({ path: `/gruposMaterias/actividades/${vchClvMateria}/${chrGrupo}/${intPeriodo}`, alias: 'Actividades' });
+            }
+            if (path.includes(`/gruposMaterias/actividades/detalleActividad/${vchClvMateria}/${chrGrupo}/${intPeriodo}/${intNumeroActi}/${intIdActividadCurso}`)) {
+                breadcrumbs.push({ path: `/gruposMaterias/${vchClvMateria}/${intPeriodo}`, alias: 'Grupos' });
+                breadcrumbs.push({ path: `/gruposMaterias/actividades/${vchClvMateria}/${chrGrupo}/${intPeriodo}`, alias: 'Actividades' });
+                breadcrumbs.push({ path: `/gruposMaterias/actividades/detalleActividad/${vchClvMateria}/${chrGrupo}/${intPeriodo}/${intNumeroActi}/${intIdActividadCurso}`, alias: 'Detalle de la Actividad' });
+            }
+            if (path.includes(`/gruposMaterias/actividades/detalleActividad/detallePractica/${vchClvMateria}/${chrGrupo}/${intPeriodo}/${intNumeroActi}/${intNumeroPractica}`)) {
+                breadcrumbs.push({ path: `/gruposMaterias/${vchClvMateria}/${intPeriodo}`, alias: 'Grupos' });
+                breadcrumbs.push({ path: `/gruposMaterias/actividades/${vchClvMateria}/${chrGrupo}/${intPeriodo}`, alias: 'Actividades' });
+                breadcrumbs.push({ path: `/gruposMaterias/actividades/detalleActividad/${vchClvMateria}/${chrGrupo}/${intPeriodo}/${intNumeroActi}/${intIdActividadCurso}`, alias: 'Detalle de la Actividad' });
+                breadcrumbs.push({ path: `/gruposMaterias/actividades/detalleActividad/detallePractica/${vchClvMateria}/${chrGrupo}/${intPeriodo}/${intNumeroActi}/${intNumeroPractica}`, alias: 'Detalle de la Practica' });
+            }
+            
+        }        
         return breadcrumbs;
     };
 

@@ -3,6 +3,7 @@ import React from 'react';
 import { Sidebar } from 'flowbite-react';
 import { HiUserGroup, HiBookOpen} from 'react-icons/hi';
 import { useAuth } from '../../server/authUser'; // Importar el hook de autenticación
+import { FaUserGraduate, FaChalkboardTeacher } from 'react-icons/fa';
 
 const SideNav = ({ isSidebarOpen, toggleSidebar }) => { 
   
@@ -26,10 +27,10 @@ const SideNav = ({ isSidebarOpen, toggleSidebar }) => {
               <Sidebar.Collapse icon={HiShoppingBag} label="Docentes">
                 <Sidebar.Item href="/Admin/Teachers">Administrar Docentes</Sidebar.Item>
               </Sidebar.Collapse>*/}
-              <Sidebar.Item href="/alumnos" icon={HiUserGroup}>
+              <Sidebar.Item href="/alumnos" icon={FaUserGraduate}>
                 Alumnos
               </Sidebar.Item>
-              <Sidebar.Item href="/docentes" icon={HiUserGroup}>
+              <Sidebar.Item href="/docentes" icon={FaChalkboardTeacher}>
                 Docentes
               </Sidebar.Item>
               <Sidebar.Item href="/" icon={HiBookOpen}>

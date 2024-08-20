@@ -6,7 +6,7 @@ import { HiClipboardList, HiUserGroup } from "react-icons/hi"; // Actualiza aqu�
 import Components from '../../components/Components';
 import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
-const { TitlePage, ContentTitle, Paragraphs, Link, TitleSection } = Components;
+const { TitlePage, ContentTitle, Paragraphs, Link, TitleSection, LoadingButton, InfoAlert } = Components;
 
 const ActividadesDocente = () => {
     const { userData } = useAuth(); // Obtén el estado de autenticación del contexto
@@ -14,7 +14,8 @@ const ActividadesDocente = () => {
     const [alumnos, setAlumnosMaterias] = useState([]);
     const { vchClvMateria, chrGrupo, intPeriodo } = useParams();
     const [loading, setLoading] = useState(false);
-    
+    const [serverResponse, setServerResponse] = useState('');
+
 
     const onloadActividades = async () => {
         try {
@@ -154,7 +155,7 @@ const ActividadesDocente = () => {
 
 
         const responseInit = await fetch('https://robe.host8b.me/WebServices/obtenerCalificacionesParcial.php', 
-            {
+        {
             method: 'POST',
             headers: 
             {
@@ -189,6 +190,7 @@ const ActividadesDocente = () => {
         }
         else 
         {
+            setServerResponse(`Error: ${resultInit.message}`);
             console.error('Error fetching data:', resultInit.message);
         }
         } 
@@ -571,7 +573,15 @@ const ActividadesDocente = () => {
 
     return (
         <section className="w-full flex flex-col">
-            <TitlePage label="Trabajo de clase" />
+            <InfoAlert
+                message={serverResponse}
+                type={serverResponse.includes('éxito') ? 'success' : 'error'}
+                isVisible={!!serverResponse}
+                onClose={() => {
+                setServerResponse('');
+                }}
+            />
+            <TitlePage label="Actividades de clase" />
             <div className="mb-4 md:mb-0 rounded-lg bg-white p-4 shadow dark:bg-gray-800 sm:p-6 xl:p-8">
                 <Tabs aria-label="Tabs with underline" style="underline">
                     <Tabs.Item 
@@ -582,35 +592,40 @@ const ActividadesDocente = () => {
                     >
                     {Object.entries(groupedActivities).map(([parcial, activities]) => (
                         <div key={parcial}>
-                        <TitleSection label={`Parcial ${parcial}`} />
-                        <button 
-                            onClick={() => fetchAndGenerateExcel(parcial)} 
-                            disabled={loading}
-                            className="mt-2 w-full sm:w-auto px-4 py-2 bg-blue-600 text-white rounded-md"
-                        >
-                            {loading ? 'Generando Excel...' : `Generar Excel ${parcial}`}
-                        </button>
-                        <Accordion collapseAll>
-                            {activities.map((actividad) => (
-                            <Accordion.Panel key={actividad.intClvActividad}>
-                                <Accordion.Title>
-                                <ContentTitle label={actividad.vchNomActivi} />
-                                </Accordion.Title>
-                                <Accordion.Content>
-                                <Paragraphs label={actividad.vchDescripcion} />
-                                <Paragraphs label={`Valor: ${actividad.fltValor} puntos`} />
-                                </Accordion.Content>
-                                <Accordion.Content>
-                                <Link
-                                    to={`/gruposMaterias/actividades/detalleActividad/${vchClvMateria}/${chrGrupo}/${intPeriodo}/${actividad.intClvActividad}/${actividad.intIdActividadCurso}`}
-                                    className="text-blue-500 underline"
-                                >
-                                    Ver Más
-                                </Link>
-                                </Accordion.Content>
-                            </Accordion.Panel>
-                            ))}
-                        </Accordion>
+                            <div className="flex items-center justify-between mb-2">
+                                    <TitleSection label={`Parcial ${parcial}`} />
+                                    <div className="ml-4">
+                                        <LoadingButton
+                                        className="h-9"
+                                            isLoading={loading}
+                                            loadingLabel="Generando Excel..."
+                                            normalLabel={`Generar Excel Parcial ${parcial}`}
+                                            onClick={() => fetchAndGenerateExcel(parcial)} 
+                                            disabled={loading}
+                                        />
+                                    </div>
+                                </div>
+                            <Accordion collapseAll>
+                                {activities.map((actividad) => (
+                                <Accordion.Panel key={actividad.intClvActividad}>
+                                    <Accordion.Title>
+                                    <ContentTitle label={actividad.vchNomActivi} />
+                                    </Accordion.Title>
+                                    <Accordion.Content>
+                                    <Paragraphs label={actividad.vchDescripcion} />
+                                    <Paragraphs label={`Valor: ${actividad.fltValor} puntos`} />
+                                    </Accordion.Content>
+                                    <Accordion.Content>
+                                    <Link
+                                        to={`/gruposMaterias/actividades/detalleActividad/${vchClvMateria}/${chrGrupo}/${intPeriodo}/${actividad.intClvActividad}/${actividad.intIdActividadCurso}`}
+                                        className="text-blue-500 underline"
+                                    >
+                                        Ver Más
+                                    </Link>
+                                    </Accordion.Content>
+                                </Accordion.Panel>
+                                ))}
+                            </Accordion>
                         </div>
                     ))}
                     </Tabs.Item>

@@ -11,7 +11,7 @@ import { FaRegFrown } from 'react-icons/fa';
 import { Label, TextInput, Button, Select, Modal } from "flowbite-react"; // Importamos el componente Button
 import * as XLSX from 'xlsx';
 import  Components from '../../../components/Components'
-const { LoadingButton, TitlePage} = Components;
+const { LoadingButton, TitlePage, IconButton} = Components;
 import { useAuth } from '../../../server/authUser'; // Importa el hook de autenticación
 
 const Materias = () => { 
@@ -533,8 +533,9 @@ const Materias = () => {
       <div className="flex items-center m-2">
         <Button icon={IoMdAdd} className="ml-2 button" onClick={() => setOpenModal(true)}>
           <IoMdAdd className="mr-2 h-5 w-5" />
-            Añadir Materias con actividades
+            Añadir dd con actividades
         </Button> 
+
       </div>
       <TitlePage label="Materias Asociadas" />
       {materias.length > 0 ? 

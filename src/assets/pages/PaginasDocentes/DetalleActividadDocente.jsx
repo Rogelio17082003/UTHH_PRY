@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import  Components from '../../components/Components'
-const {TitlePage, ContentTitle, Paragraphs, TitleSection, LoadingButton, SelectInput, FloatingLabelInput, ConfirmDeleteModal} = Components;
+const {TitlePage, ContentTitle, Paragraphs, TitleSection, LoadingButton, SelectInput, FloatingLabelInput, ConfirmDeleteModal, InfoAlert, IconButton} = Components;
 import {Card} from 'flowbite-react';
 import * as XLSX from 'xlsx';
 import { useForm } from 'react-hook-form';
-import { FaRegFrown, FaEllipsisV, FaEdit, FaInfoCircle, FaTrash } from 'react-icons/fa';
-import { Pagination, Tooltip  } from "flowbite-react";
+import { FaRegFrown, FaEllipsisV, FaEdit, FaDownload, FaTrash } from 'react-icons/fa';
+import { Pagination, Tooltip, Modal, Button  } from "flowbite-react";
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css'; // Estilos del editor
 
 const DetalleActividadDocente = () => {
     const { vchClvMateria, chrGrupo, intPeriodo, intNumeroActi, intIdActividadCurso } = useParams();
@@ -18,12 +20,45 @@ const DetalleActividadDocente = () => {
     const [arregloPracticas, setArregloPracticas] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [isMenuOpen, setIsMenuOpen] = useState(null);
+    const [openModalEdit, setOpenModalEdit] = useState(false);
     const [openModalDelete, setOpenModalDelete] = useState(false);
+    const [practiceToDelete, setPracticeToDelete] = useState(null);
+    const [serverResponse, setServerResponse] = useState('');
+    const [selectedPracticeForEdit, setSelectedPracticeForEdit] = useState({});
+    const [isLoading, setIsLoading] = useState(false);
+    const [value, setValue] = useState('');
 
-    const handleConfirmDelete = () => {
-        // Lógica para eliminar al estudiante
-        setOpenModalDelete(false);
+    const handleConfirmDelete = async () => {
+        try {
+            const response = await fetch('https://robe.host8b.me/WebServices/accionesPracticas.php', { // Cambia la ruta al archivo PHP adecuado
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ idPractica: practiceToDelete }), // Envía el ID de la práctica que quieres eliminar
+            });
+            const result = await response.json();
+            if (result.done) 
+            {
+                setServerResponse(`Éxito: ${result.message}`);
+                fetchActividad();
+            } 
+            else 
+            {
+                setServerResponse(`Error: ${result.message}`);
+            }
+        } 
+        catch (error) 
+        {
+            console.error("Error:", error);
+            alert("Error en la solicitud. Inténtalo de nuevo.");
+        } 
+        finally 
+        {
+            setOpenModalDelete(false);
+        }
     };
+    
 
     const toggleActionsMenu = (idPractica) => {
         if (isMenuOpen === idPractica) {
@@ -73,25 +108,12 @@ const DetalleActividadDocente = () => {
             }
         } catch (error) {
             console.error('Error: Error al cargar los datos de la actividad');
-            // Manejar el error, mostrar mensaje al usuario, etc.
         }
         };
         
     useEffect(() => {
         fetchActividad();
     }, [vchClvMateria, chrGrupo, intPeriodo, intNumeroActi, ]);
-
-
-
-    const craerJsonRubricaSelect = (count) => {
-        const datosPracticas = Array.from({ length: count }, (_, index) => ({
-        fkActividadGlobal: intNumeroActi,
-        vchNombre: `Práctica ${index + 1}` // Puedes personalizar el nombre según tus necesidades
-        }));
-        setPracticasServer(datosPracticas)
-        console.log("Datos de prácticas:", datosPracticas);
-    
-    };
 
     const handleFileUpload = (event) => {
         const uploadedFile = event.target.files[0];
@@ -138,27 +160,37 @@ const DetalleActividadDocente = () => {
     };
 
     const sendDataToServer = async (data) => {
-        try {
-        const response = await fetch('https://robe.host8b.me/WebServices/InsertarActividades.php', {
-            method: 'POST',
-            headers: {
-            'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        });
-        console.log(data);
+        try 
+        {
+            const response = await fetch('https://robe.host8b.me/WebServices/InsertarActividades.php', {
+                method: 'POST',
+                headers: {
+                'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+            console.log(data);
 
-        const result = await response.json();
-        console.log(result);
+            const result = await response.json();
+            console.log(result);
 
-        if (result.done) {
-            fetchActividad()
-            alert("Datos agregados correctamente.");
-        } else {
-            alert("Error al agregar los datos.");
-        }
-        } catch (error) {
-        console.error('Error al enviar los datos', error);
+            if (result.done) 
+            {
+                fetchActividad()
+                setServerResponse(`Éxito: ${result.message}`);
+                if(!file)
+                {
+                    setFile(null)
+                }
+            } 
+            else 
+            {
+                setServerResponse(`Error: ${result.message}`);
+            }
+        } 
+        catch (error) 
+        {
+            console.error('Error al enviar los datos', error);
         }
     };
 
@@ -186,7 +218,6 @@ const DetalleActividadDocente = () => {
     // Calcular el total de páginas
     const totalPages = Math.ceil(arregloPracticas.length / itemsPerPage);
 
-
     const handleSelectChange = (e) => {
         const count = parseInt(e.target.value, 10);
         // Determina el índice de inicio basado en el número de prácticas existentes en la base de datos
@@ -205,12 +236,28 @@ const DetalleActividadDocente = () => {
         setCurrentPage(1); // Reiniciar a la primera página al cambiar el número de prácticas
     };
 
-    const handleInputChange = (index, field, value) => {
+    /*const handleInputChange = (index, field, value) => {
         const newPracticas = [...arregloPracticas];
         newPracticas[index][field] = value;
         setArregloPracticas(newPracticas);
+    };*/
+    const handleInputChange = (index, field, value) => {
+        const newPracticas = [...arregloPracticas];
+        
+        // Aplica la validación solo si el campo es "titulo"
+        if (field === 'titulo') {
+            // Verifica que el valor comience con "Práctica"
+            if (value.toLowerCase().startsWith("práctica")) {
+                newPracticas[index][field] = value;
+            }
+        } else {
+            // Para otros campos, simplemente actualiza el valor
+            newPracticas[index][field] = value;
+        }
+        
+        setArregloPracticas(newPracticas);
     };
-
+    
     const onPageChange = (page) => {
         setCurrentPage(page);
     };
@@ -220,111 +267,248 @@ const DetalleActividadDocente = () => {
         currentPage * itemsPerPage
     );
 
+    const handleEditClick = (practica) => {
+        setSelectedPracticeForEdit(practica);
+        console.log("dato",practica)
+
+        console.log("datosPractica", selectedPracticeForEdit)
+    };
+    const handleInputChangePracticas = (field, value) => {
+        setSelectedPracticeForEdit(prevState => {
+            if (field === 'vchNombre') {
+                const prefix = "Práctica ";
+                // Si el valor editado no comienza con "Práctica", mantener el valor anterior
+                if (!value.toLowerCase().startsWith(prefix.toLowerCase())) {
+                    return prevState; // No hacer ningún cambio si no comienza con "Práctica"
+                }
+            }
+            
+            return {
+                ...prevState,
+                [field]: value
+            };
+        });
+    };
+    
+    
+    
+    const handleSaveEdit = async () => {
+        try {
+            const response = await fetch('https://robe.host8b.me/WebServices/accionesPracticas.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    practicaEdit: selectedPracticeForEdit
+                }),
+            });
+    
+            const result = await response.json();
+            console.log(result);
+            if (result.done) {
+                setServerResponse(`Éxito: ${result.message}`);
+                fetchActividad(); // Vuelve a cargar las prácticas
+                setSelectedPracticeForEdit(null); // Cierra el modo de edición
+            } else {
+                setServerResponse(`Error: ${result.message}`);
+            }
+        } catch (error) {
+            console.error("Error al actualizar la práctica", error);
+            setServerResponse("Error al actualizar la práctica.");
+        }
+    };
+
+    const handleDownload = () => {
+        const filePath = `${process.env.REACT_APP_API_URL}/formato.xlsx`; // Ruta del archivo en la carpeta public
+        const link = document.createElement('a');
+        link.href = filePath;
+        link.download = 'formato.xlsx';
+        link.click();
+    };
+    
     return (
+        
         <section className='w-full flex flex-col'>
+
+            {selectedPracticeForEdit && (
+                <Modal
+                    show={openModalEdit}
+                    size="md"
+                    onClose={() => setOpenModalEdit(false)}
+                    popup
+                >
+                    <Modal.Header />
+                    <Modal.Body>
+                        <div className="space-y-6 px-6 py-4">
+                            <TitleSection label="Editar Práctica" />
+                            
+                            <FloatingLabelInput
+                                id="edit_titulo"
+                                label="Título (Obligatorio)"
+                                value={selectedPracticeForEdit.vchNombre || ''}
+                                onChange={(e) => handleInputChangePracticas('vchNombre', e.target.value)}
+                            />
+                            <FloatingLabelInput
+                                id="edit_descripcion"
+                                label="Descripción (Obligatorio)"
+                                value={selectedPracticeForEdit.vchDescripcion || ''}
+                                onChange={(e) => handleInputChangePracticas('vchDescripcion', e.target.value)}
+                            />
+                            <FloatingLabelInput
+                                id="edit_instrucciones"
+                                label="Instrucciones"
+                                value={selectedPracticeForEdit.vchInstrucciones || ''}
+                                onChange={(e) => handleInputChangePracticas('vchInstrucciones', e.target.value)}
+                            />
+                                <div className="my-4">
+      <label className="block text-sm font-medium text-gray-700">
+        Instrucciones
+      </label>
+      <ReactQuill
+        theme="snow"
+        value={value}
+        onChange={setValue}
+        placeholder="Escribe las instrucciones aquí..."
+      />
+    </div>
+
+                            <div className="flex justify-center gap-4 mt-6 h-10">
+                                <LoadingButton
+                                    className="w-36"
+                                    isLoading={isLoading}
+                                    loadingLabel="Cargando..."
+                                    normalLabel="Guardar"
+                                    onClick={handleSaveEdit}
+                                    disabled={isLoading}
+                                />
+                                <Button
+                                    color="gray"
+                                    onClick={() => setOpenModalEdit(false)}
+                                    className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-200 focus:ring-4 focus:ring-gray-300"
+                                >
+                                    No, cancelar
+                                </Button>
+                            </div>
+                        </div>
+                    </Modal.Body>
+                </Modal>
+            )}
+
+            <InfoAlert
+                message={serverResponse}
+                type={serverResponse.includes('Éxito') ? 'success' : 'error'}
+                isVisible={!!serverResponse}
+                onClose={() => {
+                setServerResponse('');
+                }}
+            />
             <ConfirmDeleteModal
                 open={openModalDelete}
                 onClose={() => setOpenModalDelete(false)}
                 onConfirm={handleConfirmDelete}
                 message="¿Estás seguro de que deseas eliminar a esta práctica?<br />También se eliminarán las calificaciones."
             />
-
+            <div className="flex justify-between items-center">
+                <TitlePage label={actividad.Nombre_Actividad} />
+                <IconButton message="Descargar Formato de Rubricas" Icon={FaDownload}
+                onClick={handleDownload}/>
+            </div>
             <div className="m-3 flex flex-col">
-            <TitlePage label={actividad.Nombre_Actividad} />
-            <Paragraphs label={actividad.Descripcion_Actividad} />
+                <Paragraphs label={actividad.Descripcion_Actividad} />
             </div>
 
             <div className="flex flex-col md:flex-row">
                 <div className='md:w-1/2 md:mr-4 flex flex-col gap-y-4 mb-3'>
                     <section className="h-full rounded-lg bg-white p-4 shadow dark:bg-gray-800 sm:p-6 xl:p-8">
-                    <TitleSection label="Subir Rúbricas" />
-                    <div className="w-full flex flex-col gap-4 p-4">
-                        <div className="w-full">
-                        <input
-                            type="file"
-                            className="block w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 cursor-pointer dark:text-gray-400 focus:outline-none dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400"
-                            onChange={handleFileUpload}
-                        />
-                        </div>
-                        {file && (
-                        <>
-                        <div className="w-full flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                        <div className="flex-1">
-                            <SelectInput
-                            id="value"
-                            labelSelect="Seleccionar cuantas practicas deseas insertar:"
-                            label="Número de Prácticas"
-                            name="value"
-                            options={numPracticasInsert}
-                            errors={errors}
-                            register={register}
-                            trigger={trigger}
-                            onChange={handleSelectChange}
-                            pattern=""
-                            className="w-full"
+                        <TitleSection label="Subir Rúbricas" />
+                        <div className="w-full flex flex-col gap-4 p-4">
+                            <div className="w-full">
+                            <input
+                                type="file"
+                                className="block w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 cursor-pointer dark:text-gray-400 focus:outline-none dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400"
+                                onChange={handleFileUpload}
                             />
-                        </div>
-                        </div>
-
-                        <div className="w-full flex flex-col gap-4 md:gap-6 mt-4">
-                        <ul className="space-y-4">
-                            {currentItems.map((practica, index) => {
-                            // Calcula el índice global para las prácticas
-                            const globalIndex = (currentPage - 1) * itemsPerPage + index + 1;
-                            return (
-                                <li key={globalIndex} className="space-y-4">
-                                <FloatingLabelInput
-                                    id={`titulo_${globalIndex}`}
-                                    label={`Título ${globalIndex} (Obligatorio)`}
-                                    value={practica.titulo}
-                                    onChange={(e) => handleInputChange(index + (currentPage - 1) * itemsPerPage, 'titulo', e.target.value)}
-                                />
-                                <FloatingLabelInput
-                                    id={`descripcion_${globalIndex}`}
-                                    label={`Descripción ${globalIndex} (Obligatorio)`}
-                                    value={practica.descripcion}
-                                    onChange={(e) => handleInputChange(index + (currentPage - 1) * itemsPerPage, 'descripcion', e.target.value)}
-                                />
-                                <FloatingLabelInput
-                                    id={`instrucciones_${globalIndex}`}
-                                    label={`Instrucciones ${globalIndex} (Opcional)`}
-                                    value={practica.instrucciones}
-                                    onChange={(e) => handleInputChange(index + (currentPage - 1) * itemsPerPage, 'instrucciones', e.target.value)}
-                                />
-                                </li>
-                            );
-                            })}
-                        </ul>
-                        {currentItems.length > 0 && (
+                            </div>
+                            {file && (
                             <>
-                            <Pagination
-                                currentPage={currentPage}
-                                layout="pagination"
-                                onPageChange={onPageChange}
-                                totalPages={totalPages}
-                                previousLabel="Anterior"
-                                nextLabel="Siguiente"
-                                showIcons={true}
-                            />
-                            </>
-                        )}
-                        </div>
+                            <div className="w-full flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                                <div className="flex-1">
+                                    <SelectInput
+                                    id="value"
+                                    labelSelect="Seleccionar cuantas practicas deseas insertar:"
+                                    label="Número de Prácticas"
+                                    name="value"
+                                    options={numPracticasInsert}
+                                    errors={errors}
+                                    register={register}
+                                    trigger={trigger}
+                                    onChange={handleSelectChange}
+                                    pattern=""
+                                    className="w-full"
+                                    />
+                                </div>
+                            </div>
 
-                        {currentItems.length > 0 && (
-                        <>
-                        <div className="w-full flex justify-center md:justify-end mt-4">
-                        <LoadingButton
-                            className="w-full md:w-auto h-11"
-                            loadingLabel="Cargando..."
-                            normalLabel="Agregar"
-                            onClick={handleAddData}
-                        />
+                            <div className="w-full flex flex-col gap-4 md:gap-6 mt-4">
+                                <ul className="space-y-4">
+                                    {currentItems.map((practica, index) => {
+                                    // Calcula el índice global para las prácticas
+                                    const globalIndex = (currentPage - 1) * itemsPerPage + index + 1;
+                                    return (
+                                        <li key={globalIndex} className="space-y-4">
+                                        <FloatingLabelInput
+                                            id={`titulo_${globalIndex}`}
+                                            label={`Título ${globalIndex} (Obligatorio)`}
+                                            value={practica.titulo}
+                                            onChange={(e) => handleInputChange(index + (currentPage - 1) * itemsPerPage, 'titulo', e.target.value)}
+                                        />
+                                        <FloatingLabelInput
+                                            id={`descripcion_${globalIndex}`}
+                                            label={`Descripción ${globalIndex} (Obligatorio)`}
+                                            value={practica.descripcion}
+                                            onChange={(e) => handleInputChange(index + (currentPage - 1) * itemsPerPage, 'descripcion', e.target.value)}
+                                        />
+                                        <FloatingLabelInput
+                                            id={`instrucciones_${globalIndex}`}
+                                            label={`Instrucciones ${globalIndex} (Opcional)`}
+                                            value={practica.instrucciones}
+                                            onChange={(e) => handleInputChange(index + (currentPage - 1) * itemsPerPage, 'instrucciones', e.target.value)}
+                                        />
+                                        </li>
+                                    );
+                                    })}
+                                </ul>
+                                {currentItems.length > 0 && (
+                                    <>
+                                    <Pagination
+                                        currentPage={currentPage}
+                                        layout="pagination"
+                                        onPageChange={onPageChange}
+                                        totalPages={totalPages}
+                                        previousLabel="Anterior"
+                                        nextLabel="Siguiente"
+                                        showIcons={true}
+                                    />
+                                    </>
+                                )}
+                            </div>
+
+                            {currentItems.length > 0 && (
+                            <>
+                            <div className="w-full flex justify-center md:justify-end mt-4">
+                            <LoadingButton
+                                className="w-full md:w-auto h-11"
+                                loadingLabel="Cargando..."
+                                normalLabel="Agregar"
+                                onClick={handleAddData}
+                            />
+                            </div>
+                            </>
+                            )}
+                            </>
+                            )}
                         </div>
-                        </>
-                        )}
-                        </>
-                        )}
-                    </div>
                     </section>
                 </div>
                 <div className='md:w-1/2 flex flex-col gap-y-4'>
@@ -380,13 +564,14 @@ const DetalleActividadDocente = () => {
                                     <ul className="py-1 text-sm">
                                         <li>
                                             <button
+                                                className="flex w-full items-center py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white text-gray-700 dark:text-gray-200"
                                                 type="button"
                                                 onClick={(e) => {
                                                     e.stopPropagation(); // Evita que el clic en el botón de menú active el clic en el enlace
                                                     // Aquí puedes abrir el modal para editar
-                                                    console.log('Editar');
+                                                    handleEditClick(practica);  
+                                                    setOpenModalEdit(true); // Maneja el clic para abrir el modal de eliminar
                                                 }}
-                                                className="flex w-full items-center py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white text-gray-700 dark:text-gray-200"
                                             >
                                                 <FaEdit className="w-4 h-4 mr-2" aria-hidden="true" />
                                                 Editar
@@ -397,6 +582,7 @@ const DetalleActividadDocente = () => {
                                                 type="button"
                                                 onClick={(e) => {
                                                     e.stopPropagation(); // Evita que el clic en el botón de menú active el clic en el enlace
+                                                    setPracticeToDelete(practica.idPractica); // Establece el ID de la práctica a eliminar
                                                     setOpenModalDelete(true); // Maneja el clic para abrir el modal de eliminar
                                                     console.log('Eliminar');
                                                 }}

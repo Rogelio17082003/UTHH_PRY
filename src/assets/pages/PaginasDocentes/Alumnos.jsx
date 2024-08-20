@@ -7,7 +7,7 @@ import { Label, TextInput, Button, Select, Modal } from "flowbite-react"; // Imp
 import * as XLSX from 'xlsx';
 import  Components from '../../components/Components'
 import ArrayIterator from '../../components/Clases/Iterador'
-const { LoadingButton, SelectInput} = Components;
+const { LoadingButton, SelectInput, IconButton} = Components;
 
 const Alumnos = () => {
     const [periodos, setPeriodos] = useState([]);
@@ -499,10 +499,12 @@ const Alumnos = () => {
             </div>
             <div className="flex items-center">
             <TextInput id="email4" type="email" icon={HiOutlineSearch} placeholder="Matricula del Alumno" required />
-            <Button icon={IoMdAdd} className="ml-2" onClick={() => setOpenModal(true)}>
-                <IoMdAdd className="mr-2 h-5 w-5" />
-                Añadir Estudiantes
-            </Button> 
+            <IconButton
+                className="ml-2"
+                Icon={IoMdAdd} // Pasa el componente de ícono
+                message="Añadir Estudiantes"
+                onClick={() => setOpenModal(true)}
+            /> 
             </div>
             <div>
             <h3 className="mb-2 text-base font-bold text-gray-900 dark:text-white">Consultar Alumnos</h3>

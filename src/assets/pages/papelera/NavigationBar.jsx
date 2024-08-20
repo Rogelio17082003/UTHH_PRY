@@ -5,10 +5,10 @@ import { HiUserCircle } from 'react-icons/hi';
 import { Button, Navbar, Avatar, Dropdown } from 'flowbite-react';
 import { IoMdAdd } from 'react-icons/io';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../server/authUser'; // Importa el hook de autenticación
+import { useAuth } from '../../server/authUser'; // Importa el hook de autenticación
 import secondaryLogo from '../images/secondary-logo.png'
-import SideNav from './Admin/SideNavBar'
-import  Components from './Components'
+import SideNav from '../../components/Admin/SideNavBar'
+import  Components from '../../components/Components'
 const {IconButton} = Components;
 
 const NavigationBar = ({ isSidebarOpen, toggleSidebar }) => {
@@ -123,12 +123,13 @@ const NavigationBar = ({ isSidebarOpen, toggleSidebar }) => {
             </div>
     
             <div className="nav__section nav__button">
-              <IconButton
-                className={`button ${showMenu ? "button-menu-active" : "button-menu-disable"}`}
-                Icon={HiUserCircle} // Pasa el componente de ícono
-                message="Iniciar Sesión"
-                onClick={() => navigate('/inicio-sesion')}
-              />
+            <IconButton
+            className={`button ${showMenu ? "button-menu-active" : "button-menu-disable"}`}
+            Icon={HiUserCircle} // Pasa el componente de ícono
+            message="Iniciar Sesión"
+            onClick={() => navigate('/inicio-sesion')}
+        />
+              
             </div>
 
             <div className="nav__toggle" id="nav-toggle" onClick={toggleMenu}>
