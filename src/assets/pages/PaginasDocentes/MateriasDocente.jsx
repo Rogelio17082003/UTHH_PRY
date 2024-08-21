@@ -7,20 +7,20 @@ import {FaRegFrown } from 'react-icons/fa';
 import {Button, Modal } from "flowbite-react"; // Importamos el componente Button
 import * as XLSX from 'xlsx';
 import  Components from '../../components/Components'
-const {IconButton, LoadingButton, TitlePage, Paragraphs} = Components;
+const {IconButton, LoadingButton, TitlePage, Paragraphs, InfoAlert} = Components;
 import {useAuth } from '../../server/authUser'; // Importa el hook de autenticación
 
 const MateriasDocente = () => { 
     const {userData} = useAuth(); // Obtén el estado de autenticación del contexto
     const [materias, setMaterias] = useState([]);
     const [actividades, setActividades] = useState([]);
-    const [alertMessage, setAlertMessage] = useState(null);
     const [openModal, setOpenModal] = useState(false);
     const [file, setFile] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const [data, setData] = useState([]);
     const [header, setHeader] = useState([]);
     const [info, setInfo] = useState({});
+    const [serverResponse, setServerResponse] = useState('');
 
     const handleFileUpload = (event) => {
         const file = event.target.files[0];
@@ -223,46 +223,44 @@ const MateriasDocente = () => {
         console.log("datos", actividadesData)
         try 
         {
-        setIsLoading(true);
-        // Hacer solicitud para obtener las carreras
-        const response = await fetch('https://robe.host8b.me/WebServices/InsertarActividades.php',
+            setIsLoading(true);
+            const response = await fetch('https://robe.host8b.me/WebServices/InsertarActividades.php',
+                {
+                method: 'POST',
+                headers: 
+                {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify
+                ({
+                    dataActividades: actividadesData,
+                }),
+                }
+            );
+            const result = await response.json();
+            setActividades([]);
+            if (result.done) 
             {
-            method: 'POST',
-            headers: 
-            {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify
-            ({
-                dataActividades: actividadesData,
-            }),
+                onloadNaterias(); // Llamar a la función para recargar las materias
+                setServerResponse(`Éxito: ${result.message}`);
+                console.log('Datos recibidos php:', result);
             }
-        );
-        const result = await response.json();
-    
-        if (result.done) 
-        {
-            onloadNaterias(); // Llamar a la función para recargar las materias
-
-            setAlertMessage({ type: 'success', text: 'Datos de estudiantes registrados correctamente' });
-            console.log('Datos recibidos php:', result);
-        }
-        else
-        {                
-            setAlertMessage({ type: 'error', text: result.message });
-            console.log('Datos recibidos php:', result);
-        }
+            else
+            {
+                setServerResponse(`Error: ${result.message}`);                
+                console.log('Datos recibidos php:', result);
+            }
         } 
         catch (error) 
         {
-        setAlertMessage({ type: 'error', text: 'Error al conectar con el servidor. Inténtalo de nuevo más tarde.' });
-        console.error(error);
+            setServerResponse(`Error: ${result.message}`);
+            console.error(error);
         }
         finally 
         {
-        setIsLoading(false);
-        setOpenModal(false)
-        setFile(null);
+            setIsLoading(false);
+            setOpenModal(false)
+            setFile(null);
         }
     };
 
@@ -304,6 +302,7 @@ const MateriasDocente = () => {
             setIsLoading(false);
         }
     };
+
     useEffect(() => 
     {
         {
@@ -312,13 +311,18 @@ const MateriasDocente = () => {
     }, []);
 
     return (
-        <div className="container mx-auto px-4 py-8">
-        {alertMessage && (
-            <Alert type={alertMessage.type} onClose={() => setAlertMessage(null)}>
-            {alertMessage.text}
-            </Alert>
-        )}
-        <Modal className='mt-11 pt-16' size="4xl" base show={openModal} onClose={() => setOpenModal(false)}>
+    <div className="container mx-auto px-4 py-8">
+
+        <InfoAlert
+            message={serverResponse}
+            type={serverResponse.includes('Éxito') ? 'success' : 'error'}
+            isVisible={!!serverResponse}
+            onClose={() => {
+            setServerResponse('');
+            }}
+        />
+
+        <Modal className='h-0 mt-auto pt-16' size="4xl" base show={openModal} onClose={() => setOpenModal(false)}>
             <Modal.Header>Agregar Materias</Modal.Header>
             <Modal.Body className='max-h-60'>
             <div className="space-y-6">
@@ -382,10 +386,8 @@ const MateriasDocente = () => {
                         </Table.Head>
                         <Table.Body className="divide-y">
                         {data.map((sheet, sheetIndex) => {
-        const activityData = extractActivityData(sheet.data);
-        return activityData.map((actividad, index) => (
-
-
+                            const activityData = extractActivityData(sheet.data);
+                            return activityData.map((actividad, index) => (
                             <Table.Row key={index} className="bg-white dark:border-gray-700 dark:bg-gray-800">
                             <Table.Cell>{index + 1}</Table.Cell>
                             <Table.Cell>{actividad.actividad}</Table.Cell>
@@ -397,9 +399,8 @@ const MateriasDocente = () => {
                             <Table.Cell>{actividad.fechaSolicitud}</Table.Cell>
                             <Table.Cell>{actividad.fechaEntrega}</Table.Cell>
                             </Table.Row>
-    ))
-                    })}
-
+                            ))
+                        })}
                         </Table.Body>
                     </Table>
                     </div>
@@ -407,19 +408,22 @@ const MateriasDocente = () => {
                 )}
             </div>
             </Modal.Body>
+            {actividades.length > 0 && (
             <Modal.Footer>
-            <LoadingButton
-                onClick={handleClickRegistrar} 
-                isLoading={isLoading}
-                className="max-w-32 max-h-11" // Clase de Tailwind CSS para definir un ancho máximo
-                loadingLabel="Cargando..."
-                normalLabel="Agregar"
-            />
-            <Button color="gray" onClick={() => {setOpenModal(false); setFile(null)}}>
-                Cancelar
-            </Button>
+                <LoadingButton
+                    onClick={handleClickRegistrar} 
+                    isLoading={isLoading}
+                    className="max-w-32 max-h-11" 
+                    loadingLabel="Cargando..."
+                    normalLabel="Agregar"
+                />
+                <Button color="gray" onClick={() => {setOpenModal(false); setFile(null)}}>
+                    Cancelar
+                </Button>
             </Modal.Footer>
+            )}
         </Modal>
+        
         <div className="flex items-center m-2">
             <IconButton
                 className="ml-2 button"
@@ -428,6 +432,7 @@ const MateriasDocente = () => {
                 onClick={() => setOpenModal(true)}
             />
         </div>
+
         <TitlePage label="Materias Asociadas" />
         {materias.length > 0 ? 
         (
@@ -436,7 +441,7 @@ const MateriasDocente = () => {
                 <Card
                 key={materia.vchClvMateria}
                 href={`/gruposMaterias/${materia.vchClvMateria}/${materia.intPeriodo}`}
-                className="max-w-sm rounded-lg overflow-hidden shadow-lg transform transition duration-300 hover:scale-105"
+                className="rounded-lg overflow-hidden shadow-lg transform transition duration-300 hover:scale-105"
                 theme={{
                     root: {
                     children: "p-0",
@@ -469,8 +474,7 @@ const MateriasDocente = () => {
             <Paragraphs label="No hay clases agregadas. Añade una clase para empezar." />
             </div>
         )}
-        </div>
-
+    </div>
     );
 };
 

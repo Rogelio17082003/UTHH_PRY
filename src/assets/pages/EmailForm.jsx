@@ -61,9 +61,9 @@ const EmailForm = () => {
   };
 
   return (
-    <div className='ml-7 mr-7'>
+    <div className='min-h-screen flex items-center justify-center'>
       {!emailSent ? (
-        <section className="md:min-h-screen flex items-center justify-center">
+        <section className="">
           <div className="max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
             <InfoAlert
               message={serverError}

@@ -27,13 +27,14 @@ const BreadcrumbNav = () => {
             if (path.includes(`/actividades/${vchClvMateria}/${chrGrupo}/${intPeriodo}`)) {
                 breadcrumbs.push({ path: `/actividades/${vchClvMateria}/${chrGrupo}/${intPeriodo}`, alias: 'Actividades' });
             }
-            if (path.includes(`/actividades/detalleActividad/${vchClvMateria}/${chrGrupo}/${intPeriodo}/${intNumeroActi}`)) {
+            if (path.includes(`/actividades/detalleActividad/${vchClvMateria}/${chrGrupo}/${intPeriodo}/${intNumeroActi}/${intIdActividadCurso}`)) {
                 breadcrumbs.push({ path: `/actividades/${vchClvMateria}/${chrGrupo}/${intPeriodo}`, alias: 'Actividades' });
-                breadcrumbs.push({ path: `/actividades/detalleActividad/${vchClvMateria}/${chrGrupo}/${intPeriodo}/${intNumeroActi}`, alias: 'Detalle de la Actividad' });
+                breadcrumbs.push({ path: `/actividades/detalleActividad/${vchClvMateria}/${chrGrupo}/${intPeriodo}/${intNumeroActi}/${intIdActividadCurso}`, alias: 'Detalle de la Actividad' });
             }
+
             if (path.includes(`/actividades/detalleActividad/detallePractica/${vchClvMateria}/${chrGrupo}/${intPeriodo}/${intNumeroActi}/${intNumeroPractica}`)) {
                 breadcrumbs.push({ path: `/actividades/${vchClvMateria}/${chrGrupo}/${intPeriodo}`, alias: 'Actividades' });
-                breadcrumbs.push({ path: `/actividades/detalleActividad/${vchClvMateria}/${chrGrupo}/${intPeriodo}/${intNumeroActi}`, alias: 'Detalle de la Actividad' });
+                breadcrumbs.push({ path: `/actividades/detalleActividad/${vchClvMateria}/${chrGrupo}/${intPeriodo}/${intNumeroActi}/${intIdActividadCurso}`, alias: 'Detalle de la Actividad' });
                 breadcrumbs.push({ path: `/actividades/detalleActividad/detallePractica/${vchClvMateria}/${chrGrupo}/${intPeriodo}/${intNumeroActi}/${intNumeroPractica}`, alias: 'Detalle de la Practica' });
             }
         }

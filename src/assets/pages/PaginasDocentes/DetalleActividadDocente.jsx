@@ -333,65 +333,66 @@ const DetalleActividadDocente = () => {
 
             {selectedPracticeForEdit && (
                 <Modal
+                    className='h-0 mt-auto pt-12'
                     show={openModalEdit}
-                    size="md"
+                    size="4xl"
                     onClose={() => setOpenModalEdit(false)}
                     popup
                 >
                     <Modal.Header />
-                    <Modal.Body >
-                        <div className="space-y-6 px-6 py-4">
-                            <TitleSection label="Editar Práctica" />
-                            
-                            <FloatingLabelInput
-                                id="edit_titulo"
-                                label="Título (Obligatorio)"
-                                value={selectedPracticeForEdit.vchNombre || ''}
-                                onChange={(e) => handleInputChangePracticas('vchNombre', e.target.value)}
-                            />
-                            <FloatingLabelInput
-                                id="edit_descripcion"
-                                label="Descripción (Obligatorio)"
-                                value={selectedPracticeForEdit.vchDescripcion || ''}
-                                onChange={(e) => handleInputChangePracticas('vchDescripcion', e.target.value)}
-                            />
-                            {/*<FloatingLabelInput
-                                id="edit_instrucciones"
-                                label="Instrucciones"
-                                value={selectedPracticeForEdit.vchInstrucciones || ''}
-                                onChange={(e) => handleInputChangePracticas('vchInstrucciones', e.target.value)}
-                            />*/}
-                            <div className="my-4">
-                                <label className="block text-sm font-medium text-gray-700">
-                                    Instrucciones
-                                </label>
-                                <ReactQuill
-                                    theme="snow"
-                                    value={selectedPracticeForEdit.vchInstrucciones|| ''}
-                                    onChange={(value) => handleInputChangePracticas('vchInstrucciones', value)}
-                                    placeholder={`Instrucciones (Opcional)`}
+                    <Modal.Body className='max-h-96'>
+                            <div className="space-y-6 px-6 py-4">
+                                <TitleSection label="Editar Práctica" />
+                                
+                                <FloatingLabelInput
+                                    id="edit_titulo"
+                                    label="Título (Obligatorio)"
+                                    value={selectedPracticeForEdit.vchNombre || ''}
+                                    onChange={(e) => handleInputChangePracticas('vchNombre', e.target.value)}
                                 />
-                            </div>
-                            
-                            <div className="flex justify-center gap-4 mt-6 h-10">
-                                <LoadingButton
-                                    className="w-36"
-                                    isLoading={isLoading}
-                                    loadingLabel="Cargando..."
-                                    normalLabel="Guardar"
-                                    onClick={handleSaveEdit}
-                                    disabled={isLoading}
+                                <FloatingLabelInput
+                                    id="edit_descripcion"
+                                    label="Descripción (Obligatorio)"
+                                    value={selectedPracticeForEdit.vchDescripcion || ''}
+                                    onChange={(e) => handleInputChangePracticas('vchDescripcion', e.target.value)}
                                 />
-                                <Button
-                                    color="gray"
-                                    onClick={() => setOpenModalEdit(false)}
-                                    className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-200 focus:ring-4 focus:ring-gray-300"
-                                >
-                                    No, cancelar
-                                </Button>
+                                {/*<FloatingLabelInput
+                                    id="edit_instrucciones"
+                                    label="Instrucciones"
+                                    value={selectedPracticeForEdit.vchInstrucciones || ''}
+                                    onChange={(e) => handleInputChangePracticas('vchInstrucciones', e.target.value)}
+                                />*/}
+                                <div className="my-4">
+                                    <label className="block text-sm font-medium text-gray-700">
+                                        Instrucciones
+                                    </label>
+                                    <ReactQuill
+                                        theme="snow"
+                                        value={selectedPracticeForEdit.vchInstrucciones|| ''}
+                                        onChange={(value) => handleInputChangePracticas('vchInstrucciones', value)}
+                                        placeholder={`Instrucciones (Opcional)`}
+                                    />
+                                </div>
+                                
+                                <div className="flex justify-center gap-4 mt-6 h-10">
+                                    <LoadingButton
+                                        className="w-36"
+                                        isLoading={isLoading}
+                                        loadingLabel="Cargando..."
+                                        normalLabel="Guardar"
+                                        onClick={handleSaveEdit}
+                                        disabled={isLoading}
+                                    />
+                                    <Button
+                                        color="gray"
+                                        onClick={() => setOpenModalEdit(false)}
+                                        className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-200 focus:ring-4 focus:ring-gray-300"
+                                    >
+                                        No, cancelar
+                                    </Button>
+                                </div>
                             </div>
-                        </div>
-                    </Modal.Body>
+                        </Modal.Body>
                 </Modal>
             )}
 

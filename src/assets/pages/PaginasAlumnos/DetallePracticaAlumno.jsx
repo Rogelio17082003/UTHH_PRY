@@ -98,7 +98,7 @@ const DetallePracticaAlumno = () => {
                 <div className='md:w-full md:flex flex-col gap-y-4'>
                 <div className="mb-4 md:mb-0 rounded-lg bg-white p-4 shadow dark:bg-gray-800 sm:p-6 xl:p-8">
                     <TitleSection label="Instrucciones" />
-                    <Paragraphs label={detalleActividad.vchInstrucciones} />
+                    <div className="prose" dangerouslySetInnerHTML={{ __html: detalleActividad.vchInstrucciones }} />
                 </div>
                 <TitlePage label="Calificaion Obtenida" />
 

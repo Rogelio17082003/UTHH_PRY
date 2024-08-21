@@ -424,7 +424,7 @@ const SelectInput =  ({ id, label, labelSelect, name, option, options, errors, r
 
 const ConfirmDeleteModal = ({ open, onClose, onConfirm, message }) => {
     return (
-        <Modal show={open} size="md" onClose={onClose} popup>
+        <Modal className='h-0 mt-auto' show={open} size="md" onClose={onClose} popup>
             <div className="fixed inset-0 flex items-center justify-center z-50">
                 <div className="relative w-full max-w-lg mx-4 bg-white rounded-lg shadow-lg">
                     <Modal.Header />

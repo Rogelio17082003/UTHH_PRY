@@ -568,7 +568,7 @@ const ActividadesDocente = () => {
 
         // Generar y guardar el archivo Excel
         const buffer = await workbook.xlsx.writeBuffer();
-        saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Calificaciones.xlsx');
+        saveAs(new Blob([buffer], { type: 'application/octet-stream' }), `Calificaciones ${info.Nombre_Materia} Parcial ${info.Parcial}.xlsx`);
     };
 
     return (

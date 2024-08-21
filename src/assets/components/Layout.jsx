@@ -16,14 +16,14 @@ const Layout = ({ children }) => {
 
   
   return (
-    <div className="flex h-screen w-10p sm:w-auto">
+    <div className="flex">
       <SideNav isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar}/>
       <div className={`flex-grow bg-gray-100 ${isAuthenticated ? (isSidebarOpen ? 'ml-64' : 'ml-12') : ''}`}>
       <NavigationBar isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar}/>
         <section className='m-4'>
-          <main className="mx-auto px-4">
+          <main className="flex-grow mx-auto px-4 min-h-screen">
             <BreadcrumbNav />
-              {children}
+                {children}
           </main>
           <FooterSection />
         </section>

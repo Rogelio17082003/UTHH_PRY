@@ -79,7 +79,7 @@ const GruposMateriasDocente = () => {
                 <Card
                     key={materia.chrGrupo}
                     href={`/gruposMaterias/actividades/${vchClvMateria}/${materia.chrGrupo}/${intPeriodo}`}
-                    className="max-w-sm rounded-lg overflow-hidden shadow-lg transform transition duration-300 hover:scale-105"
+                    className="w-full rounded-lg overflow-hidden shadow-lg transform transition duration-300 hover:scale-105"
                     theme={{
                     root: {
                         children: "p-0",

@@ -39,9 +39,9 @@ const NotificationHandler = () => {
             });
 
             const result = await response.json();
+            console.log('Login:', result);
 
             if (result.done) {
-              console.log('Login exitoso:', result);
               console.log('Token FCM:', token);
               localStorage.setItem('authTokenFirebase', token);
             } else {
