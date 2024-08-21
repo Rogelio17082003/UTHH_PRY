@@ -356,6 +356,7 @@ const DetalleActividadDocente = () => {
                                     value={selectedPracticeForEdit.vchDescripcion || ''}
                                     onChange={(e) => handleInputChangePracticas('vchDescripcion', e.target.value)}
                                 />
+                                
                                 {/*<FloatingLabelInput
                                     id="edit_instrucciones"
                                     label="Instrucciones"

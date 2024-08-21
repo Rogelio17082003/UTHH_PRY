@@ -17,11 +17,11 @@ const DetallePracticaDocente = () => {
     const { intNumeroPractica } = useParams();
     const [detalleActividad, setDetalleActividad] = useState({});
     const { isAuthenticated, userData } = useAuth();
-    const [rubricaData, setRubricaData] = useState([]);
     const [rubricaCalAlumno, setRubricaCalAlumno] = useState([]);
     const [puntajeTotal, setPuntajeTotal] = useState(0);
     const [puntajeTotalCal, setPuntajeTotalCal] = useState(0);
     const [isEditing, setIsEditing] = useState(false);
+    const [rubricaData, setRubricaData] = useState([]);
     const [editedData, setEditedData] = useState([]);
     const [alumnos, setAlumnosMaterias] = useState([]);
     const {vchClvMateria, chrGrupo, intPeriodo } = useParams();
@@ -31,9 +31,14 @@ const DetallePracticaDocente = () => {
 
     const { register, handleSubmit, watch, trigger, formState: { errors } } = useForm();
 
-    const validatePuntajeTotal = (data) => {
+    {/*const validatePuntajeTotal = (data) => {
         return data.reduce((sum, rubrica) => sum + (parseInt(rubrica.intValor) || 0), 0) <= 10;
+    };*/}
+    const validatePuntajeTotal = (data) => {
+        const totalPuntos = data.reduce((sum, rubrica) => sum + (parseFloat(rubrica.intValor) || 0), 0);
+        return totalPuntos >= 10 && totalPuntos <= 10;
     };
+    
 
     const handleEditClick = () => {
         setEditedData([...rubricaData]);
@@ -42,8 +47,8 @@ const DetallePracticaDocente = () => {
 
     const handleSaveClick = async () => {
         if (!validatePuntajeTotal(editedData)) {
-        alert('El puntaje total no puede exceder de 10 puntos.');
-        return;
+            alert('El puntaje total debe ser exactamente 10 puntos.');
+            return;
         }
         console.log("datos rubrica",editedData);
         try {
@@ -84,6 +89,53 @@ const DetallePracticaDocente = () => {
         newEditedData[index][field] = value;
         setEditedData(newEditedData);
     };
+
+
+
+    // Función para eliminar un rubro por índice
+    const handleDeleteRubro = (index) => {
+        console.log(index)
+        // Elimina el rubro del estado editado
+        const updatedEditedData = editedData.filter((_, i) => i !== index);
+        setEditedData(updatedEditedData);
+        console.log(updatedEditedData)
+    
+        // Elimina el rubro del estado original
+        const updatedRubricaData = rubricaData.filter((_, i) => i !== index);
+        setRubricaData(updatedRubricaData);
+        console.log(updatedRubricaData)
+    };
+    
+    const handleAddRubro = () => {
+        // Crea un nuevo rubro con campos predefinidos
+        const newRubro = {
+            intIdDetalle: '', // Usar un identificador único
+            vchClaveCriterio: '', // Campo necesario
+            vchCriterio: '', // Campo necesario
+            vchDescripcion: '', // Campo necesario
+            intValor: 0, // Campo necesario
+            intClvPractica: intNumeroPractica // O el valor correspondiente
+        };
+    
+        // Actualiza `editedData`
+        const updatedEditedData = [...editedData, newRubro];
+        setEditedData(updatedEditedData);
+    
+        // Actualiza `rubricaData` (si es necesario)
+        const updatedRubricaData = [...rubricaData, newRubro];
+        setRubricaData(updatedRubricaData);
+
+    };
+    
+    useEffect(() => {
+        console.log("edita1", editedData);
+        console.log("edita 2", rubricaData);
+        console.log("nuevo", editedData);
+    }, [editedData, rubricaData]);
+
+    const existeCalificacionMayorACero = alumnos.some(alumno => alumno.TieneCalificacion > 0);
+
+
 
 
     const handleInputChangeCal = (index, field, value) => {
@@ -302,19 +354,6 @@ const DetallePracticaDocente = () => {
         );
     };
 
-    const handleAddRubro = () => {
-        const newRubro = {
-          // Otros campos necesarios para el rubro
-        };
-        setEditedData([...editedData, newRubro]);
-    };
-
-    // Función para eliminar un rubro por índice
-    const handleDeleteRubro = (index) => {
-        const updatedData = editedData.filter((_, i) => i !== index);
-        setEditedData(updatedData);
-    };
-
     return (
         <section className='w-full flex flex-col'>
         <TitlePage label={detalleActividad.vchNombre} />
@@ -342,66 +381,67 @@ const DetallePracticaDocente = () => {
                                     </Tooltip>
                                     </div>
                                 ) : (
-                                    <Tooltip content="Editar" placement="left">
-                                    <FaEdit className="text-gray-500 hover:text-gray-700 cursor-pointer" onClick={handleEditClick} />
-                                    </Tooltip>
+                                    
+                                    existeCalificacionMayorACero ? (
+                                        <Tooltip content="No es posible editar la rúbrica una vez usada para calificar" placement="left">
+                                            <FaEdit className="text-gray-300 cursor-not-allowed" />
+                                        </Tooltip>
+                                    ) : (
+                                        <Tooltip content="Editar" placement="left">
+                                            <FaEdit className="text-gray-500 hover:text-gray-700 cursor-pointer" onClick={handleEditClick} />
+                                        </Tooltip>
+                                    )
+                                    
                                 )}
+
                                 </div>
                                 
                                 {editedData.map((rubrica, index) => (
-                                <div key={index} className="space-y-4">
-                                    <div className="grid grid-cols-2 items-center">
-                                    <div className="text-muted-foreground">
-                                        {isEditing ? (
-                                        <CustomInputOnchange
-                                            label={`Rubro ${index + 1}`}
-                                            type="text"
-                                            name={`vchRubro_${index}`}
-                                            value={rubrica.vchDescripcion || ''}
-                                            errors={errors}
-                                            register={register}
-                                            trigger={trigger}
-                                            onChange={(value) => handleInputChange(index, 'vchDescripcion', value)}
-                                        />
-                                        ) : (
-                                        <p>{rubrica.vchDescripcion}</p>
-                                        )}
-                                    </div>
-                                    <div className="flex items-center justify-end gap-2">
-                                        {isEditing ? (
-                                        <>
-                                        <CustomInputOnchange
-                                            label={`Valor ${index + 1}`}
-                                            type="number"
-                                            name={`intValor_${index}`}
-                                            value={rubrica.intValor || ''}
-                                            pattern={/^[0-9]+$/}
-                                            errorMessage="El valor debe ser un número"
-                                            errors={errors}
-                                            register={register}
-                                            trigger={trigger}
-                                            onChange={(value) => handleInputChange(index, 'intValor', value)}
-                                        />
-                                        <Tooltip content="Eliminar rubro">
-                                            <button
-                                            type="button"
-                                            className="text-gray-500  hover:text-gray-700 cursor-pointer"
-                                            onClick={() => handleDeleteRubro(index)}
-                                            >
-                                            <FaTrash />
-                                            </button>
-                                        </Tooltip>
-                                        </>
-                                        ) : (
-                                        <span className="font-semibold">{rubrica.intValor}</span>
-                                        )}
-                                        {isAuthenticated && !userData.roles && !isEditing && (
-                                        <span className="text-muted-foreground">/{rubrica.intValor}</span>
-                                        )}
-                                    </div>
-                                    </div>
-                                </div>
-                                ))}
+    <div key={index} className="space-y-4">
+        <div className="grid grid-cols-2 items-center gap-4">
+            <div className="text-muted-foreground">
+                {isEditing ? (
+                    <FloatingLabelInput
+                        id={`vchRubro_${rubrica.intIdDetalle}`}
+                        label={`Rubro ${index + 1}`}
+                        value={rubrica.vchDescripcion || ''}
+                        onChange={(e) => handleInputChange(index, 'vchDescripcion', e.target.value)}
+                    />
+                ) : (
+                    <p className="text-gray-900 dark:text-white">{rubrica.vchDescripcion}</p>
+                )}
+            </div>
+            <div className="flex items-center justify-end gap-2">
+                {isEditing ? (
+                    <>
+                        <FloatingLabelInput
+                            id={`intValor_${rubrica.intIdDetalle}`}
+                            label={`Valor ${index + 1}`}
+                            type="number"
+                            value={rubrica.intValor || ''}
+                            onChange={(e) => handleInputChange(index, 'intValor', e.target.value)}
+                        />
+                        <Tooltip content="Eliminar rubro">
+                            <button
+                                type="button"
+                                className="text-gray-500 hover:text-gray-700 cursor-pointer"
+                                onClick={() => handleDeleteRubro(index)}
+                            >
+                                <FaTrash />
+                            </button>
+                        </Tooltip>
+                    </>
+                ) : (
+                    <span className="font-semibold text-gray-900 dark:text-white">{rubrica.intValor}</span>
+                )}
+                {isAuthenticated && !userData.roles && !isEditing && (
+                    <span className="text-muted-foreground">/{rubrica.intValor}</span>
+                )}
+            </div>
+        </div>
+    </div>
+))}
+
                                 {isEditing && (
                                 <Tooltip content="Agregar nuevo criterio">
                                     <button
