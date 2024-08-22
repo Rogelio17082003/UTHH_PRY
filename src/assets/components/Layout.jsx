@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import NavigationBar from './NavigationBar';
 import FooterSection from './FooterSection';
 import BreadcrumbNav from './Breadcrumb';
-import SideNav from '../components/Admin/SideNavBar';
+import SideNav from './SideNavBar';
 import { useAuth } from '../server/authUser'; // Importar el hook de autenticación
 
 const Layout = ({ children }) => {

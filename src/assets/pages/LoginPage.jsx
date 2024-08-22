@@ -1,24 +1,20 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom'; 
 import { useForm } from 'react-hook-form';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { Checkbox, Label } from 'flowbite-react';
-import ReCAPTCHA from 'react-google-recaptcha';
 import Components from '../components/Components';
 import { useAuth } from '../server/authUser'; 
 import imagePanel from '../images/uthhPanel.png';
 import secondaryLogo from '../images/secondary-logo.png';
 
-const {TitlePage, Paragraphs, LoadingButton, CustomInput, CustomInputPassword, InfoAlert } = Components;
+const { TitlePage, Paragraphs, LoadingButton, CustomInput, CustomInputPassword, InfoAlert } = Components;
 
 const LoginPage = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
-  const captcha = useRef(null);
 
   const [showPassword, setShowPassword] = useState(false);
-  const [captchaValidado, setCaptchaValidado] = useState(false);
-  const [captchaValidationError, setCaptchaValidationError] = useState('');
   const [serverErrorMessage, setServerErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [intentosFallidos, setIntentosFallidos] = useState(0);
@@ -35,24 +31,9 @@ const LoginPage = () => {
     setShowPassword((prev) => !prev);
   };
 
-  const onCaptchaChange = () => {
-    if (captcha.current.getValue()) {
-      setCaptchaValidationError('');
-      setCaptchaValidado(true);
-    } else {
-      setCaptchaValidationError('Por favor, completa la validación del captcha.');
-      setCaptchaValidado(false);
-    }
-  };
-
   const handleLogin = async (data) => {
     setIsLoading(true);
     try {
-      if (!captchaValidado) {
-        setCaptchaValidationError('Por favor, completa la validación del captcha.');
-        return;
-      }
-
       const response = await fetch('https://robe.host8b.me/WebServices/loginUser.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -110,13 +91,10 @@ const LoginPage = () => {
   return (
     <div>
       <InfoAlert
-        message={serverErrorMessage || captchaValidationError}
+        message={serverErrorMessage}
         type="error"
-        isVisible={!!serverErrorMessage || !!captchaValidationError}
-        onClose={() => {
-          setServerErrorMessage('');
-          setCaptchaValidationError('');
-        }}
+        isVisible={!!serverErrorMessage}
+        onClose={() => setServerErrorMessage('')}
       />
 
       <section className="min-h-screen flex flex-col lg:flex-row">
@@ -125,14 +103,10 @@ const LoginPage = () => {
         </div>
         <div className="lg:w-1/2 bg-white p-8 flex-col flex items-center justify-center">
           <img className="w-20 mb-4" src={secondaryLogo} alt="logo" />
-          <TitlePage label={"Bienvenido de vuelta"}/>
-          <Paragraphs label={"Empieza donde lo dejaste, inicia sesión para continuar."}/>
+          <TitlePage label={"Bienvenido de vuelta"} />
+          <Paragraphs label={"Empieza donde lo dejaste, inicia sesión para continuar."} />
 
           <h1 className="text-2xl font-bold mb-2" style={{ color: '#009944' }}></h1>
-          {/*<p className="text-sm text-gray-600 mb-4">
-            Inicie su sitio web en segundos. ¿No tienes una cuenta?{' '}
-            <a href="/registro" style={{ color: '#009944' }}>Inscribirse</a>
-          </p>*/}
           <form className="w-full max-w-md mx-auto" onSubmit={handleSubmit(onSubmit)}>
             <CustomInput
               label="Matrícula"
@@ -174,21 +148,6 @@ const LoginPage = () => {
               normalLabel="Iniciar Sesión"
               disabled={bloquearBoton}
             />
-            <div className='reCaptcha'>
-              <ReCAPTCHA
-                ref={captcha}
-                sitekey="6LdUThYqAAAAABBrLId4dN3DOod7byAUSYHAUW7m"
-                onChange={onCaptchaChange}
-              />
-            </div>
-            {/*
-            <div className="flex items-center gap-2 mt-4">
-              <Checkbox id="agree" />
-              <Label htmlFor="agree" className="flex">
-                Estoy de acuerdo con el&nbsp;
-                <a href="/login" className="dark:text-cyan-500 hover:text-cyan-700 hover:underline">Términos y condiciones</a>
-              </Label>
-            </div>*/}
           </form>
         </div>
       </section>

@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import Components from '../../components/Components';
-const { TitlePage, ContentTitle, Paragraphs, TitleSection } = Components;
+const { TitlePage, ContentTitle, Paragraphs, TitleSection, DescriptionActivity } = Components;
 import { Card } from 'flowbite-react';
 import { FaRegFrown } from 'react-icons/fa';
 import { useAuth } from '../../server/authUser';
+import ReactMarkdown from 'react-markdown';
 
 const DetalleActividadAlumno = () => {
     const { vchClvMateria, chrGrupo, intPeriodo, intNumeroActi, intIdActividadCurso } = useParams();
@@ -95,22 +96,25 @@ const DetalleActividadAlumno = () => {
     }, [vchClvMateria, chrGrupo, intPeriodo, intNumeroActi]);
 
     // Combina prácticas con calificaciones
-    const prácticasConCalificaciones = practicas.map(practica => {
-        const calificacion = datosCalAlumn.find(c => c.idPractica === practica.idPractica);
+
+    // Combina prácticas con calificaciones, manejando el caso cuando datosCalAlumn es null o está vacío
+    // Asegúrate de que practicas sea un arreglo antes de mapearlo
+    const prácticasConCalificaciones = (practicas || []).map(practica => {
+        const calificacion = datosCalAlumn?.find(c => c.idPractica === practica.idPractica);
         return {
             ...practica,
             calificacionPractica: calificacion ? calificacion.calificacionPractica : 'No calificado',
             calificacionObtenidaAlumno: calificacion ? calificacion.calificacionObtenidaAlumno : 'No calificado'
-
         };
     });
+
     console.log("datos",prácticasConCalificaciones)
 
     return (
         <section className='w-full flex flex-col'>
             <div className="m-3 flex flex-col">
                 <TitlePage label={actividad.Nombre_Actividad} />
-                <Paragraphs label={actividad.Descripcion_Actividad} />
+                <DescriptionActivity label={actividad.Descripcion_Actividad}/>
             </div>
             <div className="flex flex-col md:flex-row">
                 {/* Detalles de la Actividad en dispositivos móviles y en PC */}

@@ -35,6 +35,28 @@ const Paragraphs = ({className, label }) =>
     )
 }
 
+const DescriptionActivity = ({ label = "" }) => {
+    const lines = label.split('\n');
+    return (
+        <div className='mb-3 text-gray-500 dark:text-gray-400'>
+            {lines.map((line, index) => {
+                if (line.startsWith('•')) 
+                {
+                    return <p key={index} className="mt-1 ml-5">{line}</p>;
+                } 
+                else if (line.startsWith('-')) 
+                {
+                    return <p key={index} className="ml-10">{line}</p>;
+                } 
+                else 
+                {
+                    return <p key={index}>{line}</p>;
+                }
+            })}
+        </div>
+    );
+};
+
 const Link = ({ to, children }) => {
     return (
         <RouterLink 
@@ -524,6 +546,7 @@ export default {
     TitleSection, 
     ContentTitle, 
     Paragraphs, 
+    DescriptionActivity,
     Link,
     IconButton,
     LoadingButton, 

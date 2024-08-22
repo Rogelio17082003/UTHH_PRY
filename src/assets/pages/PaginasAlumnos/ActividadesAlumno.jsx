@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom';
 import { Tabs, Accordion } from "flowbite-react";
 import { HiClipboardList, HiUserGroup } from "react-icons/hi"; // Actualiza aquí
 import Components from '../../components/Components';
-const { TitlePage, ContentTitle, Paragraphs, Link, TitleSection } = Components;
+const { TitlePage, ContentTitle, Paragraphs, Link, TitleSection, DescriptionActivity } = Components;
 
 const ActividadesAlumno = () => {
     const { userData } = useAuth(); // Obtén el estado de autenticación del contexto
@@ -134,7 +134,7 @@ const ActividadesAlumno = () => {
                             <ContentTitle label={actividad.vchNomActivi} />
                         </Accordion.Title>
                         <Accordion.Content>
-                            <Paragraphs label={actividad.vchDescripcion} />
+                            <DescriptionActivity label={actividad.vchDescripcion}/>
                             <Paragraphs label={`Valor: ${actividad.fltValor} puntos`} />
                         </Accordion.Content>
                         <Accordion.Content>

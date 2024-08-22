@@ -10,6 +10,15 @@
   .transform-w {
     zoom: 0.7; /* Escala al 80% del tamaño original */
   }
+
+}
+
+@media (max-width: 639px) {
+  .no-zoom {
+    transform: scale(1) !important; /* Revertir el escalado al tamaño original */
+    position: relative; /* Asegura que el elemento se posicione correctamente */
+    z-index: 1; /* Mantén el elemento encima de otros si es necesario */
+  }
 }
 
 :root {

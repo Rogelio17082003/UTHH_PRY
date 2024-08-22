@@ -7,7 +7,7 @@ import { IoMdAdd } from 'react-icons/io';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../server/authUser'; // Importa el hook de autenticación
 import secondaryLogo from '../images/secondary-logo.png'
-import SideNav from './Admin/SideNavBar'
+import SideNav from './SideNavBar'
 import  Components from './Components'
 const {IconButton} = Components;
 
@@ -65,10 +65,6 @@ const NavigationBar = ({ isSidebarOpen, toggleSidebar }) => {
       {isAuthenticated ? 
         (
           <div className="flex md:order-2">
-            <Dropdown  label={<span className="hover:bg-gray-100 mr-3 p-3.5 rounded-full"><IoMdAdd /> </span>} inline arrowIcon={false}>
-              <Dropdown.Item >Agregar nuevo curso</Dropdown.Item>
-              <Dropdown.Item href="/Admin/Students">Agregar alumnos</Dropdown.Item>
-            </Dropdown>
             <Dropdown
                 arrowIcon={false}
                 inline

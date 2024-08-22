@@ -26,7 +26,6 @@ const DetalleActividadDocente = () => {
     const [serverResponse, setServerResponse] = useState('');
     const [selectedPracticeForEdit, setSelectedPracticeForEdit] = useState({});
     const [isLoading, setIsLoading] = useState(false);
-    const [value, setValue] = useState('');
 
     const handleConfirmDelete = async () => {
         try {
@@ -202,6 +201,16 @@ const DetalleActividadDocente = () => {
 
         try {
         const data = await processFile(file);
+        // Validar que los datos no estén vacíos y tengan descripción
+        const allPracticasValid = data.practicasServer.every(practice =>
+            practice.descripcion.trim() !== '' 
+            // Añadir más validaciones si es necesario
+        );
+
+        if (!allPracticasValid) {
+            setServerResponse(`Error: Por favor llena todos los campos obligatorios`);
+            return;
+        }
         await sendDataToServer(data);
         } catch (error) {
         console.error('Error al procesar el archivo', error);
@@ -273,6 +282,8 @@ const DetalleActividadDocente = () => {
 
         console.log("datosPractica", selectedPracticeForEdit)
     };
+
+
     const handleInputChangePracticas = (field, value) => {
         setSelectedPracticeForEdit(prevState => {
             if (field === 'vchNombre') {
@@ -290,9 +301,14 @@ const DetalleActividadDocente = () => {
         });
     };
     
-    
-    
     const handleSaveEdit = async () => {
+        // Validar que todos los campos necesarios estén completos
+        const {vchDescripcion} = selectedPracticeForEdit;
+
+        if (!vchDescripcion.trim()) {
+            setServerResponse(`Error: Por favor llena todos los campos obligatorios`);
+            return;
+        }
         try {
             const response = await fetch('https://robe.host8b.me/WebServices/accionesPracticas.php', {
                 method: 'POST',

@@ -11,7 +11,7 @@ import { FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
 import { FixedSizeList as List } from 'react-window';
 import 'react-quill/dist/quill.snow.css';
 
-const { TitlePage, Paragraphs, TitleSection, LoadingButton, CustomInputOnchange, ContentTitle, FloatingLabelInput } = Components;
+const { TitlePage, Paragraphs, TitleSection, LoadingButton, CustomInputOnchange, ContentTitle, FloatingLabelInput, InfoAlert } = Components;
 
 const DetallePracticaDocente = () => {
     const { intNumeroPractica } = useParams();
@@ -28,6 +28,7 @@ const DetallePracticaDocente = () => {
     const [selectedAlumnoMatricula, setSelectedAlumnoMatricula] = useState(null);
     const [selectedAlumno, setSelectedAlumno] = useState(null);
     const [puntajeObtenido, setPuntajeObtenido] = useState(0);
+    const [serverResponse, setServerResponse] = useState('');
 
     const { register, handleSubmit, watch, trigger, formState: { errors } } = useForm();
 
@@ -45,9 +46,25 @@ const DetallePracticaDocente = () => {
         setIsEditing(true);
     };
 
+    const validateRubricaData = (data) => {
+        for (const rubrica of data) {
+            if (!rubrica.vchDescripcion || !rubrica.intValor || rubrica.intValor <= 0) {
+                return `Error: Todos los campos deben estar completos y el valor debe ser mayor a 0.`;
+            }
+        }
+        return '';
+    };
+
     const handleSaveClick = async () => {
+
+        const validationError = validateRubricaData(editedData);
+        if (validationError) {
+            setServerResponse(validationError);
+            return;
+        }
+        
         if (!validatePuntajeTotal(editedData)) {
-            alert('El puntaje total debe ser exactamente 10 puntos.');
+            setServerResponse(`Error: El puntaje total debe ser exactamente 10 puntos.`);
             return;
         }
         console.log("datos rubrica",editedData);
@@ -57,14 +74,19 @@ const DetallePracticaDocente = () => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ updatedRubrica: editedData }),
         });
-        const data = await response.json();
+        const result = await response.json();
+        console.log("datos php",result);
 
-        if (data.done) {
+        if (result.done) {
             setRubricaData(editedData);
             localStorage.setItem('rubricaData', JSON.stringify(editedData));
             setIsEditing(false);
+            setServerResponse(`Éxito: ${result.message}`);
+
         } else {
-            console.error('Error al actualizar la rúbrica');
+            setServerResponse(`Error: ${result.message}`);
+
+            console.error('Error al actualizar la rúbrica', data);
         }
         } catch (error) {
         console.error('Error:', error.message);
@@ -114,7 +136,7 @@ const DetallePracticaDocente = () => {
             vchCriterio: '', // Campo necesario
             vchDescripcion: '', // Campo necesario
             intValor: 0, // Campo necesario
-            intClvPractica: intNumeroPractica // O el valor correspondiente
+            intClvPractica: parseInt(intNumeroPractica, 10) // El segundo argumento 10 es para especificar que estamos usando base decimal
         };
     
         // Actualiza `editedData`
@@ -197,7 +219,8 @@ const DetallePracticaDocente = () => {
     
     const handleCalificarClick = async () => {
         if (!selectedAlumnoMatricula) {
-        alert('Selecciona un alumno antes de calificar.');
+        setServerResponse(`Error: Selecciona un alumno antes de calificar.`);
+
         return;
         }
         console.log(rubricaCalAlumno)
@@ -217,9 +240,9 @@ const DetallePracticaDocente = () => {
     
         if (result.done) {
             onloadAlumnos()
-            alert('Calificaciones actualizadas exitosamente');
+            setServerResponse(`Éxito: ${result.message}`);
         } else {
-            console.error('Error al calificar:', result.message);
+            setServerResponse(`Error: ${result.message}`);
         }
         } catch (error) {
         console.error('Error:', error.message);
@@ -356,6 +379,14 @@ const DetallePracticaDocente = () => {
 
     return (
         <section className='w-full flex flex-col'>
+            <InfoAlert
+                message={serverResponse}
+                type={serverResponse.includes('Éxito') ? 'success' : 'error'}
+                isVisible={!!serverResponse}
+                onClose={() => {
+                setServerResponse('');
+                }}
+            />
         <TitlePage label={detalleActividad.vchNombre} />
         <Paragraphs className="ml-3" label={detalleActividad.vchDescripcion} />
         <Tabs>
