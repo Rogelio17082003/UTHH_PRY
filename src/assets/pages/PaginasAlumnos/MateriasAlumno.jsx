@@ -59,14 +59,14 @@ return (
                     <Card
                     key={materia.vchClvMateria}
                     href={`/actividades/${materia.vchClvMateria}/${userData.dataEstudiante.chrGrupo}/${materia.intPeriodo}`}
-                    className="max-w-sm rounded-lg overflow-hidden shadow-lg transform transition duration-300 hover:scale-105"
+                    className="rounded-lg overflow-hidden shadow-lg transform transition duration-300 hover:scale-105"
                     >
                         <div className="flex justify-end px-4 pt-4">
                         {/* Aquí puedes agregar un menú desplegable si es necesario */}
                         </div>
                         <div className="flex flex-col items-center pb-6 px-4">
-                            <img alt="User settings" 
-                                src={`https://robe.host8b.me/assets/imagenes/${materia.vchFotoPerfil}`}
+                            <img alt={`Foto de perfil de ${materia.vchNombre}`} 
+                                src={materia.vchFotoPerfil ? `https://robe.host8b.me/assets/imagenes/${materia.vchFotoPerfil}` : 'https://robe.host8b.me/assets/imagenes/userProfile.png'}
                                 className="w-24 h-24 rounded-full shadow-lg mb-3" 
                                 data-testid="flowbite-avatar-img"
                             />

@@ -4,6 +4,7 @@ import { Label, TextInput, Button, Select, Modal, Tooltip } from "flowbite-react
 import { HiOutlineExclamationCircle } from 'react-icons/hi';
 import { FaInfoCircle, FaCheckCircle, FaExclamationCircle } from "react-icons/fa"; // Importa íconos de react-icons
 import { AiOutlineClose } from 'react-icons/ai';
+import { BsCircleFill } from 'react-icons/bs';
 
 const TitlePage = ({ label }) => 
 {   
@@ -12,10 +13,10 @@ const TitlePage = ({ label }) =>
     )
 }
 
-const TitleSection = ({ label }) => 
+const TitleSection = ({className, label }) => 
 {   
     return (
-        <h3 className="mb-2 text-base font-bold text-gray-900 dark:text-white">{label}</h3>
+        <h3 className={`mb-2 text-base font-bold text-gray-900 dark:text-white   ${className}`}>{label}</h3>
     )
 }
 
@@ -481,15 +482,15 @@ const ConfirmDeleteModal = ({ open, onClose, onConfirm, message }) => {
     );
 };
 
-const InfoAlert = ({ message, type, isVisible, onClose }) => {
+const InfoAlert = ({ message, type, isVisible, onClose, hasDuration = true }) => {
     useEffect(() => {
-        if (isVisible) {
+        if (isVisible && (type !== "error" || hasDuration)) {
             const timer = setTimeout(() => {
                 onClose();
-            }, 1900);
+            }, 2000);
             return () => clearTimeout(timer);
         }
-    }, [isVisible, onClose]);
+    }, [isVisible, onClose, type, hasDuration]);
 
     if (!isVisible) return null;
 
@@ -520,7 +521,7 @@ const InfoAlert = ({ message, type, isVisible, onClose }) => {
     return (
         <div
             id="alert-1"
-            className={`alert-slide flex items-center p-4 mb-4 rounded-lg shadow-lg ${bgColor} ${textColor}`}
+            className={`flex items-center p-4 mb-4 rounded-lg shadow-lg alert-slide ${bgColor} ${textColor} myComponent`} // Esto equivale a md:max-w-lg
             role="alert"
         >
             <Icon className="flex-shrink-0 w-4 h-4" aria-hidden="true" />
@@ -533,13 +534,31 @@ const InfoAlert = ({ message, type, isVisible, onClose }) => {
             >
                 <AiOutlineClose className="w-3 h-3" />
             </button>
-            {/* Barra de progreso con animación */}
-            <div
-                className={`progress-bar absolute bottom-0 left-0 h-1 ${progressColor}`}
-            ></div>
+            {hasDuration && (
+                <div
+                    className={`progress-bar absolute bottom-0 left-0 h-1 ${progressColor}`}
+                ></div>
+            )}
         </div>
     );
 };
+
+const LoadingOverlay = ({ isLoading }) => {
+    if (!isLoading) {
+      return null; // No renderiza nada si no está cargando
+    }
+  
+    return (
+      <div className="loading-overlay">
+        <div className="loading-balls">
+          <BsCircleFill className="ball" />
+          <BsCircleFill className="ball" />
+          <BsCircleFill className="ball" />
+        </div>
+      </div>
+    );
+  };
+
 
 export default {
     TitlePage,  
@@ -557,5 +576,6 @@ export default {
     CustomInputOnchange,
     SelectInput,
     ConfirmDeleteModal,
-    InfoAlert
+    InfoAlert,
+    LoadingOverlay
 };

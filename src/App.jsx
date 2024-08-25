@@ -50,7 +50,7 @@ function App() {
           {/*PAGINAS PARA Alumnos */}
           <Route path="/actividades/:vchClvMateria/:chrGrupo/:intPeriodo" element={<PrivateRouteUser><Layout><ActividadesAlumno/></Layout></PrivateRouteUser>} />
           <Route path="/actividades/detalleActividad/:vchClvMateria/:chrGrupo/:intPeriodo/:intNumeroActi/:intIdActividadCurso" element={<PrivateRouteUser><Layout><DetalleActividadAlumno/></Layout></PrivateRouteUser>} />
-          <Route path="/actividades/detalleActividad/detallePractica/:vchClvMateria/:chrGrupo/:intPeriodo/:intNumeroActi/:intNumeroPractica" element={<PrivateRouteUser><Layout><DetallePracticaAlumno/></Layout></PrivateRouteUser>} />
+          <Route path="/actividades/detalleActividad/detallePractica/:vchClvMateria/:chrGrupo/:intPeriodo/:intNumeroActi/:intNumeroPractica/:intIdActividadCurso" element={<PrivateRouteUser><Layout><DetallePracticaAlumno/></Layout></PrivateRouteUser>} />
           {/*PAGINAS PARA Docentes */}
           <Route path="/alumnos" element={<PrivateRoute><Layout><Alumnos/></Layout></PrivateRoute>} />
           <Route path="/docentes" element={<PrivateRoute><Layout><Docentes/></Layout></PrivateRoute>} />
@@ -58,7 +58,7 @@ function App() {
           <Route path="/gruposMaterias/:vchClvMateria/:intPeriodo" element={<PrivateRoute><Layout><GruposMateriasDocente/></Layout></PrivateRoute>} />
           <Route path="/gruposMaterias/actividades/:vchClvMateria/:chrGrupo/:intPeriodo" element={<PrivateRoute><Layout><ActividadesDocente/></Layout></PrivateRoute>} />
           <Route path="/gruposMaterias/actividades/detalleActividad/:vchClvMateria/:chrGrupo/:intPeriodo/:intNumeroActi/:intIdActividadCurso" element={<PrivateRoute><Layout><DetalleActividadDocente/></Layout></PrivateRoute>} />
-          <Route path="/gruposMaterias/actividades/detalleActividad/detallePractica/:vchClvMateria/:chrGrupo/:intPeriodo/:intNumeroActi/:intNumeroPractica" element={<PrivateRoute><Layout><DetallePracticaDocente/></Layout></PrivateRoute>} />
+          <Route path="/gruposMaterias/actividades/detalleActividad/detallePractica/:vchClvMateria/:chrGrupo/:intPeriodo/:intNumeroActi/:intNumeroPractica/:intIdActividadCurso" element={<PrivateRoute><Layout><DetallePracticaDocente/></Layout></PrivateRoute>} />
 
           <Route path="/Terminos" element={<Layout><PrivacyPolicy/></Layout>} />
           <Route path="/*"element={<Layout><Error404/></Layout>}/>

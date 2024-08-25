@@ -590,7 +590,7 @@ const Alumnos = () => {
                 <Table.HeadCell>Correo</Table.HeadCell>
                 <Table.HeadCell>Estado de inscripcion</Table.HeadCell>
                 <Table.HeadCell>Estado de cuenta</Table.HeadCell>
-                <Table.HeadCell className='px-4 py-3'><div class="sr-only">Actions</div></Table.HeadCell>
+                <Table.HeadCell className='px-4 py-3'><div className="sr-only">Actions</div></Table.HeadCell>
                 </Table.Head>
                 <Table.Body className="divide-y">
                 {alumnos.map((alumnosFitro) =>

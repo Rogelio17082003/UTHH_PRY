@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { NavLink } from "react-router-dom";
 import { IoClose, IoMenu } from "react-icons/io5";
 import { HiUserCircle } from 'react-icons/hi';
+import { FaUser, FaSignOutAlt } from 'react-icons/fa';
 import { Button, Navbar, Avatar, Dropdown } from 'flowbite-react';
 import { IoMdAdd } from 'react-icons/io';
 import { useNavigate } from 'react-router-dom';
@@ -64,27 +65,36 @@ const NavigationBar = ({ isSidebarOpen, toggleSidebar }) => {
       </div>
       {isAuthenticated ? 
         (
-          <div className="flex md:order-2">
-            <Dropdown
-                arrowIcon={false}
-                inline
-                label={<Avatar alt="User settings" 
-                  img={profileImageUrl}
-                  rounded />}
-            >
-                <Dropdown.Header>
-                <span className="block text-sm">{userData.vchNombre}</span>
-                <span className="block truncate text-sm font-medium">{userData.roles}</span>
-                <span className="block text-sm">{userData.vchCorreoElectronico}</span>
-                </Dropdown.Header>
-                <Dropdown.Item href="/mi-perfil">Mi Perfil</Dropdown.Item>
-                {/*<Dropdown.Item>Ajustes</Dropdown.Item>
-                <Dropdown.Item href="/ResultadosCalificaciones">Busqueda Sencilla</Dropdown.Item>
-                <Dropdown.Item href="/BusquedaAvanzada">Busqueda Avanzada</Dropdown.Item>*/}
-                <Dropdown.Divider />
-                <Dropdown.Item onClick={logout}>Cerrar Sesion</Dropdown.Item>
-            </Dropdown>
+        <div className="flex items-center gap-4 md:order-2">
+          <Dropdown
+            arrowIcon={false}
+            inline
+            label={
+              <Avatar
+                alt="User settings"
+                img={profileImageUrl}
+                rounded
+              />
+            }
+          >
+            <Dropdown.Item href='/mi-perfil'>
+              <FaUser className="mr-2" />
+              Mi Perfil
+            </Dropdown.Item>
+            <Dropdown.Item onClick={logout}>
+              <FaSignOutAlt className="mr-2" />
+              Cerrar Sesión
+            </Dropdown.Item>
+          </Dropdown>
+
+          <div className="flex flex-col text-right">
+          <span className="text-sm font-medium text-gray-900 dark:text-white capitalize">
+            {userData.vchNombre.toLowerCase()} {userData.vchAPaterno.toLowerCase()} {userData.vchAMaterno.toLowerCase()}
+          </span>
+            <span className="text-sm text-gray-500 dark:text-gray-400 truncate">{userData.vchNombreRol}</span>
           </div>
+        </div>
+
         )
         :
         (

@@ -163,7 +163,7 @@ const DetalleActividadAlumno = () => {
                                 {prácticasConCalificaciones.map((practica) => (
                               <Card
                               key={practica.idPractica}
-                              href={`/actividades/detalleActividad/detallePractica/${vchClvMateria}/${chrGrupo}/${intPeriodo}/${intNumeroActi}/${practica.idPractica}`}
+                              href={`/actividades/detalleActividad/detallePractica/${vchClvMateria}/${chrGrupo}/${intPeriodo}/${intNumeroActi}/${practica.idPractica}/${intIdActividadCurso}`}
                               className="relative rounded-lg overflow-hidden shadow-lg p-0"
                               theme={{ root: { children: "p-0" } }}
                           >

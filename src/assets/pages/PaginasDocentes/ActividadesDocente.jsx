@@ -6,7 +6,7 @@ import { HiClipboardList, HiUserGroup } from "react-icons/hi"; // Actualiza aqu�
 import Components from '../../components/Components';
 import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
-const { TitlePage, ContentTitle, Paragraphs, Link, TitleSection, LoadingButton, InfoAlert } = Components;
+const { TitlePage, ContentTitle, Paragraphs, Link, TitleSection, LoadingButton, InfoAlert, DescriptionActivity, LoadingOverlay } = Components;
 
 const ActividadesDocente = () => {
     const { userData } = useAuth(); // Obtén el estado de autenticación del contexto
@@ -15,9 +15,11 @@ const ActividadesDocente = () => {
     const { vchClvMateria, chrGrupo, intPeriodo } = useParams();
     const [loading, setLoading] = useState(false);
     const [serverResponse, setServerResponse] = useState('');
+    const [isLoadingPage, setIsLoadingPage] = useState(false);
 
 
     const onloadActividades = async () => {
+        setIsLoadingPage(true);
         try {
         const response = await fetch('https://robe.host8b.me/WebServices/cargarMaterias.php', {
             method: 'POST',
@@ -61,6 +63,9 @@ const ActividadesDocente = () => {
         setTimeout(() => {
             alert('¡Ay caramba! Encontramos un pequeño obstáculo en el camino, pero estamos trabajando para superarlo. Gracias por tu paciencia mientras solucionamos este problemita.');
         }, 2000);
+        }
+        finally{
+            setIsLoadingPage(false);
         }
     };
 
@@ -573,6 +578,8 @@ const ActividadesDocente = () => {
 
     return (
         <section className="w-full flex flex-col">
+            <LoadingOverlay isLoading={isLoadingPage} />
+
             <InfoAlert
                 message={serverResponse}
                 type={serverResponse.includes('éxito') ? 'success' : 'error'}
@@ -612,7 +619,7 @@ const ActividadesDocente = () => {
                                     <ContentTitle label={actividad.vchNomActivi} />
                                     </Accordion.Title>
                                     <Accordion.Content>
-                                    <Paragraphs label={actividad.vchDescripcion} />
+                                    <DescriptionActivity label={actividad.vchDescripcion}/>
                                     <Paragraphs label={`Valor: ${actividad.fltValor} puntos`} />
                                     </Accordion.Content>
                                     <Accordion.Content>

@@ -100,36 +100,34 @@ const DetallePracticaAlumno = () => {
                     <TitleSection label="Instrucciones" />
                     <div className="prose" dangerouslySetInnerHTML={{ __html: detalleActividad.vchInstrucciones }} />
                 </div>
-                <TitlePage label="Calificaion Obtenida" />
 
-                <div className="grid grid-cols-1 gap-1 md:mb-0 rounded-lg bg-white p-4 shadow dark:bg-gray-800 sm:p-6 xl:p-8">
-                    <div className="flex justify-between items-center">
+                <div className="rounded-lg bg-white p-6 shadow-lg dark:bg-gray-800">
+                <div className="mb-4 border-b border-gray-300 dark:border-gray-700">
                     <TitleSection label="Rúbrica de Evaluación" />
-                    </div>
-                    {rubricaCalAlumno.map((rubrica, index) => (
-                    <div key={index} className="space-y-4">
-                        <div className="grid grid-cols-2 items-center">
-                        <div className="text-muted-foreground">
-                        <p>{rubrica.criterioDescripcion}</p>
-                        </div>
-                        <div className="flex items-center justify-end gap-2">
-                            <span className="text-muted-foreground">{rubrica.calificacionObtenida}</span>
-                            <span className="font-semibold">/{rubrica.valorMaximo}</span>
-                        </div>
-                        </div>
-                    </div>
-                    ))}
+                </div>
 
-                    <div className="mt-6 flex justify-between items-center">
-                    <div className="text-muted-foreground">Puntaje Total</div>
-                    <div className="flex items-center gap-2">
-                        {isAuthenticated && !userData.roles && (
-                        <span className="text-muted-foreground">{puntajeObtenido}</span>
-                        )}
-                        <span className="font-semibold text-2xl">/{puntajeTotalCal}</span>
+                {rubricaCalAlumno.map((rubrica, index) => (
+                    <div key={index} className="flex justify-between items-center py-4 border-b border-gray-200 dark:border-gray-700">
+                    <div className="flex-1 text-muted-foreground mr-4">
+                        <p className='text-gray-900 dark:text-white'>{rubrica.criterioDescripcion}</p>
                     </div>
+                    <div className="flex-shrink-0 flex items-center gap-2 text-lg font-semibold">
+                        <span className="text-gray-700 dark:text-gray-300">{rubrica.calificacionObtenida||'0'}</span>
+                        <span className="text-gray-500 dark:text-gray-400">/{rubrica.valorMaximo}</span>
+                    </div>
+                    </div>
+                ))}
+                
+                <div className="mt-6 flex justify-between items-center pt-4 border-t border-gray-300 dark:border-gray-700">
+                    <div className="text-muted-foreground text-xl font-semibold">Puntaje Total</div>
+                    <div className="flex items-center gap-2 text-xl font-bold">
+                        
+                    <span className="font-semibold text-2xl text-muted-foreground text-gray-700">{puntajeObtenido}</span>
+                    <span className="font-semibold text-2xl">/ {puntajeTotalCal}</span>
                     </div>
                 </div>
+                </div>
+
 
                 </div>
                 {/** 

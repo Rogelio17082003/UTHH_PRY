@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import  Components from '../../components/Components'
-const {TitlePage, ContentTitle, Paragraphs, TitleSection, LoadingButton, SelectInput, FloatingLabelInput, ConfirmDeleteModal, InfoAlert, IconButton} = Components;
+const {TitlePage, ContentTitle, Paragraphs, TitleSection, LoadingButton, SelectInput, FloatingLabelInput, ConfirmDeleteModal, InfoAlert, IconButton, DescriptionActivity, LoadingOverlay} = Components;
 import {Card} from 'flowbite-react';
 import * as XLSX from 'xlsx';
 import { useForm } from 'react-hook-form';
@@ -26,6 +26,7 @@ const DetalleActividadDocente = () => {
     const [serverResponse, setServerResponse] = useState('');
     const [selectedPracticeForEdit, setSelectedPracticeForEdit] = useState({});
     const [isLoading, setIsLoading] = useState(false);
+    const [isLoadingPage, setIsLoadingPage] = useState(false);
 
     const handleConfirmDelete = async () => {
         try {
@@ -83,6 +84,7 @@ const DetalleActividadDocente = () => {
 
         try 
         {
+            setIsLoadingPage(true);
             const response = await fetch('https://robe.host8b.me/WebServices/cargarMaterias.php', 
             {
             method: 'POST',
@@ -108,11 +110,14 @@ const DetalleActividadDocente = () => {
         } catch (error) {
             console.error('Error: Error al cargar los datos de la actividad');
         }
+        finally{
+            setIsLoadingPage(false);
+        }
         };
         
     useEffect(() => {
         fetchActividad();
-    }, [vchClvMateria, chrGrupo, intPeriodo, intNumeroActi, ]);
+    }, [vchClvMateria, chrGrupo, intPeriodo, intNumeroActi, intIdActividadCurso]);
 
     const handleFileUpload = (event) => {
         const uploadedFile = event.target.files[0];
@@ -346,6 +351,7 @@ const DetalleActividadDocente = () => {
     return (
         
         <section className='w-full flex flex-col'>
+            <LoadingOverlay isLoading={isLoadingPage} />
 
             {selectedPracticeForEdit && (
                 <Modal
@@ -373,12 +379,6 @@ const DetalleActividadDocente = () => {
                                     onChange={(e) => handleInputChangePracticas('vchDescripcion', e.target.value)}
                                 />
                                 
-                                {/*<FloatingLabelInput
-                                    id="edit_instrucciones"
-                                    label="Instrucciones"
-                                    value={selectedPracticeForEdit.vchInstrucciones || ''}
-                                    onChange={(e) => handleInputChangePracticas('vchInstrucciones', e.target.value)}
-                                />*/}
                                 <div className="my-4">
                                     <label className="block text-sm font-medium text-gray-700">
                                         Instrucciones
@@ -433,7 +433,7 @@ const DetalleActividadDocente = () => {
                 onClick={handleDownload}/>
             </div>
             <div className="m-3 flex flex-col">
-                <Paragraphs label={actividad.Descripcion_Actividad} />
+                <DescriptionActivity label={actividad.Descripcion_Actividad}/>
             </div>
 
             <div className="flex flex-col md:flex-row">
@@ -628,7 +628,7 @@ const DetalleActividadDocente = () => {
                             )}
                         </div>
                         <a
-                            href={`/gruposMaterias/actividades/detalleActividad/detallePractica/${vchClvMateria}/${chrGrupo}/${intPeriodo}/${intNumeroActi}/${practica.idPractica}`}
+                            href={`/gruposMaterias/actividades/detalleActividad/detallePractica/${vchClvMateria}/${chrGrupo}/${intPeriodo}/${intNumeroActi}/${practica.idPractica}/${intIdActividadCurso}`}
                             className="block h-36"
                         >
                             <div className="relative h-full">

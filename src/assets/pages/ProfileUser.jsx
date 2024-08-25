@@ -7,7 +7,7 @@ import { Card, Avatar } from 'flowbite-react';
 import  Components from '../components/Components'
 import AlexaLogo from '../images/alexa-logo.png';
 
-const {TitlePage, TitleSection, LoadingButton, CustomInput, Paragraphs, CustomInputPassword, CustomRepeatPassword} = Components;
+const {TitlePage, TitleSection, LoadingButton, CustomInput, Paragraphs, CustomInputPassword, CustomRepeatPassword, InfoAlert} = Components;
 const PasswordValidationItem = ({ isValid, text }) => (
   <li className="flex items-center mb-1">
     {isValid ? <FaCheck className="text-green-500" /> : <FaTimes className="text-red-500" />}
@@ -23,6 +23,7 @@ const PerfilUsuario = () => {
   const [isLoading, setIsLoading] = useState(false);
   const fileInputRef = useRef(null);
   const [loading, setLoading] = useState(false);
+  const [serverResponse, setServerResponse] = useState('');
 
   const profileImageUrl = isAuthenticated && userData?.vchFotoPerfil
   ? `https://robe.host8b.me/assets/imagenes/${userData.vchFotoPerfil}`
@@ -187,7 +188,6 @@ const PerfilUsuario = () => {
             }),
         });
         const result = await response.json();
-        console.log(result);
         if (result.done) 
         {
           const token = localStorage.getItem('authToken');
@@ -218,8 +218,7 @@ const PerfilUsuario = () => {
 
   const onSubmitUpdatePassword = async (data, event) => {
     event.preventDefault();
-    const updatedData = { ...data, user: userData.vchMatricula };
-    data = {data:updatedData};
+    const updatedData = { ...data, matricula: userData.vchMatricula };
     console.log('Formulario enviado:', data);
     
     try {
@@ -232,7 +231,7 @@ const PerfilUsuario = () => {
               'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-              ...data
+              ...updatedData
               
           }),
       });
@@ -240,18 +239,11 @@ const PerfilUsuario = () => {
       const result = await response.json();
   
       if (result.done) {
-          console.log('Contraseña actualizada correctamente:',result.done);
-          alert("Contraseña actualizada correctamente")
-          window.location.reload(); // Recarga la página
-          
-          
+          setServerResponse(`Éxito: ${result.message}`);          
         } 
         else {
 
-          
-          console.error('Error en el cambio de Contraseña:',result.message); 
-          alert("Error en el cambio de Contraseña:Contraseña actual incorrecta")
-
+          setServerResponse(`Error: ${result.message}`);
           if (result.debug_info) {
               console.error('Información de depuración:', result.debug_info);
           }
@@ -282,6 +274,14 @@ const PerfilUsuario = () => {
 
   return (
     <section className='w-full flex flex-col'>
+      <InfoAlert
+        message={serverResponse}
+        type={serverResponse.includes('Éxito') ? 'success' : 'error'}
+        isVisible={!!serverResponse}
+        onClose={() => {
+        setServerResponse('');
+        }}
+      />
       <TitlePage label="Mi perfil" />
       <div className="flex flex-col md:flex-row">
         <div className='md:w-1/2 md:ml-4 md:flex flex-col gap-y-4 '>
@@ -324,7 +324,7 @@ const PerfilUsuario = () => {
 
               </div>
               <div className='ml-px	'>
-              <TitleSection label={`${userData.vchNombre} ${userData.vchAPaterno} ${userData.vchAMaterno}`} />
+              <TitleSection className="capitalize" label={`${userData.vchNombre.toLowerCase()} ${userData.vchAPaterno.toLowerCase()} ${userData.vchAMaterno.toLowerCase()}`} />
               <h2 className="text-xl font-bold dark:text-white"></h2>
                 <ul className="mt-2 space-y-1">
                   <li className="flex items-center text-sm font-normal text-gray-500 dark:text-gray-400">
@@ -466,7 +466,7 @@ const PerfilUsuario = () => {
                           <CustomInputPassword
                               className="mb-0"
                               label="Contraseña Actual"
-                              name="realpassword"
+                              name="passwordActual"
                               type={showPassword ? 'text' : 'password'}
                               errors={errors}
                               register={register}
@@ -498,7 +498,7 @@ const PerfilUsuario = () => {
                   <CustomRepeatPassword
                     type={showPassword ? 'text' : 'password'}
                     label="Repetir contraseña"
-                    name="passwordRepeat"
+                    name="passwordConfirmado"
                     errors={errors}
                     register={register}
                     trigger={trigger}
