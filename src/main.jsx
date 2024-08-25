@@ -7,7 +7,7 @@ import { onMessage, getToken } from 'firebase/messaging';
 import { messaging } from './assets/pages/notificaciones/firebase.jsx';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { AuthProvider } from '../src/assets/server/authUser.jsx'; // Importa el AuthProvider
+import { AuthProvider } from '../src/assets/server/authUser'; // Importa el AuthProvider
 import NotificationHandler from './NotificationHandler'; // Importa el nuevo componente NotificationHandler
 
 /*
