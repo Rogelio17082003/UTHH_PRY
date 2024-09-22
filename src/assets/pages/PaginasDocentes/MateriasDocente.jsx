@@ -21,7 +21,6 @@ const MateriasDocente = () => {
     const [header, setHeader] = useState([]);
     const [info, setInfo] = useState({});
     const [serverResponse, setServerResponse] = useState('');
-    const [isLoadingPage, setIsLoadingPage] = useState(false);
 
     const handleFileUpload = (event) => {
         const file = event.target.files[0];
@@ -85,9 +84,19 @@ const MateriasDocente = () => {
                 });
                 headers.push({ sheetName, header: headerRow });
             }
+            let alertShown = false; // Bandera para controlar si la alerta se muestra
+
+            const activityData = extractActivityData(parsedData, (message) => {
+                if (!alertShown) { // Solo mostrar la alerta si no se ha mostrado antes
+                    setServerResponse(`Error: ${message}`);                
+
+                    alertShown = true;
+                }
+            });
     
-            const activityData = extractActivityData(parsedData);
-            allActivities = [...allActivities, ...activityData];
+            if (!alertShown) {
+                allActivities = [...allActivities, ...activityData];
+            }
             }
         });
         console.log(allData)
@@ -151,20 +160,24 @@ const MateriasDocente = () => {
         return { period, partial };
     };
 
-    const extractActivityData = (parsedData) => {
+    const extractActivityData = (parsedData, showAlert) => {
         const activityData = [];
         let totalPuntuacion = 0;
     
         for (let i = 14; i < parsedData.length; i++) {
+
+        // Verificar si la fila está completamente vacía
+        if (parsedData[i].every(cell => cell === null || cell === undefined || cell === '')) {
+            continue; // Saltar la fila vacía pero no detener la lectura
+        }
             if (parsedData[i][0] === 'Subtotal') {
-                break; // Detener la lectura cuando se encuentre "Subtotal"
-            }
+            break; // Detener la lectura cuando se encuentre "Subtotal"
+        }
             if (i % 9 === 14 % 9) {
                 const puntuacion = parseFloat(parsedData[i][3]); // Asegúrate de convertir a número
                 
                 if (totalPuntuacion + puntuacion > 10) {
-                    console.error("No se puede agregar la actividad: " + parsedData[i][0] + ". La suma de las puntuaciones excede 10.");
-                    break; // Detén la iteración si la suma excede 10
+                    if (showAlert) showAlert("No se pueden agregar más actividades. La suma de las puntuaciones excede 10.");
                 }
     
                 totalPuntuacion += puntuacion; // Sumar la puntuación solo si no excede 10
@@ -186,9 +199,7 @@ const MateriasDocente = () => {
     
         // Validar si la suma de las puntuaciones es exactamente 10
         if (totalPuntuacion !== 10) {
-            
-            alert("La suma de las puntuaciones debe ser igual a 10. La suma actual es: " + totalPuntuacion);
-            return []; // Retornar un arreglo vacío si la suma no es 10
+            if (showAlert) showAlert("La suma de las puntuaciones debe ser igual a 10. La suma actual es: " + totalPuntuacion);
         }
     
         return activityData; // Retornar los datos de actividad si la suma es 10
@@ -266,11 +277,9 @@ const MateriasDocente = () => {
     };
 
     const onloadNaterias = async () => 
-        {
+    {
         try 
         {
-            setIsLoadingPage(true);
-
             const response = await fetch('https://robe.host8b.me/WebServices/cargarMaterias.php', 
             {
                 method: 'POST',
@@ -299,13 +308,7 @@ const MateriasDocente = () => {
             alert('¡Ay caramba! Encontramos un pequeño obstáculo en el camino, pero estamos trabajando para superarlo. Gracias por tu paciencia mientras solucionamos este problemita.'); 
             }, 2000);
         } 
-        finally 
-        {
-            setIsLoadingPage(false);
-        }
     };
-
-    
 
     useEffect(() => 
     {
@@ -316,7 +319,6 @@ const MateriasDocente = () => {
 
     return (
     <div className="container mx-auto px-4 py-8">
-        <LoadingOverlay isLoading={isLoadingPage} />
 
         <InfoAlert
             message={serverResponse}
@@ -328,7 +330,7 @@ const MateriasDocente = () => {
             hasDuration={false} // El alert permanecerá visible hasta que el usuario lo cierre
         />
 
-        <Modal className='h-0 mt-auto pt-16' size="4xl" show={openModal} onClose={() => setOpenModal(false)}>
+        <Modal className='h-0 mt-auto pt-16' size="4xl" show={openModal} onClose={() =>{setFile(null), setOpenModal(false)}}>
             <Modal.Header>Agregar Materias</Modal.Header>
             <Modal.Body className='max-h-60'>
             <div className="space-y-6">
@@ -414,7 +416,7 @@ const MateriasDocente = () => {
                 )}
             </div>
             </Modal.Body>
-            {actividades.length > 0 && (
+            {actividades.length > 0 && file !==null && (
             <Modal.Footer>
                 <LoadingButton
                     onClick={handleClickRegistrar} 

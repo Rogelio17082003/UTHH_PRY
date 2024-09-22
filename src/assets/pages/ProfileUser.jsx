@@ -431,10 +431,11 @@ const PerfilUsuario = () => {
         </div>
         {/* Sección de información adicional del usuario */}
         <div className="md:w-1/2 md:ml-4 md:flex flex-col">
-        {userData.intRol == null  && (
             <div className="mb-4 rounded-lg bg-white p-4 shadow dark:bg-gray-800 sm:p-6 xl:p-8">
               <TitleSection label="Información adicional"/>
               <address className="text-sm font-normal not-italic text-gray-500 dark:text-gray-400">
+              {userData.intRol == null ? (
+                <>
                 <div>
                   <div className="mt-4">Carrera</div>
                   <div className="mb-2 text-sm font-medium text-gray-900 dark:text-white">
@@ -453,14 +454,25 @@ const PerfilUsuario = () => {
                   {userData.dataEstudiante?.vchPeriodo}      
                   </div>
                 </div>
+                </>
+                )
+                :
+                (
+                  <>
+                  <div className="mt-4">Departamento</div>
+                  <div className="mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                  {userData.vchDepartamento}      
+                  </div>
+                  </>
+                )}
               </address>
             </div>
-          )
-        }
+
         {/*seccion de Actualizar contraseña*/}
         <div className="md:w-full rounded-lg bg-white p-4 shadow dark:bg-gray-800 sm:p-6 xl:p-8">
           <TitleSection label="Actualizar contraseña"/>
-            <form onSubmit={handleSubmit(onSubmitUpdatePassword)}>
+          <Paragraphs label="Aquí puedes cambiar tu contraseña actual por una nueva. Asegúrate de que tu nueva contraseña sea segura y diferente de la anterior para proteger tu cuenta."/>
+            <form className='mt-4' onSubmit={handleSubmit(onSubmitUpdatePassword)}>
               <div className="grid grid-cols-6 gap-x-4">
                 <div className="col-span-6 grid grid-cols-1 gap-y-2 sm:col-span-3 relative">
                           <CustomInputPassword

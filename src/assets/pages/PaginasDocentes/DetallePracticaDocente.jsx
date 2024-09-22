@@ -8,15 +8,14 @@ import { useForm } from 'react-hook-form';
 import { Tabs } from "flowbite-react";
 import { MdDescription, MdAssignment } from "react-icons/md";
 import { FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
-import { FixedSizeList as List } from 'react-window';
 import 'react-quill/dist/quill.snow.css';
 
-const { TitlePage, Paragraphs, TitleSection, LoadingButton, CustomInputOnchange, ContentTitle, FloatingLabelInput, InfoAlert, LoadingOverlay } = Components;
+const { TitlePage, Paragraphs, TitleSection, LoadingButton, CustomInputOnchange, ContentTitle, FloatingLabelInput, InfoAlert, IconButton } = Components;
 
 const DetallePracticaDocente = () => {
-    const { intNumeroPractica } = useParams();
+    const {intNumeroActi, intIdActividadCurso, intNumeroPractica } = useParams();
     const [detalleActividad, setDetalleActividad] = useState({});
-    const { isAuthenticated, userData } = useAuth();
+    const { sendNotification, userData } = useAuth();
     const [rubricaCalAlumno, setRubricaCalAlumno] = useState([]);
     const [puntajeTotal, setPuntajeTotal] = useState(0);
     const [puntajeTotalCal, setPuntajeTotalCal] = useState(0);
@@ -29,7 +28,7 @@ const DetallePracticaDocente = () => {
     const [selectedAlumno, setSelectedAlumno] = useState(null);
     const [puntajeObtenido, setPuntajeObtenido] = useState(0);
     const [serverResponse, setServerResponse] = useState('');
-    const [isLoadingPage, setIsLoadingPage] = useState(false);
+    const [selectedAlumnoTokenFirebase, setSelectedAlumnoTokenFirebase] = useState(null);
 
     const { register, handleSubmit, watch, trigger, formState: { errors } } = useForm();
 
@@ -162,7 +161,10 @@ const DetallePracticaDocente = () => {
 
 
     const handleInputChangeCal = (index, field, value) => {
-        const newValue = parseFloat(value) || 0;
+        let newValue = parseFloat(value);
+        if (isNaN(newValue) || newValue < 0) {
+            newValue = 0;
+        }
         const updatedRubricas = rubricaCalAlumno.map((rubrica, i) => {
             if (i === index) {
                 // Validar que el valor no exceda el valor máximo
@@ -188,7 +190,7 @@ const DetallePracticaDocente = () => {
         if (selectedAlumnoMatricula) {
             fetchCalificacionesAlumno(selectedAlumnoMatricula);
         }
-    }, [selectedAlumnoMatricula]);
+    }, [selectedAlumnoMatricula, selectedAlumnoTokenFirebase]);
     
     const fetchCalificacionesAlumno = async (matricula) => {
         try {
@@ -224,7 +226,19 @@ const DetallePracticaDocente = () => {
 
         return;
         }
-        console.log(rubricaCalAlumno)
+
+        const sumaCalificaciones = rubricaCalAlumno.reduce((total, criterio) => total + criterio.calificacionObtenida, 0);
+
+        const notificacion = {
+            matricula: selectedAlumnoMatricula,
+            title:`${detalleActividad.vchNombre} - ${detalleActividad.vchDescripcion}`,
+            body:`Nueva calificacion: ${sumaCalificaciones}/10 \nDocente: ${userData.vchNombre} ${userData.vchAPaterno} ${userData.vchAMaterno}`,
+            tokenUser: selectedAlumnoTokenFirebase,
+            url:`https://robe.host8b.me/actividades/detalleActividad/detallePractica/${vchClvMateria}/${chrGrupo}/${intPeriodo}/${intNumeroActi}/${intNumeroPractica}/${intIdActividadCurso}`
+        }
+
+    
+        console.log(notificacion)
 
         try {
         const response = await fetch('https://robe.host8b.me/WebServices/accionesAlumnos.php', {
@@ -240,6 +254,7 @@ const DetallePracticaDocente = () => {
         const result = await response.json();
     
         if (result.done) {
+            sendNotification(notificacion)
             onloadAlumnos()
             setServerResponse(`Éxito: ${result.message}`);
         } else {
@@ -296,8 +311,6 @@ const DetallePracticaDocente = () => {
         const fetchActividad = async () => {
         const requestData = { idPracticaDetalle: intNumeroPractica };
         try {
-            setIsLoadingPage(true);
-
             const response = await fetch('https://robe.host8b.me/WebServices/cargarMaterias.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -317,18 +330,17 @@ const DetallePracticaDocente = () => {
         } catch (error) {
             console.error('Error:', error.message);
         }
-        finally{
-            setIsLoadingPage(false);
-        }
         };
 
         fetchActividad();
     }, [intNumeroPractica]);
 
 
-    const handleAlumnoSelect = (matricula) => {
+    const handleAlumnoSelect = (matricula, TokenFirebase) => {
         setSelectedAlumno(alumnos.find(alumno => alumno.AlumnoMatricula === matricula));
         setSelectedAlumnoMatricula(matricula);
+        setSelectedAlumnoTokenFirebase(TokenFirebase);
+        
     };
     
 
@@ -345,49 +357,8 @@ const DetallePracticaDocente = () => {
         setPuntajeObtenido(totalObtenido);
     }, [rubricaCalAlumno]);
 
-
-    const Row = ({ index, style, data }) => {
-        const alumno = data[index];
-        return (
-            <div
-                className={`flex items-center justify-between cursor-pointer p-2 hover:bg-gray-100 dark:hover:bg-gray-700 ${alumno.TieneCalificacion ? 'text-green-500' : 'text-red-500'}`}
-                style={style}
-                onClick={() => handleAlumnoSelect(alumno.AlumnoMatricula)}
-            >
-                <Paragraphs
-                    className='text-gray-900'
-                    label={`${alumno.AlumnoMatricula} ${alumno.AlumnoNombre} ${alumno.AlumnoApellidoPaterno} ${alumno.AlumnoApellidoMaterno}`}
-                />
-
-                {alumno.TieneCalificacion ? (
-                    <FaCheckCircle className="ml-2 text-lg" />
-                ) : (
-                    <FaTimesCircle className="ml-2 text-lg" />
-                )}
-            </div>
-        );
-    };
-
-    const AlumnosList = ({ alumnos, handleAlumnoSelect }) => {
-        return (
-            <List
-                height={400}           // Altura de la lista visible (en píxeles)
-                itemCount={alumnos.length} // Número total de elementos en la lista
-                itemSize={60}          // Altura de cada fila (en píxeles)
-                width={'100%'}         // Ancho de la lista (puede ser un valor fijo o 100% del contenedor)
-                itemData={{ alumnos, handleAlumnoSelect }} // Datos pasados a cada fila
-            >
-                {({ index, style }) => (
-                    <Row index={index} style={style} data={alumnos} />
-                )}
-            </List>
-        );
-    };
-
     return (
         <section className='w-full flex flex-col'>
-                        <LoadingOverlay isLoading={isLoadingPage} />
-
             <InfoAlert
                 message={serverResponse}
                 type={serverResponse.includes('Éxito') ? 'success' : 'error'}
@@ -508,42 +479,58 @@ const DetallePracticaDocente = () => {
             <Tabs.Item title="Trabajos de los Alumnos" icon={MdAssignment}>
             <div className="flex flex-col md:flex-row gap-4">
                 <div className='md:w-5/12 md:flex flex-col gap-y-4'>
-                <div className="mb-4 md:mb-0 rounded-lg bg-white p-4 shadow dark:bg-gray-800 sm:p-6 xl:p-8">
-                    <TitleSection label="Lista de Alumnos Calificados" />
-                    {/* Botón de seleccionar el alumno y mandar la matrícula */}
-                    {/*{alumnos.map((alumno) => (
-                    <div
-                        className={`flex items-center justify-between cursor-pointer p-2 hover:bg-gray-100 dark:hover:bg-gray-700 ${alumno.TieneCalificacion ? 'text-green-500' : 'text-red-500'}`}
-                        key={alumno.AlumnoMatricula}
-                        onClick={() => handleAlumnoSelect(alumno.AlumnoMatricula)}
-                    >
-                        <Paragraphs
-                        label={`${alumno.AlumnoMatricula} ${alumno.AlumnoNombre} ${alumno.AlumnoApellidoPaterno} ${alumno.AlumnoApellidoMaterno}`}
-                        />
-                        {alumno.TieneCalificacion ? (
-                        <FaCheckCircle className="ml-2 text-lg" />
-                        ) : (
-                        <FaTimesCircle className="ml-2 text-lg" />
-                        )}
+                    <div className="mb-4 md:mb-0 rounded-lg bg-white p-4 shadow dark:bg-gray-800 sm:p-6 xl:p-8">
+                        <TitleSection label="Lista de Alumnos Calificados" />
+                        <div className="max-h-[400px] overflow-y-auto">
+                            <ul className="space-y-2">
+                                {alumnos.map((alumno) => (
+                                <li
+                                    key={alumno.AlumnoMatricula}
+                                    className={`flex items-center justify-between cursor-pointer p-3 bg-white rounded-lg shadow-sm hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 transition-colors duration-300 ${alumno.TieneCalificacion ? 'text-green-600' : 'text-red-600'}`}
+                                    onClick={() => handleAlumnoSelect(alumno.AlumnoMatricula, alumno.TokenFirebase)}
+                                >
+                                    <div className="flex items-center space-x-3">
+                                    <img
+                                        className="w-10 h-10 rounded-full object-cover"
+                                        src={alumno.FotoPerfil ? `https://robe.host8b.me/assets/imagenes/${alumno.FotoPerfil}` : 'https://robe.host8b.me/assets/imagenes/userProfile.png'}
+                                        alt={`Foto de ${alumno.AlumnoNombre}`}
+                                    />
+                                    <div>
+                                        <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                        {`${alumno.AlumnoNombre} ${alumno.AlumnoApellidoPaterno} ${alumno.AlumnoApellidoMaterno}`}
+                                        </p>
+                                        <p className="text-xs text-gray-500 dark:text-gray-300">
+                                        Matrícula: {alumno.AlumnoMatricula}
+                                        </p>
+                                    </div>
+                                    </div>
+                                    {alumno.TieneCalificacion ? (
+                                    <FaCheckCircle className="text-lg text-green-600" />
+                                    ) : (
+                                    <FaTimesCircle className="text-lg text-red-600" />
+                                    )}
+                                </li>
+                                ))}
+                            </ul>
+                        </div>
                     </div>
-                    ))}*/}
-                    <AlumnosList alumnos={alumnos} handleAlumnoSelect={handleAlumnoSelect} />
-                </div>
                 </div>
                 <div className="md:w-7/12 md:flex flex-col">
                 <div className="h-full rounded-lg bg-white p-4 shadow dark:bg-gray-800 sm:p-6 xl:p-8">
-                    <div className="flex flex-col md:flex-row justify-between items-center mb-4">
+                    <div className="flex flex-col md:flex-row justify-between items-start mb-4">
                     {selectedAlumno ? (
                         <>
                         <div className="flex flex-col mb-4 md:mb-0">
-                            <TitleSection label="Calificación de Rúbrica" />
-                            <ContentTitle label="Alumno seleccionado" />
+                            <TitleSection label="Rúbrica de Evaluación" />
                             <div className="mt-4">
-                                <p><strong>Matricula:</strong> {selectedAlumno.AlumnoMatricula}</p>
-                                <p><strong>Nombre:</strong> {selectedAlumno.AlumnoNombre} {selectedAlumno.AlumnoApellidoPaterno} {selectedAlumno.AlumnoApellidoMaterno}</p>
+                                <p className="text-base font-medium text-gray-900 dark:text-gray-100">
+                                    {selectedAlumno.AlumnoNombre} {selectedAlumno.AlumnoApellidoPaterno} {selectedAlumno.AlumnoApellidoMaterno}
+                                </p>
+                                <p className="text-sm text-gray-500 dark:text-gray-300">
+                                    Matrícula: {selectedAlumno.AlumnoMatricula}
+                                </p>
                             </div>
                         </div>
-                        <LoadingButton normalLabel="Calificar" className="w-28 h-10 text-white py-2 px-4 rounded-lg" onClick={handleCalificarClick} />
                         </>
                         ) 
                         : 
@@ -578,11 +565,12 @@ const DetallePracticaDocente = () => {
 
                     {selectedAlumno && (
                     <div className="mt-6 flex justify-between items-center">
-                    <div className="text-muted-foreground text-xl font-semibold">Puntaje Total</div>
-                    <div className="flex items-center gap-2">
-                    <span className="font-semibold text-2xl text-gray-700">{puntajeObtenido}</span>
-                    <span className="font-semibold text-2xl text-gray-900">/ {puntajeTotalCal}</span>
+                        <div className="flex items-center gap-2">
+                            <span className="text-muted-foreground text-2xl font-semibold">Puntaje Total:</span>
+                            <span className="font-semibold text-2xl text-gray-700">{puntajeObtenido}</span>
+                            <span className="font-semibold text-2xl text-gray-900">/ {puntajeTotalCal}</span>
                         </div>
+                        <LoadingButton Icon={FaCheckCircle} normalLabel="Calificar" className="w-28 h-10 text-white py-2 px-4 rounded-lg" onClick={handleCalificarClick} />
                     </div>
                     )}
                 </div>

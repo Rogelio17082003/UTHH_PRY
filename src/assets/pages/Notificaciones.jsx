@@ -29,7 +29,7 @@ const Notificaciones = () => {
 
   const sendNotification = async (tokenUser, title, body) => {
     try {
-      const response = await axios.post('https://firebase-uthh.vercel.app/', {
+      const response = await axios.post('http://localhost:3000/notificacion', {
         tokenUser: tokenUser,
         title: title,
         body: body

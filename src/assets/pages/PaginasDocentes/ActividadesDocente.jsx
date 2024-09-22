@@ -15,11 +15,8 @@ const ActividadesDocente = () => {
     const { vchClvMateria, chrGrupo, intPeriodo } = useParams();
     const [loading, setLoading] = useState(false);
     const [serverResponse, setServerResponse] = useState('');
-    const [isLoadingPage, setIsLoadingPage] = useState(false);
-
 
     const onloadActividades = async () => {
-        setIsLoadingPage(true);
         try {
         const response = await fetch('https://robe.host8b.me/WebServices/cargarMaterias.php', {
             method: 'POST',
@@ -63,9 +60,6 @@ const ActividadesDocente = () => {
         setTimeout(() => {
             alert('¡Ay caramba! Encontramos un pequeño obstáculo en el camino, pero estamos trabajando para superarlo. Gracias por tu paciencia mientras solucionamos este problemita.');
         }, 2000);
-        }
-        finally{
-            setIsLoadingPage(false);
         }
     };
 
@@ -578,8 +572,6 @@ const ActividadesDocente = () => {
 
     return (
         <section className="w-full flex flex-col">
-            <LoadingOverlay isLoading={isLoadingPage} />
-
             <InfoAlert
                 message={serverResponse}
                 type={serverResponse.includes('éxito') ? 'success' : 'error'}
@@ -642,18 +634,29 @@ const ActividadesDocente = () => {
                     className="w-full sm:w-auto" // Hacer que el tab ocupe todo el ancho en móviles
                     >
                     <TitlePage label="Alumnos" />
-                    <div className="p-4">
-                        {alumnos.map((alumnos) => (
-                        <div 
-                            key={alumnos.AlumnoMatricula} 
-                            className="flex items-center mb-2"
+                    <div className="space-y-3">
+                    {alumnos.map((alumno) => (
+                        <div
+                            key={alumno.AlumnoMatricula}
+                            className="flex items-center p-3 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300"
                         >
-                            <Paragraphs 
-                            className="mb-0" 
-                            label={`${alumnos.AlumnoMatricula} - ${alumnos.AlumnoNombre} ${alumnos.AlumnoApellidoPaterno} ${alumnos.AlumnoApellidoMaterno}`} 
-                            />
+                        <img
+                            className="w-12 h-12 rounded-full object-cover"
+                            src={alumno.FotoPerfil
+                            ? `https://robe.host8b.me/assets/imagenes/${alumno.FotoPerfil}`
+                            : 'https://robe.host8b.me/assets/imagenes/userProfile.png'}
+                            alt={`Foto de ${alumno.AlumnoNombre}`}
+                        />
+                        <div className="ml-3">
+                            <p className="text-sm font-medium text-gray-900">
+                            {`${alumno.AlumnoNombre} ${alumno.AlumnoApellidoPaterno} ${alumno.AlumnoApellidoMaterno}`}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                            Matrícula: {alumno.AlumnoMatricula}
+                            </p>
                         </div>
-                        ))}
+                        </div>
+                    ))}
                     </div>
                     </Tabs.Item>
                 </Tabs>

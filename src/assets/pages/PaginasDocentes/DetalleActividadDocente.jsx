@@ -26,7 +26,6 @@ const DetalleActividadDocente = () => {
     const [serverResponse, setServerResponse] = useState('');
     const [selectedPracticeForEdit, setSelectedPracticeForEdit] = useState({});
     const [isLoading, setIsLoading] = useState(false);
-    const [isLoadingPage, setIsLoadingPage] = useState(false);
 
     const handleConfirmDelete = async () => {
         try {
@@ -84,7 +83,6 @@ const DetalleActividadDocente = () => {
 
         try 
         {
-            setIsLoadingPage(true);
             const response = await fetch('https://robe.host8b.me/WebServices/cargarMaterias.php', 
             {
             method: 'POST',
@@ -110,9 +108,7 @@ const DetalleActividadDocente = () => {
         } catch (error) {
             console.error('Error: Error al cargar los datos de la actividad');
         }
-        finally{
-            setIsLoadingPage(false);
-        }
+
         };
         
     useEffect(() => {
@@ -351,8 +347,6 @@ const DetalleActividadDocente = () => {
     return (
         
         <section className='w-full flex flex-col'>
-            <LoadingOverlay isLoading={isLoadingPage} />
-
             {selectedPracticeForEdit && (
                 <Modal
                     className='h-0 mt-auto pt-12'
@@ -457,6 +451,7 @@ const DetalleActividadDocente = () => {
                                     labelSelect="Seleccionar cuantas practicas deseas insertar:"
                                     label="Número de Prácticas"
                                     name="value"
+                                    value="value"
                                     options={numPracticasInsert}
                                     errors={errors}
                                     register={register}

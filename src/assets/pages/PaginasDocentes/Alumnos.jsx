@@ -1,19 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { Checkbox, Table, Alert, Tooltip } from 'flowbite-react';
 import { useForm } from 'react-hook-form';
-import { IoMdAdd, IoMdCreate, IoMdTrash } from 'react-icons/io';
+import { IoMdAdd } from 'react-icons/io';
 import { HiOutlineSearch, HiOutlineExclamationCircle } from "react-icons/hi";
-import { Label, TextInput, Button, Select, Modal } from "flowbite-react"; // Importamos el componente Button
+import { Label, TextInput, Button, Tabs, Modal } from "flowbite-react"; // Importamos el componente Button
 import * as XLSX from 'xlsx';
 import  Components from '../../components/Components'
 import ArrayIterator from '../../components/Clases/Iterador'
-const { LoadingButton, SelectInput, IconButton} = Components;
+const { LoadingButton, SelectInput, IconButton, CustomInput, InfoAlert} = Components;
+import { FaFileExcel, FaPencilAlt } from 'react-icons/fa';
 
 const Alumnos = () => {
     const [periodos, setPeriodos] = useState([]);
+    const [periodosTotal, setPeriodosTotal] = useState([]);
     const [carreras, setCarreras] = useState([]);
+    const [carrerasTotal, setCarreraTotal] = useState([]);
     const [cuatrimestres, setCuatrimestres] = useState([]);
+    const [cuatrimestresTotal, setCuatrimestresTotal] = useState([]);
     const [grupos, setGrupos] = useState([]);
+    const [gruposTotal, setGruposTotal] = useState([]);
     const [periodo, setPeriodo] = useState('');
     const [carrera, setCarrera] = useState('');
     const [cuatrimestre, setCuatrimestre] = useState('');
@@ -25,11 +30,13 @@ const Alumnos = () => {
     const [alumnos, setAlumnos] = useState([]);
     const [alumnosUpload, setAlumnosUpload] = useState([]);
     const [openModal, setOpenModal] = useState(false);
+    const [openModalAlumn, setOpenModalAlumn] = useState(false);
     const [openModalDelete, setOpenModalDelete] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [alertMessage, setAlertMessage] = useState(null);
     const [activeMenu, setActiveMenu] = useState(null);
-
+    const [serverResponse, setServerResponse] = useState('');
+    
     const {
         register,
         handleSubmit,
@@ -46,8 +53,6 @@ const Alumnos = () => {
         setActiveMenu(matricula);
         }
     };
-
-
 
     const handleFileUpload = (event) => {
         const file = event.target.files[0];
@@ -108,53 +113,55 @@ const Alumnos = () => {
 
     const registrarEstudiantes = async (alumnosData) => 
     {
-    try 
-    {
-        setIsLoading(true);
-        // Hacer solicitud para obtener las carreras
-        const response = await fetch('https://robe.host8b.me/WebServices/registerStudents.php',
+        try 
         {
-            method: 'POST',
-            headers: 
+            setIsLoading(true);
+            // Hacer solicitud para obtener las carreras
+            const response = await fetch('https://robe.host8b.me/WebServices/registerStudents.php',
             {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify
-            ({
-            dataEstudiantes: alumnosData,
-            }),
-        }
-        );
-        const result = await response.json();
+                method: 'POST',
+                headers: 
+                {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify
+                ({
+                dataEstudiantes: alumnosData,
+                }),
+            }
+            );
+            const result = await response.json();
 
-        if (result.done) 
+            if (result.done) 
+            {
+                setServerResponse(`Éxito: Datos de estudiantes registrados correctamente`);
+                console.log('Datos recibidos php:', result);
+            }
+            else
+            {         
+                setServerResponse(`Error: ${result.message} Inténtalo de nuevo.`);
+                console.log('Datos recibidos php:', result);
+            }
+        } 
+        catch (error) 
         {
-        setAlertMessage({ type: 'info', text: 'Datos de estudiantes registrados correctamente' });
-        console.log('Datos recibidos php:', result);
+            setServerResponse(`Error: Error al conectar con el servidor. ${error}`);
         }
-        else
-        {                
-        setAlertMessage({ type: 'failure', text:  result.message+' Inténtalo de nuevo.' });
-        console.log('Datos recibidos php:', result);
+        finally 
+        {
+            setIsLoading(false);
+            setOpenModal(false)
+            setFile(null);
         }
-    } 
-    catch (error) 
-    {
-        setAlertMessage({ type: 'failure', text: 'Error al conectar con el servidor. Inténtalo de nuevo más tarde.' });
-        console.error(error);
-    }
-    finally 
-    {
-        setIsLoading(false);
-        setOpenModal(false)
-        setFile(null);
-    }
     };
+
     useEffect(() => {
-        {
+    {
         cargarPeriodos()
-        }
-    }, []);
+        cargarCarrerasTotal()
+        cargarCuatrimestresTotal()
+        cargarGruposTotal()
+    }}, []);
 
     useEffect(() => {
         const loadData = async () => {
@@ -175,6 +182,63 @@ const Alumnos = () => {
         loadData();
     }, [selectedPeriodo, selectedCarrera, selectedCuatrimestre, selectedGrupo]);
     
+    const cargarCarrerasTotal = async () => 
+    {
+        try
+        {
+            const response = await fetch('https://robe.host8b.me/WebServices/obtenerCarreras.php');
+            const result = await response.json();
+    
+            if (!result.done) 
+            {
+                throw new Error('Error al obtener las carreras');
+            }
+            setCarreraTotal(result.message);
+        }
+        catch(error)
+        {
+            console.error(error);
+        } 
+    }
+
+    const cargarCuatrimestresTotal = async () => 
+    {
+        try
+        {
+            const response = await fetch('https://robe.host8b.me/WebServices/obtenerCuatrimestres.php');
+            const result = await response.json();
+        
+            if (!result.done) 
+            {
+                throw new Error('Error al obtener las carreras');
+            }
+            setCuatrimestresTotal(result.message);
+        }
+        catch(error)
+        {
+            console.error(error);
+        } 
+    }
+
+    const cargarGruposTotal = async () => 
+    {
+        try
+        {
+            const response = await fetch('https://robe.host8b.me/WebServices/obtenerGrupos.php');
+            const result = await response.json();
+            
+            if (!result.done) 
+            {
+                throw new Error('Error al obtener las carreras');
+            }
+            setGruposTotal(result.message);
+        }
+        catch(error)
+        {
+            console.error(error);
+        } 
+    }
+
     const cargarPeriodos = async () => 
     {
         try
@@ -223,6 +287,7 @@ const Alumnos = () => {
             opts.push(iterador.next())
         }
         setPeriodos(opts);
+        setPeriodosTotal(result.message);
 
         
         //setPeriodos(new ArrayIterator(result.message));
@@ -238,8 +303,8 @@ const Alumnos = () => {
         } 
     }
         // Función para cargar las carreras
-        const cargarCarreras = async (data) => 
-        {
+    const cargarCarreras = async (data) => 
+    {
         try 
         {
             // Hacer solicitud para obtener las carreras
@@ -269,10 +334,10 @@ const Alumnos = () => {
         {
             console.error(error);
         }
-        };
+    };
 
-        const cargarCuatrimestres = async (carrera) => 
-        {
+    const cargarCuatrimestres = async (carrera) => 
+    {
         try 
         {
             // Hacer solicitud para obtener las carreras
@@ -305,10 +370,10 @@ const Alumnos = () => {
         {
             console.error(error);
         }
-        };
+    };
 
-        const cargarGrupos = async (cuatrimestre) => 
-        {
+    const cargarGrupos = async (cuatrimestre) => 
+    {
         try 
         {
             // Hacer solicitud para obtener las carreras
@@ -339,9 +404,40 @@ const Alumnos = () => {
         {
             console.error(error);
         }
-        };
+    };
 
-        const cargarAlumnos = async (grupo) => {
+    const onSubmit = async (data) => {
+        console.log(data)
+        try {        
+            const response = await fetch('https://robe.host8b.me/WebServices/registerStudents.php',
+            {
+                method: 'POST',
+                headers: 
+                {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    dataEstudiante:data
+                }),
+            });
+
+            const result = await response.json();
+            console.log(result);
+            if(result.done)
+            {
+                setServerResponse(`Éxito: ${result.message}`);
+                setOpenModal(false)
+            }
+            else
+            {
+                setServerResponse(`Error: ${result.message}`);
+            }    
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    const cargarAlumnos = async (grupo) => {
         try {
             const requestBody = {
             idPeriodo: selectedPeriodo,
@@ -375,10 +471,14 @@ const Alumnos = () => {
             // Actualizar el estado de las carreras con los datos recibidos
             setAlumnos(result.message);
             }    
+            else
+            {
+                setAlumnos([]);
+            }
         } catch (error) {
             console.error(error);
         }
-        };
+    };
 
     const [file, setFile] = useState(null);
 
@@ -390,89 +490,213 @@ const Alumnos = () => {
 
     return (
         <section className='flex flex-col'>
-        {alertMessage && (
-            <Alert color={alertMessage.type} onDismiss={() => setAlertMessage(null)}>
-            {alertMessage.text}
-            </Alert>
-        )}
-        <Modal className='mt-11 pt-16' size="4xl" base show={openModal} onClose={() => setOpenModalDelete(false)}>
+        <InfoAlert
+            message={serverResponse}
+            type={serverResponse.includes('Éxito') ? 'success' : 'error'}
+            isVisible={!!serverResponse}
+            onClose={() => {
+            setServerResponse('');
+            }}
+        />
+
+        <Modal className='mt-11 pt-16' size="4xl" show={openModal} onClose={() =>{ setOpenModal(false), setFile(null)}}>
             <Modal.Header>Agregar Alumnos</Modal.Header>
-            <Modal.Body className='max-h-60'>
-            <div className="space-y-6">
-                <h3 className="mt-4 mb-2 text-base font-bold text-gray-900 dark:text-white">Selecciona un archivo en formato excel</h3>
-                <input type="file" accept=".xlsx, .xls" onChange={handleFileUpload} />
-                {file !==null && (
-                <section>
-                    <h3 className="mt-4 mb-2 text-base font-bold text-gray-900 dark:text-white">Datos recibidos</h3>
-                    <div>
-                        <div className='grid grid-cols-2 grid-rows-2 gap-4 m-y-2 mb-4'>
-                        <div className='flex-row'>
-                            <div className="mt-4">Periodo</div>
-                            <div className="mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                            {periodo}
-                            </div>
+            <div className='px-8'>
+                <Tabs aria-label="Tabs with underline" style="underline">
+                    <Tabs.Item active title="Carga desde Excel" icon={FaFileExcel}>
+                        <Modal.Body className='max-h-60 px-0 pt-0'>
+                        <div className="space-y-6">
+                            <h3 className="mt-4 mb-2 text-base font-bold text-gray-900 dark:text-white">Selecciona un archivo en formato excel</h3>
+                            <input type="file" accept=".xlsx, .xls" onChange={handleFileUpload} />
+                            {file !==null && (
+                            <section>
+                                <h3 className="mt-4 mb-2 text-base font-bold text-gray-900 dark:text-white">Datos recibidos</h3>
+                                <div>
+                                    <div className='grid grid-cols-2 grid-rows-2 gap-4 m-y-2 mb-4'>
+                                    <div className='flex-row'>
+                                        <div className="mt-4">Periodo</div>
+                                        <div className="mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                                        {periodo}
+                                        </div>
+                                    </div>
+                                    <div className='flex-row'>
+                                        <div className="mt-4">Carrera</div>
+                                        <div className="mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                                        {carrera}
+                                        </div>
+                                    </div>
+                                    <div className='flex-row'>
+                                        <div className="mt-4">Cuatrimestre</div>
+                                        <div className="mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                                        {cuatrimestre}
+                                        </div>
+                                    </div>
+                                    <div className='flex-row'>
+                                        <div className="mt-4">Grupo</div>
+                                        <div className="mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                                        {grupo}
+                                        </div>
+                                    </div>
+                                    </div>
+                                </div>
+                                <div className="overflow-x-auto">
+                                <Table hoverable>
+                                    <Table.Head>
+                                    <Table.HeadCell>Matricula</Table.HeadCell>
+                                    <Table.HeadCell>Nombre</Table.HeadCell>
+                                    <Table.HeadCell>Correo</Table.HeadCell>
+                                    <Table.HeadCell>Contraseña</Table.HeadCell>
+                                    </Table.Head>
+                                    <Table.Body className="divide-y">
+                                        {alumnosUpload.map((alumnosExcel, index) =>
+                                        (
+                                        <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800" key={index}>
+                                            <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
+                                            {alumnosExcel.MATRICULA}
+                                            </Table.Cell>
+                                            <Table.Cell>{alumnosExcel.NOMBRE} {alumnosExcel.APELLIDOMATERNO} {alumnosExcel.APELLIDOPATERNO}</Table.Cell>
+                                            <Table.Cell>{alumnosExcel.CORREO}</Table.Cell>
+                                            <Table.Cell>{alumnosExcel.PASSWORD}</Table.Cell>
+                                        </Table.Row>
+                                        ))
+                                        }
+                                    </Table.Body>
+                                </Table>
+                                </div>
+                            </section>
+                            )}
                         </div>
-                        <div className='flex-row'>
-                            <div className="mt-4">Carrera</div>
-                            <div className="mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                            {carrera}
-                            </div>
-                        </div>
-                        <div className='flex-row'>
-                            <div className="mt-4">Cuatrimestre</div>
-                            <div className="mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                            {cuatrimestre}
-                            </div>
-                        </div>
-                        <div className='flex-row'>
-                            <div className="mt-4">Grupo</div>
-                            <div className="mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                            {grupo}
-                            </div>
-                        </div>
-                        </div>
-                    </div>
-                    <div className="overflow-x-auto">
-                    <Table hoverable>
-                        <Table.Head>
-                        <Table.HeadCell>Matricula</Table.HeadCell>
-                        <Table.HeadCell>Nombre</Table.HeadCell>
-                        <Table.HeadCell>Correo</Table.HeadCell>
-                        <Table.HeadCell>Contraseña</Table.HeadCell>
-                        </Table.Head>
-                        <Table.Body className="divide-y">
-                            {alumnosUpload.map((alumnosExcel, index) =>
-                            (
-                            <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800" key={index}>
-                                <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                                {alumnosExcel.MATRICULA}
-                                </Table.Cell>
-                                <Table.Cell>{alumnosExcel.NOMBRE} {alumnosExcel.APELLIDOMATERNO} {alumnosExcel.APELLIDOPATERNO}</Table.Cell>
-                                <Table.Cell>{alumnosExcel.CORREO}</Table.Cell>
-                                <Table.Cell>{alumnosExcel.PASSWORD}</Table.Cell>
-                            </Table.Row>
-                            ))
-                            }
-                        </Table.Body>
-                    </Table>
-                    </div>
-                </section>
-                )}
+                        </Modal.Body>
+                        {file !==null && (
+                        <Modal.Footer>
+                        <LoadingButton
+                            className="max-w-32 max-h-11" // Clase de Tailwind CSS para definir un ancho máximo
+                            onClick={handleClickRegistrar} 
+                            isLoading={isLoading}
+                            loadingLabel="Cargando..."
+                            normalLabel="Agregar"
+                        />
+                        <Button color="gray" onClick={() => {setOpenModal(false); setFile(null)}}>
+                            Cancelar
+                        </Button>
+                        </Modal.Footer>
+                        )}
+                    </Tabs.Item>
+                    <Tabs.Item  title="Ingreso Manual" icon={FaPencilAlt} onClick={() =>setFile(null)}>
+                        <form  onSubmit={handleSubmit(onSubmit)}>
+                            <Modal.Body className='max-h-96'>
+                                <div className='info-person grid grid-cols-2 gap-x-4'>
+                                    <CustomInput
+                                        label="Matrícula"
+                                        name="matriculaAlum"
+                                        pattern={/^\d+$/}
+                                        errorMessage="Solo números y sin espacios"
+                                        errors={errors}
+                                        register={register}
+                                        trigger={trigger}
+                                    />
+                                    <CustomInput
+                                        label="Nombre"
+                                        name="nombre"
+                                        pattern={/^[a-zA-ZáéíóúüÁÉÍÓÚÜñÑ]+$/}
+                                        errorMessage="Solo letras y sin espacios"
+                                        errors={errors}
+                                        register={register}
+                                        trigger={trigger}
+                                    />
+                                    <CustomInput
+                                        label="Apellido Paterno"
+                                        name="apellidoPaterno"
+                                        pattern={/^[a-zA-ZáéíóúüÁÉÍÓÚÜñÑ]+$/}
+                                        errorMessage="Solo letras y sin espacios"
+                                        errors={errors}
+                                        register={register}
+                                        trigger={trigger}
+                                    />
+                                    <CustomInput
+                                        label="Apellido Materno"
+                                        name="apellidoMaterno"
+                                        pattern={/^[a-zA-ZáéíóúüÁÉÍÓÚÜñÑ]+$/}
+                                        errorMessage="Solo letras y sin espacios"
+                                        errors={errors}
+                                        register={register}
+                                        trigger={trigger}
+                                    />
+                                </div>
+
+                                <div className='info-person grid grid-cols-2 gap-x-4'>
+                                    <SelectInput
+                                        id="intIdPeriodo" 
+                                        labelSelect="Seleccionar Periodo" 
+                                        label="Periodo"
+                                        name="vchPeriodoTo"
+                                        value="vchPeriodo" 
+                                        options={periodosTotal}
+                                        errorMessage="No cumples con el patron de contraseña"
+                                        errors={errors}
+                                        register={register}
+                                        trigger={trigger}
+                                        pattern="" 
+                                    />
+
+                                    <SelectInput
+                                        id="intClvCarrera" 
+                                        labelSelect="Seleccionar Carrera" 
+                                        label="Carrera"
+                                        name="vchNomCarreraTo"
+                                        value="vchNomCarreraTo" 
+                                        options={carrerasTotal}
+                                        errors={errors}
+                                        register={register}
+                                        trigger={trigger}
+                                    />
+
+                                    <SelectInput
+                                        id="intClvCuatrimestre" 
+                                        labelSelect="Seleccionar Cuatrimestre" 
+                                        label="Cuatrimestre"
+                                        name="vchNomCuatriTo"
+                                        value="vchNomCuatriTo"
+                                        options={cuatrimestresTotal}
+                                        errorMessage="No cumples con el patron de contraseña"
+                                        errors={errors}
+                                        register={register}
+                                        trigger={trigger}
+                                        pattern="" 
+                                    />
+
+                                    <SelectInput
+                                        id="chrGrupo" 
+                                        labelSelect="Seleccionar Grupo" 
+                                        label="Grupo"
+                                        name="chrGrupoTo"
+                                        value="chrGrupoTo"
+                                        options={gruposTotal}
+                                        errorMessage="No cumples con el patron de contraseña"
+                                        errors={errors}
+                                        register={register}
+                                        trigger={trigger}
+                                        pattern="" 
+                                    />
+                                </div>
+                            </Modal.Body>
+                            <Modal.Footer>
+                            <LoadingButton
+                                className="max-w-32 max-h-11" // Clase de Tailwind CSS para definir un ancho máximo
+                                isLoading={isLoading}
+                                loadingLabel="Cargando..."
+                                normalLabel="Agregar"
+                            />
+                            <Button color="gray" onClick={() => {setOpenModal(false); setFile(null)}}>
+                                Cancelar
+                            </Button>
+                            </Modal.Footer>
+                        </form>
+                    </Tabs.Item>
+                </Tabs>
             </div>
-            </Modal.Body>
-            <Modal.Footer>
-            <LoadingButton
-                className="max-w-32 max-h-11" // Clase de Tailwind CSS para definir un ancho máximo
-                onClick={handleClickRegistrar} 
-                isLoading={isLoading}
-                loadingLabel="Cargando..."
-                normalLabel="Agregar"
-            />
-            <Button color="gray" onClick={() => {setOpenModal(false); setFile(null)}}>
-                Cancelar
-            </Button>
-            </Modal.Footer>
         </Modal>
+
         <Modal show={openModalDelete} size="md" onClose={() => setOpenModalDelete(false)} popup>
             <Modal.Header />
             <Modal.Body>
@@ -514,7 +738,7 @@ const Alumnos = () => {
                 labelSelect="Seleccionar Periodo" 
                 label="Periodo"
                 name="vchPeriodo"
-                option="" 
+                value="vchPeriodo"
                 options={periodos}
                 errorMessage="No cumples con el patron de contraseña"
                 errors={errors}
@@ -531,7 +755,7 @@ const Alumnos = () => {
                 labelSelect="Seleccionar Carrera" 
                 label="Carrera"
                 name="vchNomCarrera"
-                option="" 
+                value="vchNomCarrera"
                 options={carreras}
                 errorMessage="No cumples con el patron de contraseña"
                 errors={errors}
@@ -548,7 +772,7 @@ const Alumnos = () => {
                 labelSelect="Seleccionar Cuatrimestre" 
                 label="Cuatrimestre"
                 name="vchNomCuatri"
-                option="" 
+                value="vchNomCuatri"
                 options={cuatrimestres}
                 errorMessage="No cumples con el patron de contraseña"
                 errors={errors}
@@ -565,7 +789,7 @@ const Alumnos = () => {
                 labelSelect="Seleccionar Grupo" 
                 label="Grupo"
                 name="chrGrupo"
-                option="" 
+                value="chrGrupo"
                 options={grupos}
                 errorMessage="No cumples con el patron de contraseña"
                 errors={errors}
@@ -582,9 +806,6 @@ const Alumnos = () => {
             <div className="overflow-x-auto">
             <Table hoverable>
                 <Table.Head>
-                <Table.HeadCell className="p-4">
-                    <Checkbox />
-                </Table.HeadCell>
                 <Table.HeadCell>Matricula</Table.HeadCell>
                 <Table.HeadCell>Nombre</Table.HeadCell>
                 <Table.HeadCell>Correo</Table.HeadCell>
@@ -596,9 +817,6 @@ const Alumnos = () => {
                 {alumnos.map((alumnosFitro) =>
                 (
                     <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
-                    <Table.Cell className="p-4">
-                        <Checkbox />
-                    </Table.Cell>
                     <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
                         {alumnosFitro.vchMatricula}
                     </Table.Cell>

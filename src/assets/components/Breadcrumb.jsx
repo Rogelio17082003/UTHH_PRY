@@ -7,7 +7,7 @@ import { AuthProvider, useAuth } from '../server/authUser';
 const BreadcrumbNav = () => {
     const { isAuthenticated, userData } = useAuth();
     const location = useLocation();
-    const { id, vchClvMateria, chrGrupo, intPeriodo, intNumeroActi, intNumeroPractica, intIdActividadCurso } = useParams();
+    const { vchClvMateria, chrGrupo, intPeriodo, intNumeroActi, intNumeroPractica, intIdActividadCurso } = useParams();
     
     const getBreadcrumbs = () => {
         const path = location.pathname;

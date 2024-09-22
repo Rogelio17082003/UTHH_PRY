@@ -10,7 +10,7 @@ import { useAuth } from '../server/authUser'; // Importa el hook de autenticaci�
 import secondaryLogo from '../images/secondary-logo.png'
 import SideNav from './SideNavBar'
 import  Components from './Components'
-const {IconButton} = Components;
+const {LoadingButton} = Components;
 
 const NavigationBar = ({ isSidebarOpen, toggleSidebar }) => {
   const navigate = useNavigate(); 
@@ -98,49 +98,12 @@ const NavigationBar = ({ isSidebarOpen, toggleSidebar }) => {
         )
         :
         (
-          <div className="contents items-center">
-            <div className={`nav__section nav__menu ${showMenu ? "show-menu" : ""}`} id="nav-menu">
-              <ul className="nav__list">
-                <li className="nav__item">
-                  <NavLink to="/" className="nav__link" onClick={closeMenuOnMobile}>
-                    Inicio
-                  </NavLink>
-                </li>
-                <li className="nav__item">
-                  <NavLink to="/news" className="nav__link" onClick={closeMenuOnMobile}>
-                    Para Docentes
-                  </NavLink>
-                </li>
-                <li className="nav__item">
-                  <NavLink to="/about-us" className="nav__link" onClick={closeMenuOnMobile}>
-                    Gamificación educativa
-                  </NavLink>
-                </li>
-                <li className="nav__item">
-                  <NavLink to="/favorite" className="nav__link" onClick={closeMenuOnMobile}>
-                    Preguntas frecuentes
-                  </NavLink>
-                </li>
-              </ul>
-
-              <div className="nav__close" id="nav-close" onClick={toggleMenu}>
-                <IoClose />
-              </div>
-            </div>
-    
-            <div className="nav__section nav__button">
-              <IconButton
-                className={`button ${showMenu ? "button-menu-active" : "button-menu-disable"}`}
-                Icon={HiUserCircle} // Pasa el componente de ícono
-                message="Iniciar Sesión"
-                onClick={() => navigate('/inicio-sesion')}
-              />
-            </div>
-
-            <div className="nav__toggle" id="nav-toggle" onClick={toggleMenu}>
-            <IoMenu />
-            </div>
-          </div>
+          <LoadingButton 
+            Icon={HiUserCircle} 
+            normalLabel="Iniciar Sesión" 
+            className="w-auto h-auto"
+            onClick={() => navigate('/inicio-sesion')} 
+          />
         )
     }
     </Navbar>

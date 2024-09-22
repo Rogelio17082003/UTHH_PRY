@@ -23,19 +23,11 @@ function FooterSection() {
                   <Footer.Link href="#">E-mail: rectoría@uthh.edu.mx</Footer.Link>
                 </Footer.LinkGroup>
               </div>
-              <div>
-                <Footer.Title title="Recursos" />
-                <Footer.LinkGroup col>
-                  <Footer.Link href="#">Guías de productos</Footer.Link>
-                  <Footer.Link href="#">Preguntas frecuentes</Footer.Link>
-                  <Footer.Link href="#">Gamificación educativa</Footer.Link>
-                </Footer.LinkGroup>
-              </div>
+
               <div>
                 <Footer.Title title="Terminos Legales" />
                 <Footer.LinkGroup col>
                   <Footer.Link href="/Terminos">Terminos &amp; Condiciones</Footer.Link>
-                  <Footer.Link href="#">Política de Cockies</Footer.Link>
                 </Footer.LinkGroup>
               </div>
             </div>
@@ -43,13 +35,14 @@ function FooterSection() {
           <Footer.Divider />
           <div className="w-full sm:flex sm:items-center sm:justify-between">
             <Footer.Copyright href="#" by="UTHH" year={2024} />
+            {/*
             <div className="mt-4 flex space-x-6 sm:mt-0 sm:justify-center">
               <Footer.Icon href="#" icon={BsFacebook} />
               <Footer.Icon href="#" icon={BsInstagram} />
               <Footer.Icon href="#" icon={BsTwitter} />
               <Footer.Icon href="#" icon={BsGithub} />
               <Footer.Icon href="#" icon={BsDribbble} />
-            </div>
+            </div> */}
           </div>
         </div>
       </Footer>

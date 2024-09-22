@@ -10,11 +10,9 @@ const GruposMateriasDocente = () => {
     const {userData} = useAuth(); // Obtén el estado de autenticación del contexto
     const [materias, setMaterias] = useState([]);
     const {vchClvMateria, chrGrupo, intPeriodo} = useParams();
-    const [isLoadingPage, setIsLoadingPage] = useState(false);
 
     const onloadNaterias = async () => {
         try {
-        setIsLoadingPage(true);
 
         const response = await fetch('https://robe.host8b.me/WebServices/cargarMaterias.php', {
             method: 'POST',
@@ -62,8 +60,6 @@ const GruposMateriasDocente = () => {
         setTimeout(() => {
             alert('¡Ay caramba! Encontramos un pequeño obstáculo en el camino, pero estamos trabajando para superarlo. Gracias por tu paciencia mientras solucionamos este problemita.'); 
             }, 2000);
-    } finally {
-        setIsLoadingPage(false);
     }
     };
 
@@ -75,7 +71,6 @@ const GruposMateriasDocente = () => {
 
     return (
         <div className="container mx-auto px-4 py-8">
-            <LoadingOverlay isLoading={isLoadingPage} />
             <TitlePage label="Grupos inscritos en la Materia" />
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                 {materias.map((materia) => (

@@ -1,7 +1,7 @@
 // SideNav.js
 import React from 'react';
 import { Sidebar } from 'flowbite-react';
-import { HiUserGroup, HiBookOpen} from 'react-icons/hi';
+import { HiUserGroup, HiBookOpen, HiOfficeBuilding, HiAcademicCap } from 'react-icons/hi';
 import { useAuth } from '../server/authUser'; // Importar el hook de autenticación
 import { FaUserGraduate, FaChalkboardTeacher } from 'react-icons/fa';
 
@@ -27,6 +27,13 @@ const SideNav = ({ isSidebarOpen, toggleSidebar }) => {
                 </Sidebar.Item>
                 <Sidebar.Item href="/docentes" icon={FaChalkboardTeacher}>
                   Docentes
+                </Sidebar.Item>
+                <Sidebar.Item href="/departamentos" icon={HiOfficeBuilding}>
+                  Departamentos
+                </Sidebar.Item>
+                {/* Ítem para Carreras */}
+                <Sidebar.Item href="/carreras" icon={HiAcademicCap}>
+                  Carreras
                 </Sidebar.Item>
                 <Sidebar.Item href="/" icon={HiBookOpen}>
                   Materias
