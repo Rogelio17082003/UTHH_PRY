@@ -90,19 +90,19 @@ Se utiliza **Integración Continua (CI)** para asegurar que cada cambio que se i
 ```bash
 git clone https://github.com/BERCHNARD10/UTHH_PRY
 ```
-
+2. **Entrar en el directorio del proyecto**: Accede al directorio clonado donde está el código del proyecto.
 ```bash
 cd UTHH_PRY
 ```
-
+3. **Instalar dependencias**: Esto instalará todas las dependencias necesarias del proyecto especificadas en package.json.
 ```bash
 npm install
 ```
-
+4. **Ejecutar el proyecto en modo desarrollo**: Inicia el servidor en modo desarrollo. Esto te permitirá ver la aplicación en tiempo real y se recargará automáticamente cuando realices cambios en el código.
 ```bash
 npm run dev
 ```
-
+5. **Ejecutar las pruebas**: Corre las pruebas automatizadas del proyecto para asegurarse de que todo funcione correctamente.
 ```bash
 npm run test
 ```
