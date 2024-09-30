@@ -76,20 +76,33 @@ git merge feature/nombre-de-la-funcionalidad
 ## Estrategia de Despliegue
 Para el despliegue del proyecto, se ha seleccionado la estrategia de **Rolling Deployment**, que permite realizar actualizaciones de la aplicación sin tiempos de inactividad.
 
-### Entornos Definidos:
-1. **Desarrollo**: Aquí se realizan las primeras pruebas de las funcionalidades.
+### Entornos de Despliegue Definidos:
+1. **Desarrollo**: Aquí se realizan las primeras pruebas de las funcionalidades iniciales y desarrollo activo.
 2. **Staging**: Réplica del entorno de producción donde se realizan las pruebas finales antes del despliegue.
-3. **Producción**: Entorno final donde los usuarios acceden a la aplicación en vivo.
+3. **Producción**: El entorno en el que la aplicación está disponible para los usuarios finales.
 
 ## Proceso de CI/CD
 Se utiliza **Integración Continua (CI)** para asegurar que cada cambio que se integra al tronco principal pase por un proceso automatizado de pruebas. Cuando todas las pruebas pasan, el código se despliega automáticamente en los entornos de **Staging** y posteriormente en **Producción**.
 
 ## Instrucciones para Contribuir
 
-### Clonar el Repositorio:
+1. **Clonar el repositorio**: Esto descargará una copia del código fuente en tu máquina local.
 ```bash
 git clone https://github.com/BERCHNARD10/UTHH_PRY
+```
+
+```bash
 cd UTHH_PRY
+```
+
+```bash
 npm install
+```
+
+```bash
 npm run dev
+```
+
+```bash
 npm run test
+```
