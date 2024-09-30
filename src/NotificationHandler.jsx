@@ -11,7 +11,7 @@ const NotificationHandler = () => {
   const requestPermission = async () => {
     try {
       if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('../firebase-messaging-sw.js')
+        navigator.serviceWorker.register('../firebase-messaging-sw.js', { scope: '/firebase/' })
           .then(function(registration) {
             console.log('Service Worker registrado con éxito:', registration);
             

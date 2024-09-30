@@ -30,6 +30,7 @@ const ActividadesAlumno = () => {
         });
 
         const requestData = {
+            matriculaAlumno: userData.vchMatricula,
             intClvCarrera:userData.dataEstudiante.intClvCarrera,
             intMateria: vchClvMateria,
             intPeriodo: userData.dataEstudiante.intPeriodo,
@@ -70,10 +71,10 @@ const ActividadesAlumno = () => {
             'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-            clvMateria: vchClvMateria,
-            matriculaDocent: userData.vchMatricula,
-            chrGrupo: userData.dataEstudiante.chrGrupo,
-            intPeriodo: userData.dataEstudiante.intPeriodo,
+                clvMateria: vchClvMateria,
+                matriculaAlumno: userData.vchMatricula,
+                chrGrupo:chrGrupo,
+                periodo: intPeriodo,
             }),
         });
         const result = await response.json();
@@ -150,14 +151,61 @@ const ActividadesAlumno = () => {
                 ))}
             </Tabs.Item>
             <Tabs.Item title="Alumnos" icon={HiUserGroup}>
-                <TitlePage label="Alumnos" />
-                <div className="p-4">
-                {alumnos.map((alumnos) => (
-                    <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }} key={alumnos.AlumnoMatricula}>
-                    <Paragraphs className="mb-0" label={`${alumnos.AlumnoMatricula} - ${alumnos.AlumnoNombre} ${alumnos.AlumnoApellidoPaterno} ${alumnos.AlumnoApellidoMaterno}`} />
+                <TitlePage label="Docente" />
+                {alumnos.length > 0 && (
+                    <div
+                        key={alumnos[0].DocenteMatricula}
+                        className="flex items-center p-3 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300"
+                    >
+                        <img
+                            className="w-12 h-12 rounded-full object-cover"
+                            src={alumnos[0].DocenteFotoPerfil
+                                ? `https://robe.host8b.me/assets/imagenes/${alumnos[0].DocenteFotoPerfil}`
+                                : 'https://robe.host8b.me/assets/imagenes/userProfile.png'}
+                            alt={`Foto de ${alumnos[0].DocenteNombre}`}
+                        />
+                        <div className="ml-3">
+                            <p className="text-sm font-medium text-gray-900">
+                                {`${alumnos[0].DocenteNombre} ${alumnos[0].DocenteApellidoPaterno} ${alumnos[0].DocenteApellidoMaterno}`}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                                Matrícula: {alumnos[0].DocenteMatricula}
+                            </p>
+                        </div>
                     </div>
-                ))}
+                )}
+
+                <div className="flex items-center justify-between mt-4">
+                    <TitlePage label="Alumnos" />
+                    <p className="text-lg font-semibold text-gray-800 text-start mb-3">
+                    Total de alumnos: {alumnos.length+1}
+                    </p>
                 </div>
+
+                <div className="space-y-3">
+                    {alumnos.map((alumno) => (
+                        <div
+                            key={alumno.AlumnoMatricula}
+                            className="flex items-center p-3 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300"
+                        >
+                        <img
+                            className="w-12 h-12 rounded-full object-cover"
+                            src={alumno.FotoPerfil
+                            ? `https://robe.host8b.me/assets/imagenes/${alumno.FotoPerfil}`
+                            : 'https://robe.host8b.me/assets/imagenes/userProfile.png'}
+                            alt={`Foto de ${alumno.AlumnoNombre}`}
+                        />
+                        <div className="ml-3">
+                            <p className="text-sm font-medium text-gray-900">
+                            {`${alumno.AlumnoNombre} ${alumno.AlumnoApellidoPaterno} ${alumno.AlumnoApellidoMaterno}`}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                            Matrícula: {alumno.AlumnoMatricula}
+                            </p>
+                        </div>
+                        </div>
+                    ))}
+                    </div>
             </Tabs.Item>
             </Tabs>
         </div>

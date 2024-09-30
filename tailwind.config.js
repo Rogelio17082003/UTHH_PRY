@@ -9,14 +9,15 @@ export default {
     extend: {
       colors: {
         primary: '#009944',
-        secondary: '#23262d',
+        //#23262d
+        secondary: '#02233a',
       },
       
       
       // Asegúrate de incluir configuraciones para hover si es necesario
       backgroundColor: theme => ({
         ...theme('colors'),
-        'primary-hover': '#23262d', // Un color diferente para hover, por ejemplo
+        'primary-hover': '#02233a', // Un color diferente para hover, por ejemplo
       }),
     },
   },
