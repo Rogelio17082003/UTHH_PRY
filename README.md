@@ -7,12 +7,21 @@ Currently, two official plugins are available:
 - [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
 - [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-# Proyecto UTHH VIRTUAL - Plataforma de evaluacion educativa - Sistema de Suscripciones y Pasarela de Pagos
+El proyecto **UTHH_PRY** es una **plataforma de educación educativa** diseñada para facilitar la creación y gestión de aulas virtuales, permitiendo a los docentes realizar actividades como la creación de **materias**, **gestión de alumnos**, **asignación de tareas**, y la **calificación** de los estudiantes. Además, incluye la funcionalidad única de generar un **concentrado de calificaciones**, lo que agiliza el seguimiento y evaluación de los estudiantes.
 
-## Descripción del Proyecto
+### Funcionalidades Clave
+
+- **Creación de Materias**: Los docentes pueden crear materias y organizarlas dentro de la plataforma para gestionar el contenido y las evaluaciones.
+- **Gestión de Alumnos**: Los profesores pueden gestionar el registro de alumnos, asignarles tareas y monitorear su progreso.
+- **Asignación y Evaluación de Tareas**: La plataforma permite a los docentes asignar tareas a los estudiantes, que luego pueden ser evaluadas dentro del sistema.
+- **Sistema de Calificaciones**: Se pueden introducir y gestionar calificaciones para cada alumno. Además, la plataforma permite generar un **concentrado de calificaciones** automático para facilitar la revisión de notas.
+- **Notificaciones en Tiempo Real**: Los estudiantes y profesores reciben notificaciones sobre tareas pendientes, calificaciones y actualizaciones en el aula.
+  
+
+## Objetivo general
 Este proyecto consiste en el desarrollo de una **Progressive Web App (PWA)** que incluye un sistema de **suscripciones**, **notificaciones push en tiempo real**, funcionalidad **offline**, y una **pasarela de pagos segura**. El objetivo es ofrecer una experiencia similar a una app nativa que permita a los usuarios suscribirse a diferentes planes y acceder a funcionalidades premium mediante una pasarela de pagos confiable.
 
-## Objetivos Principales
+### Próximas Funcionalidades
 
 - **Pasarela de Pagos Segura**: Implementar una integración segura para que los usuarios puedan realizar pagos que permita a los usuarios suscribirse y acceder a funcionalidades premium de la aplicación. 
 - **Sistema de Suscripciones**: Permitir a los usuarios suscribirse a planes mensuales y anuales, gestionar renovaciones y cancelaciones.
