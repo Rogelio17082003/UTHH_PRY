@@ -31,6 +31,14 @@ El proyecto sigue una arquitectura basada en tres capas:
 ## Metodología de Trabajo
 Este proyecto utiliza **Extreme Programming (XP)** para fomentar la comunicación y colaboración constante dentro del equipo. Además, implementa **Trunk-Based Development** como estrategia de versionamiento, permitiendo integrar pequeñas actualizaciones frecuentes en la rama principal.
 
+- **Revisiones frecuentes de código** mediante **pair programming**.
+- **Pruebas continuas** para asegurar la calidad de cada nuevo cambio antes de integrarlo.
+- **Feedback del cliente** para ajustar los objetivos del proyecto a las necesidades cambiantes.
+
+### Ciclos de Iteración:
+Cada iteración tiene una duración de 1-2 semanas, y al final de cada iteración se realiza una reunión de retrospectiva para evaluar el progreso y ajustar las prioridades. Los entregables se revisan constantemente con el cliente.
+
+
 ## Control de Versiones
 
 El proyecto utiliza **Git** como sistema de control de versiones y sigue el flujo de trabajo de **Trunk-Based Development**.
@@ -42,14 +50,29 @@ El proyecto utiliza **Git** como sistema de control de versiones y sigue el fluj
   - `feature/suscripciones`
   - `feature/notificaciones-push`
   - `feature/offline-pwa`
+
+- **Integración frecuente**: Las ramas deben fusionarse rápidamente a `main` una vez que el código haya sido revisado y probado.
+- **Revisión de código**: Se realiza una revisión de código por al menos un miembro del equipo antes de fusionar la rama.
 - Las ramas se fusionan al tronco principal mediante **pull requests** o **merge requests**, después de ser revisadas por el equipo.
 
 ### Flujo de Trabajo:
 1. **Crear una nueva rama** para cada funcionalidad o tarea específica.
+```bash
+git checkout -b feature/nombre-de-la-funcionalidad
+```
 2. **Hacer commits** frecuentes de los cambios.
+```bash
+git add .
+git commit -m "Descripción del cambio"
+```
 3. **Abrir un pull request** para revisión de código por otro miembro del equipo.
+```bash
+git checkout main
+```
 4. **Integrar la rama** en `main` después de que las pruebas automáticas pasen y el código sea aprobado.
-
+```bash
+git merge feature/nombre-de-la-funcionalidad
+```
 ## Estrategia de Despliegue
 Para el despliegue del proyecto, se ha seleccionado la estrategia de **Rolling Deployment**, que permite realizar actualizaciones de la aplicación sin tiempos de inactividad.
 
