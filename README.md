@@ -53,12 +53,15 @@ Cada iteración tiene una duración de 1-2 semanas, y al final de cada iteració
 El proyecto utiliza **Git** como sistema de control de versiones y sigue el flujo de trabajo de **Trunk-Based Development**.
 
 ### Estrategia de Versionamiento:
-- El desarrollo de cada funcionalidad se realiza en ramas **temporales** cortas que se derivan de la rama principal (`main`).
+- El desarrollo de cada funcionalidad se realiza en ramas **temporales** cortas que se derivan de la rama principal (`master`).
 - Las ramas siguen la convención `feature/nombre-de-la-funcionalidad`. Ejemplos:
-  - `feature/pasarela-pagos`
-  - `feature/suscripciones`
-  - `feature/notificaciones-push`
-  - `feature/offline-pwa`
+- `feature/pasarela-pagos`
+- `feature/suscripciones`
+- `feature/notificaciones-push`
+- `feature/notificaciones-push-backend`
+- `feature/apis-logica-negocio`
+- `feature/diseno-responsivo`
+- `feature/offline-pwa`
 
 - **Integración frecuente**: Las ramas deben fusionarse rápidamente a `main` una vez que el código haya sido revisado y probado.
 - **Revisión de código**: Se realiza una revisión de código por al menos un miembro del equipo antes de fusionar la rama.

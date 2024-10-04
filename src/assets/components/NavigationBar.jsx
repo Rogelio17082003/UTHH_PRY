@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { NavLink } from "react-router-dom";
-import { IoClose, IoMenu } from "react-icons/io5";
+import { IoNotifications, IoMenu, IoClose } from 'react-icons/io5';
 import { HiUserCircle } from 'react-icons/hi';
 import { FaUser, FaSignOutAlt } from 'react-icons/fa';
-import { Button, Navbar, Avatar, Dropdown } from 'flowbite-react';
+import { Button, Navbar, Avatar, Dropdown, Badge } from 'flowbite-react';
 import { IoMdAdd } from 'react-icons/io';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../server/authUser'; // Importa el hook de autenticación
@@ -20,6 +20,58 @@ const NavigationBar = ({ isSidebarOpen, toggleSidebar }) => {
   const [deferredPrompt, setDeferredPrompt] = useState(null);
   const [showSnackbar, setShowSnackbar] = useState(false); // Muestra el snackbar si la app es instalable
   const [isInstallable, setIsInstallable] = useState(false); // Estado para saber si la PWA es instalable
+  const [notifications, setNotifications] = useState([]);
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+
+  // Función para alternar el menú de notificaciones
+  const toggleNotifications = () => {
+    setIsNotificationsOpen(!isNotificationsOpen);
+  };
+
+  // Simulamos obtener notificaciones (puedes sustituir con una llamada a una API)
+  useEffect(() => {
+    // Datos de ejemplo de las notificaciones
+    const fetchedNotifications = [
+      { 
+        id: 1, 
+        message: 'Tarea de Juan Pérez: "Proyecto de Matemáticas entregado."', 
+        time: 'Hace 1 hora', 
+        status: 'Entregada', 
+        profileImageUrl: 'https://randomuser.me/api/portraits/men/1.jpg' // URL de la imagen
+      },
+      { 
+        id: 2, 
+        message: 'Tarea de Ana López: "Informe de Ciencias pendiente."', 
+        time: 'Hace 2 horas', 
+        status: 'Pendiente', 
+        profileImageUrl: 'https://randomuser.me/api/portraits/women/2.jpg' 
+      },
+      { 
+        id: 3, 
+        message: 'Tarea de Carlos García: "Tarea de Inglés comentada."', 
+        time: 'Hace 4 horas', 
+        status: 'Comentario', 
+        profileImageUrl: 'https://randomuser.me/api/portraits/men/3.jpg' 
+      },
+      { 
+        id: 4, 
+        message: 'Tarea de María Sánchez: "Entrega tardía de Historia."', 
+        time: 'Hace 6 horas', 
+        status: 'Entregada tarde', 
+        profileImageUrl: 'https://randomuser.me/api/portraits/women/4.jpg' 
+      },
+      { 
+        id: 5, 
+        message: 'Tarea de José Ruiz: "Ensayo de Filosofía entregado."', 
+        time: 'Hace 1 día', 
+        status: 'Entregada', 
+        profileImageUrl: 'https://randomuser.me/api/portraits/men/5.jpg' 
+      },
+    ];
+
+    setNotifications(fetchedNotifications);
+  }, []);
+
 
     // Función para verificar si la PWA está instalada
     const checkIfAppIsInstalled = () => {
@@ -157,6 +209,52 @@ const handleInstallClick = () => {
       {isAuthenticated ? 
         (
         <div className="flex items-center gap-4 md:order-2">
+        
+          <Dropdown
+            arrowIcon={false}
+            inline
+            label={
+            <>
+              <div className="relative">
+                <IoNotifications className="w-8 h-8 text-gray-500 dark:text-white" />
+                  {notifications.length > 0 && (
+                    <span className="absolute top-0 right-0 inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full">
+                        {notifications.length}
+                    </span>
+                  )}
+              </div>
+            </>
+            }
+          >
+          <Dropdown.Header>
+            <span className="font-semibold text-gray-700">Notificaciones</span>
+          </Dropdown.Header>
+
+          {notifications.length === 0 ? (
+            <Dropdown.Header>
+              <span className="font-semibold text-gray-700">Notificaciones</span>
+            </Dropdown.Header>
+          ) 
+            : 
+            (
+              notifications.map((notification) => (
+              <>
+                <Dropdown.Item href='/mi-perfil'>
+                  {/* Imagen de perfil del docente/alumno */}
+                  <img 
+                    src={notification.profileImageUrl} 
+                    alt="Perfil" 
+                    className="w-10 h-10 rounded-full mr-3"
+                  />
+                  <div>
+                    <p className="text-gray-700">{notification.message}</p>
+                    <p className="text-sm text-gray-400">{notification.time}</p>
+                  </div>
+                </Dropdown.Item>
+              </>
+            ))
+          )}
+          </Dropdown>
           <Dropdown
             arrowIcon={false}
             inline
