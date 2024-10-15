@@ -21,6 +21,7 @@ const ResetPassword = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [serverResponse, setServerResponse] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const apiUrl = import.meta.env.VITE_API_URL;
 
   const {
     register,
@@ -69,7 +70,7 @@ const ResetPassword = () => {
     event.preventDefault();
     try {
       setIsLoading(true);
-      const response = await fetch('https://robe.host8b.me/WebServices/restablecer-contrasena.php', {
+      const response = await fetch(`${apiUrl}/restablecer-contrasena.php`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -109,6 +110,9 @@ const ResetPassword = () => {
         />
           
         <TitlePage label={"Restablecer Contraseña"}/>
+        <p className="text-sm text-gray-600">
+          Para restablecer tu contraseña, sigue estos pasos y asegúrate de que la nueva contraseña cumpla con todos los requisitos de seguridad:
+        </p>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="mb-5 relative">
             <CustomInputPassword

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import Components from '../../components/Components';
-const { TitlePage, ContentTitle, Paragraphs, TitleSection, DescriptionActivity } = Components;
+const { TitlePage, ContentTitle, Paragraphs, TitleSection, DescriptionActivity, DetailedActivitySkeleton} = Components;
 import { Card } from 'flowbite-react';
 import { FaRegFrown } from 'react-icons/fa';
 import { useAuth } from '../../server/authUser';
@@ -13,6 +13,8 @@ const DetalleActividadAlumno = () => {
     const [practicas, setPracticas] = useState([]);
     const [datosCalAlumn, setDatosCalAlumn] = useState([]);
     const {userData} = useAuth();
+    const [isLoading, setIsLoading] = useState(true);
+    const apiUrl = import.meta.env.VITE_API_URL;
 
     const fetchActividad = async () => {
         const requestData = {
@@ -24,7 +26,7 @@ const DetalleActividadAlumno = () => {
         };
 
         try {
-            const response = await fetch('https://robe.host8b.me/WebServices/cargarMaterias.php', {
+            const response = await fetch(`${apiUrl}/cargarMaterias.php`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -42,8 +44,12 @@ const DetalleActividadAlumno = () => {
                 console.log(data);
             }
         } catch (error) {
-            console.error('Error: Error al cargar los datos de la actividad');
+            alert('Error 500: Ocurrió un problema en el servidor. Intenta nuevamente más tarde.');
             // Manejar el error, mostrar mensaje al usuario, etc.
+        }
+        finally
+        {
+            setIsLoading(false)
         }
     };
 
@@ -57,7 +63,7 @@ const DetalleActividadAlumno = () => {
         console.log("datos", dataAlumnCal);
     
         try {
-            const response = await fetch('https://robe.host8b.me/WebServices/cargarMaterias.php', {
+            const response = await fetch(`${apiUrl}/cargarMaterias.php`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -109,6 +115,10 @@ const DetalleActividadAlumno = () => {
     });
 
     console.log("datos",prácticasConCalificaciones)
+
+    if (isLoading) {
+        return <DetailedActivitySkeleton />;
+    }
 
     return (
         <section className='w-full flex flex-col'>

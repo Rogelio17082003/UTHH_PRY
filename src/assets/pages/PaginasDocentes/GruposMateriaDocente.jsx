@@ -4,17 +4,18 @@ import { useAuth } from '../../server/authUser'; // Importa el hook de autentica
 import { useParams } from 'react-router-dom';
 import { Card} from 'flowbite-react';
 import  Components from '../../components/Components'
-const {TitlePage, LoadingOverlay} = Components;
+const {TitlePage, CardSkeleton } = Components;
 
 const GruposMateriasDocente = () => { 
     const {userData} = useAuth(); // Obtén el estado de autenticación del contexto
     const [materias, setMaterias] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
     const {vchClvMateria, chrGrupo, intPeriodo} = useParams();
+    const apiUrl = import.meta.env.VITE_API_URL;
 
     const onloadNaterias = async () => {
         try {
-
-        const response = await fetch('https://robe.host8b.me/WebServices/cargarMaterias.php', {
+        const response = await fetch(`${apiUrl}/cargarMaterias.php`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -27,21 +28,13 @@ const GruposMateriasDocente = () => {
                 periodo:intPeriodo
             }),
         });
-        const requestData = {
-            clvMateria: vchClvMateria,
-            matriculaDocent: userData.vchMatricula,
-            chrGrupo: chrGrupo,
-            periodo: intPeriodo
-        };
-    console.log("datods: ", requestData)
+
         const result = await response.json();
-    console.log(result);
         if (result.done) {
             setMaterias(result.message);
 
             } else {
 
-            
             console.error('Error en el registro:', result.message);
 
             if (result.debug_info) {
@@ -57,9 +50,11 @@ const GruposMateriasDocente = () => {
         
     } catch (error) {
         console.error('Error 500', error);
-        setTimeout(() => {
-            alert('¡Ay caramba! Encontramos un pequeño obstáculo en el camino, pero estamos trabajando para superarlo. Gracias por tu paciencia mientras solucionamos este problemita.'); 
-            }, 2000);
+        alert('Error 500: Ocurrió un problema en el servidor. Intenta nuevamente más tarde.');
+    }
+    finally{
+        setIsLoading(false);
+
     }
     };
 
@@ -73,7 +68,11 @@ const GruposMateriasDocente = () => {
         <div className="container mx-auto px-4 py-8">
             <TitlePage label="Grupos inscritos en la Materia" />
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                {materias.map((materia) => (
+            {isLoading
+                ? Array.from({ length: 3 }).map((_, index) => (
+                    <CardSkeleton key={index} />
+            ))
+            : materias.map((materia) => (                    
                 <Card
                     key={materia.chrGrupo}
                     href={`/gruposMaterias/actividades/${vchClvMateria}/${materia.chrGrupo}/${intPeriodo}`}

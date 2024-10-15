@@ -17,8 +17,10 @@ import DetalleActividadAlumno from './assets/pages/PaginasAlumnos/DetalleActivid
 import DetallePracticaAlumno from './assets/pages/PaginasAlumnos/DetallePracticaAlumno';
 
 //PAGINAS DOCENTE
+
 import Docentes from './assets/pages/PaginasDocentes/Teachers';
 import Alumnos from './assets/pages/PaginasDocentes/Alumnos';
+import CarrerasCrud from './assets/pages/PaginasDocentes/Carreras';
 import Departamentos from './assets/pages/PaginasDocentes/Departamentos';
 import GruposMateriasDocente from './assets/pages/PaginasDocentes/GruposMateriaDocente';
 import ActividadesDocente from './assets/pages/PaginasDocentes/ActividadesDocente';
@@ -32,10 +34,11 @@ import './main'
 import { ToastContainer, toast } from 'react-toastify';
 import './App.css';
 import  Components from './assets/components/Components'
-const {LoadingOverlay} = Components;
+const {LoadingOverlay, OfflineAlert} = Components;
 
 function App() {
   const [isLoading, setIsLoading] = useState(false);
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
 
   useEffect(() => {
     const navigationEntries = window.performance.getEntriesByType('navigation');
@@ -47,10 +50,26 @@ function App() {
         setIsLoading(false);
       }, 1500); // Ajusta el tiempo según lo necesites
     }
+
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+
   }, []);
 
   if (isLoading) {
     return <LoadingOverlay />;
+  }
+
+  if (!isOnline ) {
+    return <OfflineAlert/>;
   }
 
   return (
@@ -72,8 +91,10 @@ function App() {
           <Route path="/actividades/detalleActividad/:vchClvMateria/:chrGrupo/:intPeriodo/:intNumeroActi/:intIdActividadCurso" element={<PrivateRouteUser><Layout><DetalleActividadAlumno/></Layout></PrivateRouteUser>} />
           <Route path="/actividades/detalleActividad/detallePractica/:vchClvMateria/:chrGrupo/:intPeriodo/:intNumeroActi/:intNumeroPractica/:intIdActividadCurso" element={<PrivateRouteUser><Layout><DetallePracticaAlumno/></Layout></PrivateRouteUser>} />
           {/*PAGINAS PARA Docentes */}
+          
           <Route path="/alumnos" element={<PrivateRoute><Layout><Alumnos/></Layout></PrivateRoute>} />
           <Route path="/departamentos" element={<PrivateRoute><Layout><Departamentos/></Layout></PrivateRoute>} />
+          <Route path="/carreras" element={<PrivateRoute><Layout><CarrerasCrud/></Layout></PrivateRoute>} />
           <Route path="/docentes" element={<PrivateRoute><Layout><Docentes/></Layout></PrivateRoute>} />
           <Route path="/Admin/Teachers" element={<Layout><Docentes/></Layout>} />
           <Route path="/gruposMaterias/:vchClvMateria/:intPeriodo" element={<PrivateRoute><Layout><GruposMateriasDocente/></Layout></PrivateRoute>} />

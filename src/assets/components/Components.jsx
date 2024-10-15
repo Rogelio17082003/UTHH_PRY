@@ -2,9 +2,169 @@ import React, { useState, useEffect  } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { Label, TextInput, Button, Select, Modal, Tooltip } from "flowbite-react"; // Importamos el componente Button
 import { HiOutlineExclamationCircle } from 'react-icons/hi';
-import { FaInfoCircle, FaCheckCircle, FaExclamationCircle } from "react-icons/fa"; // Importa íconos de react-icons
+import { FaInfoCircle, FaCheckCircle, FaExclamationCircle, FaWifi } from "react-icons/fa"; // Importa íconos de react-icons
 import { AiOutlineClose } from 'react-icons/ai';
 import { BsCircleFill } from 'react-icons/bs';
+import Skeleton from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
+
+
+const ActivitiesSkeleton = () => {
+    return (
+      <div className="space-y-6">
+        {/* Título Principal */}
+        <div>
+          <Skeleton width="50%" height={30} style={{ marginBottom: '10px' }} />
+        </div>
+  
+        {/* Contenedor de Tabs - Tab de Actividades */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow space-y-6">
+          {/* Parcial y Botón de Excel */}
+          {Array.from({ length: 1 }).map((_, parcialIndex) => (
+            <div key={parcialIndex} className="mb-4">
+              <div className="flex justify-between items-center mb-2">
+                <Skeleton width="20%" height={20} />
+                <Skeleton width="30%" height={35} />
+              </div>
+  
+              {/* Acordeón de Actividades */}
+              <div className="space-y-4">
+                {Array.from({ length: 2 }).map((_, activityIndex) => (
+                  <div key={activityIndex} className="border border-gray-300 dark:border-gray-700 rounded-lg p-3 space-y-3">
+                    <Skeleton width="70%" height={20} />
+                    <Skeleton width="90%" height={15} />
+                    <Skeleton width="20%" height={15} />
+                    <Skeleton width="25%" height={15} />
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+const DetailedActivitySkeleton = () => {
+    return (
+      <section className="w-full flex flex-col space-y-6">
+        {/* Título y Botón de Descarga */}
+        <div className="flex justify-between items-center">
+          <Skeleton width="60%" height={30} />
+          <Skeleton width={180} height={40} />
+        </div>
+        
+        {/* Descripción */}
+        <Skeleton count={3} height={20} width="80%" />
+  
+        {/* Sección de Subir Rúbricas y Detalles */}
+        <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
+          <div className="md:w-1/2 bg-white p-4 rounded-lg shadow dark:bg-gray-800">
+            <Skeleton height={30} width="50%" />
+            <Skeleton height={40} width="100%" style={{ marginTop: '10px' }} />
+          </div>
+          <div className="md:w-1/2 bg-white p-4 rounded-lg shadow dark:bg-gray-800">
+            <Skeleton height={150} width="100%" />
+          </div>
+        </div>
+  
+        {/* Tarjetas de Prácticas */}
+        <div>
+          <Skeleton width={100} height={30} />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+            {Array.from({ length: 6 }).map((_, index) => (
+              <div key={index} className="bg-white rounded-lg shadow p-4">
+                <Skeleton width="60%" height={20} />
+                <Skeleton width="80%" height={15} style={{ marginTop: '5px' }} />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  };
+
+  const DetailedPracticeSkeleton = () => {
+    return (
+        <div className="space-y-6">
+        {/* Título de la Práctica y Descripción (directamente sobre fondo gris) */}
+        <div>
+          <Skeleton width="40%" height={30} style={{ marginBottom: '10px' }} />
+          <Skeleton width="60%" height={20} style={{ marginBottom: '5px' }} />
+        </div>
+        
+        {/* Instrucciones */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
+          {/* Título de Instrucciones */}
+          <Skeleton width="30%" height={25} style={{ marginBottom: '10px' }} />
+          {/* Texto de Instrucciones */}
+          <div className="space-y-2">
+            <Skeleton width="100%" height={15} />
+            <Skeleton width="90%" height={15} />
+            <Skeleton width="95%" height={15} />
+          </div>
+        </div>
+        
+        {/* Rúbrica de Evaluación */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow space-y-4">
+          {/* Título de Rúbrica y Botón de Edición */}
+          <div className="flex justify-between items-center border-b border-gray-300 dark:border-gray-600 pb-2 mb-4">
+            <Skeleton width="40%" height={25} />
+            <Skeleton circle width={25} height={25} />
+          </div>
+  
+          {/* Rubros */}
+          {Array.from({ length: 3 }).map((_, index) => (
+          <div key={index} className="border-b border-gray-300 dark:border-gray-600 py-3 mb-2">
+            <div className="flex justify-between items-center">
+              <div className="flex-1 pr-2">
+                <Skeleton width="90%" height={15} style={{ marginBottom: '5px' }} />
+                <Skeleton width="75%" height={15} />
+              </div>
+              <Skeleton width={30} height={20} />
+            </div>
+          </div>
+        ))}
+  
+          {/* Puntaje Total */}
+          <div className="flex justify-between items-center mt-4">
+            <Skeleton width="30%" height={20} />
+            <Skeleton width="20%" height={20} />
+          </div>
+        </div>
+      </div>
+    );
+  };
+  
+  const RubricaSkeletonLoader = ({ count = 3 }) => {
+    return (
+        <>
+            {[...Array(count)].map((_, index) => (
+                <div key={index} className="py-4 border-b border-gray-300 dark:border-gray-700">
+                    <div className="grid grid-cols-10 gap-4 items-center">
+                        <div className="col-span-7">
+                            <Skeleton height={20} width="80%" />
+                        </div>
+                        <div className="col-span-3 flex items-center justify-end gap-2">
+                            <Skeleton height={30} width="50px" />
+                            <Skeleton width="20px" />
+                        </div>
+                    </div>
+                </div>
+            ))}
+
+            <div className="mt-6 flex justify-between items-center">
+                <div className="flex items-center gap-2">
+                    <Skeleton width={120} height={24} />
+                    <Skeleton width={50} height={24} />
+                    <Skeleton width={50} height={24} />
+                </div>
+                <Skeleton width={110} height={40} borderRadius="0.5rem" />
+            </div>
+        </>
+    );
+};
+
 
 const TitlePage = ({ label }) => 
 {   
@@ -16,14 +176,14 @@ const TitlePage = ({ label }) =>
 const TitleSection = ({className, label }) => 
 {   
     return (
-        <h3 className={`mb-2 text-lg font-semibold text-gray-900 dark:text-white   ${className}`}>{label}</h3>
+        <h3 className={`mb-2 text-base font-bold text-gray-900 dark:text-white   ${className}`}>{label}</h3>
     )
 }
 
 const ContentTitle = ({ label }) => 
 {   
     return (
-        <h5 className="mb-D2 text-base font-semibold text-gray-900 dark:text-white">{label}</h5>
+        <h5 className="mb-D2 text-sm font-medium text-gray-900 dark:text-white">{label}</h5>
     )
 }
 
@@ -34,6 +194,25 @@ const Paragraphs = ({className, label }) =>
         {label}
         </p>
     )
+}
+
+const OfflineAlert =()=>{
+    const handleReload = () => {
+        window.location.reload();
+      };
+    
+      return (
+        <div className="fixed inset-0 flex flex-col items-center justify-center bg-gray-50 text-center">
+        <FaWifi className="text-7xl text-gray-500 mb-6" />
+        <p className="text-lg text-gray-400 mb-6">No tienes conexión a internet. Verifica tu conexión y recarga la página.</p>
+        <button
+          onClick={handleReload}
+          className="bg-gray-500 text-white px-5 py-2 rounded-md hover:bg-gray-600 transition-colors duration-200"
+        >
+          Recargar Página
+        </button>
+      </div>
+      );
 }
 
 const DescriptionActivity = ({ label = "" }) => {
@@ -54,6 +233,17 @@ const DescriptionActivity = ({ label = "" }) => {
                     return <p key={index}>{line}</p>;
                 }
             })}
+        </div>
+    );
+};
+
+const CardSkeleton = () => {
+    return (
+        <div className="w-full rounded-lg overflow-hidden shadow-lg">
+            <Skeleton height={160} /> {/* Placeholder principal */}
+            <div className="pt-5 pb-6 px-4 flex justify-center items-center h-full">
+                <Skeleton height={30} width="60%" /> {/* Placeholder del título */}
+            </div>
         </div>
     );
 };
@@ -182,7 +372,7 @@ const FloatingLabelInput = ({
 };
 
 
-const CustomInput = ({className, label, value, name, errors, register, trigger, errorMessage, pattern }) => 
+const CustomInput = ({className, label, value, name, errors, register, trigger, errorMessage, pattern, style, readOnly}) => 
 {
     const [inputError, setInputError] = useState(false);
 
@@ -193,7 +383,10 @@ const CustomInput = ({className, label, value, name, errors, register, trigger, 
                 type='text'
                 id={name}
                 value={value}
+                style={style}
                 aria-describedby={`${name}_help`}
+                readOnly= {readOnly}
+                
                 className=
                 {`block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border-1 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer 
                     ${
@@ -377,7 +570,6 @@ const CustomInputPassword = ({ label, name, errors, register, trigger, pattern, 
                 {label}
                 </label>
             </div>
-            
             {inputError && (
                 <p className="mt-2 text-xs text-red-600 dark:text-red-400">
                 <span className="font-medium">Oh, snapp!</span>{' '}
@@ -570,9 +762,13 @@ const LoadingOverlay = () => {
 
 
 export default {
+    ActivitiesSkeleton,
+    DetailedActivitySkeleton,
+    DetailedPracticeSkeleton,
     TitlePage,  
     TitleSection, 
     ContentTitle, 
+    CardSkeleton,
     Paragraphs, 
     DescriptionActivity,
     Link,
@@ -586,5 +782,7 @@ export default {
     SelectInput,
     ConfirmDeleteModal,
     InfoAlert,
-    LoadingOverlay
+    OfflineAlert,
+    LoadingOverlay,
+    RubricaSkeletonLoader
 };

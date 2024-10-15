@@ -280,7 +280,11 @@
   animation: progress-animation 2s linear forwards; /* Mantener la duración de 4 segundos */
 }
 
-
+@media (max-width: 365px) {
+  .hidden-below-365 {
+    display: none;
+  }
+}
 
 /*
 a {

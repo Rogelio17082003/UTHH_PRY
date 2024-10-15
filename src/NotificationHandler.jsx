@@ -7,6 +7,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 const NotificationHandler = () => {
   const { userData, isAuthenticated } = useAuth(); // Obtén el estado de autenticación del contexto
+  const apiUrl = import.meta.env.VITE_API_URL;
 
   const requestPermission = async () => {
     try {
@@ -28,7 +29,7 @@ const NotificationHandler = () => {
           if (token) {
             console.log("nuevo",token)
             try {
-              const response = await fetch('https://robe.host8b.me/WebServices/enviarToken.php', {
+              const response = await fetch(`${apiUrl}/enviarToken.php`, {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',

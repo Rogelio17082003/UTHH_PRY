@@ -11,6 +11,7 @@ const EmailForm = () => {
   const [emailSent, setEmailSent] = useState(false);
   const [serverError, setServerError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const apiUrl = import.meta.env.VITE_API_URL;
 
   const navigate = useNavigate();
 
@@ -26,7 +27,7 @@ const EmailForm = () => {
 
     try {
       setIsLoading(true);
-      const response = await fetch('https://robe.host8b.me/WebServices/correo.php', {
+      const response = await fetch(`${apiUrl}/correo.php`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

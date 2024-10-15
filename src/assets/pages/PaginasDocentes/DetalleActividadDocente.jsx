@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import  Components from '../../components/Components'
-const {TitlePage, ContentTitle, Paragraphs, TitleSection, LoadingButton, SelectInput, FloatingLabelInput, ConfirmDeleteModal, InfoAlert, IconButton, DescriptionActivity, LoadingOverlay} = Components;
+const {DetailedActivitySkeleton, TitlePage, ContentTitle, Paragraphs, TitleSection, LoadingButton, SelectInput, FloatingLabelInput, ConfirmDeleteModal, InfoAlert, IconButton, DescriptionActivity, LoadingOverlay} = Components;
 import {Card} from 'flowbite-react';
 import * as XLSX from 'xlsx';
 import { useForm } from 'react-hook-form';
@@ -11,6 +11,8 @@ import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css'; // Estilos del editor
 
 const DetalleActividadDocente = () => {
+    const apiUrl = import.meta.env.VITE_API_URL;
+    const webUrl = import.meta.env.VITE_URL;
     const { vchClvMateria, chrGrupo, intPeriodo, intNumeroActi, intIdActividadCurso } = useParams();
     const [actividad, setActividad] = useState([]);
     const [practicas, setPracticas] = useState([]);
@@ -25,11 +27,11 @@ const DetalleActividadDocente = () => {
     const [practiceToDelete, setPracticeToDelete] = useState(null);
     const [serverResponse, setServerResponse] = useState('');
     const [selectedPracticeForEdit, setSelectedPracticeForEdit] = useState({});
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
 
     const handleConfirmDelete = async () => {
         try {
-            const response = await fetch('https://robe.host8b.me/WebServices/accionesPracticas.php', { // Cambia la ruta al archivo PHP adecuado
+            const response = await fetch(`${apiUrl}/accionesPracticas.php`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -83,7 +85,7 @@ const DetalleActividadDocente = () => {
 
         try 
         {
-            const response = await fetch('https://robe.host8b.me/WebServices/cargarMaterias.php', 
+            const response = await fetch(`${apiUrl}/cargarMaterias.php`, 
             {
             method: 'POST',
             headers: 
@@ -107,6 +109,9 @@ const DetalleActividadDocente = () => {
             }
         } catch (error) {
             console.error('Error: Error al cargar los datos de la actividad');
+        }
+        finally{
+            setIsLoading(false);
         }
 
         };
@@ -162,7 +167,7 @@ const DetalleActividadDocente = () => {
     const sendDataToServer = async (data) => {
         try 
         {
-            const response = await fetch('https://robe.host8b.me/WebServices/InsertarActividades.php', {
+            const response = await fetch(`${apiUrl}/InsertarActividades.php`, {
                 method: 'POST',
                 headers: {
                 'Content-Type': 'application/json'
@@ -311,7 +316,7 @@ const DetalleActividadDocente = () => {
             return;
         }
         try {
-            const response = await fetch('https://robe.host8b.me/WebServices/accionesPracticas.php', {
+            const response = await fetch(`${apiUrl}/accionesPracticas.php`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -336,13 +341,32 @@ const DetalleActividadDocente = () => {
         }
     };
 
-    const handleDownload = () => {
-        const filePath = `${process.env.REACT_APP_API_URL}/formato.xlsx`; // Ruta del archivo en la carpeta public
+      const handleDownload = async () => {
+        const response = await fetch(`${webUrl}assets/archivos/Formato-de-Rubricas.xlsx`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/octet-stream',
+          },
+        });
+    
+        if (!response.ok) {
+          throw new Error('Error al descargar el archivo');
+        }
+    
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
         const link = document.createElement('a');
-        link.href = filePath;
-        link.download = 'formato.xlsx';
+        link.href = url;
+        link.download = 'Formato-de-Rubricas.xlsx';
+        document.body.appendChild(link);
         link.click();
-    };
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      };
+
+    if (isLoading) {
+        return <DetailedActivitySkeleton />;
+      }
     
     return (
         
@@ -355,55 +379,57 @@ const DetalleActividadDocente = () => {
                     onClose={() => setOpenModalEdit(false)}
                     popup
                 >
-                    <Modal.Header />
-                    <Modal.Body className='max-h-96'>
-                            <div className="space-y-6 px-6 py-4">
-                                <TitleSection label="Editar Práctica" />
-                                
-                                <FloatingLabelInput
-                                    id="edit_titulo"
-                                    label="Título (Obligatorio)"
-                                    value={selectedPracticeForEdit.vchNombre || ''}
-                                    onChange={(e) => handleInputChangePracticas('vchNombre', e.target.value)}
-                                />
-                                <FloatingLabelInput
-                                    id="edit_descripcion"
-                                    label="Descripción (Obligatorio)"
-                                    value={selectedPracticeForEdit.vchDescripcion || ''}
-                                    onChange={(e) => handleInputChangePracticas('vchDescripcion', e.target.value)}
-                                />
-                                
-                                <div className="my-4">
-                                    <label className="block text-sm font-medium text-gray-700">
-                                        Instrucciones
-                                    </label>
-                                    <ReactQuill
-                                        theme="snow"
-                                        value={selectedPracticeForEdit.vchInstrucciones|| ''}
-                                        onChange={(value) => handleInputChangePracticas('vchInstrucciones', value)}
-                                        placeholder={`Instrucciones (Opcional)`}
+                    <div className="fixed inset-0 flex items-center justify-center z-50">
+                        <div className="relative w-full mx-12 bg-white rounded-lg shadow-lg">
+                            <Modal.Header>Editar Práctica</Modal.Header>
+                            <Modal.Body className='sm:max-h-72 max-h-96'>
+                                <div className="space-y-6 px-6 py-4">                                
+                                    <FloatingLabelInput
+                                        id="edit_titulo"
+                                        label="Título (Obligatorio)"
+                                        value={selectedPracticeForEdit.vchNombre || ''}
+                                        onChange={(e) => handleInputChangePracticas('vchNombre', e.target.value)}
                                     />
-                                </div>
-                                
-                                <div className="flex justify-center gap-4 mt-6 h-10">
-                                    <LoadingButton
-                                        className="w-36"
-                                        isLoading={isLoading}
-                                        loadingLabel="Cargando..."
-                                        normalLabel="Guardar"
-                                        onClick={handleSaveEdit}
-                                        disabled={isLoading}
+                                    <FloatingLabelInput
+                                        id="edit_descripcion"
+                                        label="Descripción (Obligatorio)"
+                                        value={selectedPracticeForEdit.vchDescripcion || ''}
+                                        onChange={(e) => handleInputChangePracticas('vchDescripcion', e.target.value)}
                                     />
-                                    <Button
-                                        color="gray"
-                                        onClick={() => setOpenModalEdit(false)}
-                                        className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-200 focus:ring-4 focus:ring-gray-300"
-                                    >
-                                        No, cancelar
-                                    </Button>
+                                    
+                                    <div className="my-4">
+                                        <label className="block text-sm font-medium text-gray-700">
+                                            Instrucciones
+                                        </label>
+                                        <ReactQuill
+                                            theme="snow"
+                                            value={selectedPracticeForEdit.vchInstrucciones|| ''}
+                                            onChange={(value) => handleInputChangePracticas('vchInstrucciones', value)}
+                                            placeholder={`Instrucciones (Opcional)`}
+                                        />
+                                    </div>
+                                
                                 </div>
-                            </div>
-                        </Modal.Body>
+                            </Modal.Body>
+                            <Modal.Footer>
+                                <LoadingButton
+                                    className="w-36"
+                                    isLoading={isLoading}
+                                    loadingLabel="Cargando..."
+                                    normalLabel="Guardar"
+                                    onClick={handleSaveEdit}
+                                    disabled={isLoading}
+                                />
+                                <Button
+                                    color="gray"
+                                    onClick={() => setOpenModalEdit(false)}
+                                    className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-200 focus:ring-4 focus:ring-gray-300"
+                                >
+                                    No, cancelar
+                                </Button>
+                            </Modal.Footer>
+                        </div>
+                    </div>
                 </Modal>
             )}
 

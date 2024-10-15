@@ -24,10 +24,12 @@ const PerfilUsuario = () => {
   const fileInputRef = useRef(null);
   const [loading, setLoading] = useState(false);
   const [serverResponse, setServerResponse] = useState('');
+  const apiUrl = import.meta.env.VITE_API_URL;
+  const webUrl = import.meta.env.VITE_URL;
 
   const profileImageUrl = isAuthenticated && userData?.vchFotoPerfil
-  ? `https://robe.host8b.me/assets/imagenes/${userData.vchFotoPerfil}`
-  : 'https://robe.host8b.me/assets/imagenes/userProfile.png'; // Enlace alternativo cuando vchFotoPerfil es null o usuario no está autenticado
+  ? `${webUrl}assets/imagenes/${userData.vchFotoPerfil}`
+  : `${webUrl}assets/imagenes/userProfile.png`; // Enlace alternativo cuando vchFotoPerfil es null o usuario no está autenticado
 
 
 
@@ -47,7 +49,7 @@ const PerfilUsuario = () => {
 
       try {
         // Subir el archivo al servidor usando fetch
-        const response = await fetch('https://robe.host8b.me/WebServices/UploadImagen.php', {
+        const response = await fetch(`${apiUrl}/UploadImagen.php`, {
           method: 'POST',
           body: formData,
         });
@@ -133,7 +135,7 @@ const PerfilUsuario = () => {
     try 
     {
       setIsLoading(true);
-      const response = await fetch('https://robe.host8b.me/WebServices/correo.php', 
+      const response = await fetch(`${apiUrl}/correo.php`, 
       {
         method: 'POST',
         headers: 
@@ -177,7 +179,7 @@ const PerfilUsuario = () => {
   {
     try 
     {
-        const response = await fetch('https://robe.host8b.me/WebServices/sesionManager.php', 
+      const response = await fetch(`${apiUrl}/sesionManager.php`, 
         {
             method: 'POST',
             headers: {
@@ -224,8 +226,7 @@ const PerfilUsuario = () => {
     try {
       setIsLoading(true);
       console.log('Datos enviados:', JSON.stringify(data));
-
-      const response = await fetch('https://robe.host8b.me/WebServices/updatePassword.php', {
+      const response = await fetch(`${apiUrl}/updatePassword.php`, {
           method: 'POST',
           headers: {
               'Content-Type': 'application/json',

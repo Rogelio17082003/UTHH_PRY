@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect  } from 'react';
 import { useNavigate } from 'react-router-dom'; 
 import { useForm } from 'react-hook-form';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
@@ -19,6 +19,8 @@ const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [intentosFallidos, setIntentosFallidos] = useState(0);
   const [bloquearBoton, setBloquearBoton] = useState(false);
+  const [segundosRestantes, setSegundosRestantes] = useState(0);
+  const apiUrl = import.meta.env.VITE_API_URL;
 
   const {
     register,
@@ -34,7 +36,7 @@ const LoginPage = () => {
   const handleLogin = async (data) => {
     setIsLoading(true);
     try {
-      const response = await fetch('https://robe.host8b.me/WebServices/loginUser.php', {
+      const response = await fetch(`${apiUrl}/loginUser.php`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...data, matriculaAlum: data.matriculaAlum.toString() }),
@@ -44,13 +46,6 @@ const LoginPage = () => {
 
       if (result.done) {
         login(result.userData.JWTUser, result.userData);
-
-        await fetch('https://robe.host8b.me/WebServices/Logs/LogInicioSesion.php', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ...data, matriculaAlum: data.matriculaAlum.toString() }),
-        });
-
         navigate('/');
       } else {
         handleFailedLogin();
@@ -58,30 +53,70 @@ const LoginPage = () => {
       }
     } catch (error) {
       console.error('Error 500', error);
-      alert('¡Ay caramba! Encontramos un pequeño obstáculo en el camino, pero estamos trabajando para superarlo. Gracias por tu paciencia mientras solucionamos este problemita.');
+      alert('Error 500: Ocurrió un problema en el servidor. Intenta nuevamente más tarde.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleFailedLogin = async () => {
+  const handleFailedLogin = () => {
     setIntentosFallidos((prev) => prev + 1);
-    if (intentosFallidos >= 2) { // Use >= 2 to block on the 3rd attempt
+  };
+
+
+  useEffect(() => {
+    // Cargar el tiempo de bloqueo desde localStorage al cargar la página
+    const bloqueoTiempo = localStorage.getItem('bloqueoTiempo');
+    if (bloqueoTiempo) {
+      const tiempoRestante = Math.floor((bloqueoTiempo - Date.now()) / 1000);
+      if (tiempoRestante > 0) {
+        setBloquearBoton(true);
+        setSegundosRestantes(tiempoRestante);
+
+        const interval = setInterval(() => {
+          setSegundosRestantes((prev) => {
+            if (prev <= 1) {
+              clearInterval(interval);
+              setBloquearBoton(false);
+              setIntentosFallidos(0);
+              localStorage.removeItem('bloqueoTiempo');
+              return 0;
+            }
+            return prev - 1;
+          });
+        }, 1000);
+
+        return () => clearInterval(interval);
+      } else {
+        localStorage.removeItem('bloqueoTiempo');
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (intentosFallidos >= 3) {
       alert('El login ha sido suspendido por 30 segundos');
       setBloquearBoton(true);
+      const tiempoDesbloqueo = Date.now() + 30000;
+      localStorage.setItem('bloqueoTiempo', tiempoDesbloqueo);
+      setSegundosRestantes(30);
 
-      await fetch('https://robe.host8b.me/WebServices/Logs/LogBloqueo.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...data, matriculaAlum: data.matriculaAlum.toString() }),
-      });
+      const interval = setInterval(() => {
+        setSegundosRestantes((prev) => {
+          if (prev <= 1) {
+            clearInterval(interval);
+            setBloquearBoton(false);
+            setIntentosFallidos(0);
+            localStorage.removeItem('bloqueoTiempo');
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
 
-      setTimeout(() => {
-        setIntentosFallidos(0);
-        setBloquearBoton(false);
-      }, 30000); // 30 segundos
+      return () => clearInterval(interval);
     }
-  };
+  }, [intentosFallidos]);
 
   const onSubmit = (data, event) => {
     event.preventDefault();
@@ -145,7 +180,7 @@ const LoginPage = () => {
             <LoadingButton
               isLoading={isLoading}
               loadingLabel="Cargando..."
-              normalLabel="Iniciar Sesión"
+              normalLabel={bloquearBoton ? `Bloqueado (${segundosRestantes}s)` : 'Iniciar Sesión'}
               disabled={bloquearBoton}
             />
           </form>

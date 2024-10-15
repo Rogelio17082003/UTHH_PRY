@@ -25,16 +25,20 @@ const SideNav = ({ isSidebarOpen, toggleSidebar }) => {
                 <Sidebar.Item href="/alumnos" icon={FaUserGraduate}>
                   Alumnos
                 </Sidebar.Item>
-                <Sidebar.Item href="/docentes" icon={FaChalkboardTeacher}>
-                  Docentes
-                </Sidebar.Item>
-                <Sidebar.Item href="/departamentos" icon={HiOfficeBuilding}>
-                  Departamentos
-                </Sidebar.Item>
-                {/* Ítem para Carreras */}
-                <Sidebar.Item href="/carreras" icon={HiAcademicCap}>
-                  Carreras
-                </Sidebar.Item>
+                {userData.vchNombreRol === 'Administrador' && (
+                  <>
+                    <Sidebar.Item href="/docentes" icon={FaChalkboardTeacher}>
+                      Docentes
+                    </Sidebar.Item>
+                    <Sidebar.Item href="/departamentos" icon={HiOfficeBuilding}>
+                      Departamentos
+                    </Sidebar.Item>
+                    <Sidebar.Item href="/carreras" icon={HiAcademicCap}>
+                      Carreras
+                    </Sidebar.Item>
+                  </>
+                )}
+
                 <Sidebar.Item href="/" icon={HiBookOpen}>
                   Materias
                 </Sidebar.Item>

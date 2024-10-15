@@ -10,12 +10,12 @@ import { MdDescription, MdAssignment } from "react-icons/md";
 import { FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
 import 'react-quill/dist/quill.snow.css';
 
-const { TitlePage, Paragraphs, TitleSection, LoadingButton, CustomInputOnchange, ContentTitle, FloatingLabelInput, InfoAlert, IconButton } = Components;
+const {RubricaSkeletonLoader, DetailedPracticeSkeleton, TitlePage, Paragraphs, TitleSection, LoadingButton, CustomInputOnchange, ContentTitle, FloatingLabelInput, InfoAlert, IconButton } = Components;
 
 const DetallePracticaDocente = () => {
     const {intNumeroActi, intIdActividadCurso, intNumeroPractica } = useParams();
     const [detalleActividad, setDetalleActividad] = useState({});
-    const { sendNotification, userData } = useAuth();
+    const {sendNotification, userData } = useAuth();
     const [rubricaCalAlumno, setRubricaCalAlumno] = useState([]);
     const [puntajeTotal, setPuntajeTotal] = useState(0);
     const [puntajeTotalCal, setPuntajeTotalCal] = useState(0);
@@ -29,6 +29,11 @@ const DetallePracticaDocente = () => {
     const [puntajeObtenido, setPuntajeObtenido] = useState(0);
     const [serverResponse, setServerResponse] = useState('');
     const [selectedAlumnoTokenFirebase, setSelectedAlumnoTokenFirebase] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isLoadingAlumn, setIsLoadingAlumn] = useState(false);
+
+    const apiUrl = import.meta.env.VITE_API_URL;
+    const webUrl = import.meta.env.VITE_URL;
 
     const { register, handleSubmit, watch, trigger, formState: { errors } } = useForm();
 
@@ -69,7 +74,7 @@ const DetallePracticaDocente = () => {
         }
         console.log("datos rubrica",editedData);
         try {
-        const response = await fetch('https://robe.host8b.me/WebServices/cargarMaterias.php', {
+        const response = await fetch(`${apiUrl}/cargarMaterias.php`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ updatedRubrica: editedData }),
@@ -111,8 +116,6 @@ const DetallePracticaDocente = () => {
         newEditedData[index][field] = value;
         setEditedData(newEditedData);
     };
-
-
 
     // Función para eliminar un rubro por índice
     const handleDeleteRubro = (index) => {
@@ -157,9 +160,6 @@ const DetallePracticaDocente = () => {
 
     const existeCalificacionMayorACero = alumnos.some(alumno => alumno.TieneCalificacion > 0);
 
-
-
-
     const handleInputChangeCal = (index, field, value) => {
         let newValue = parseFloat(value);
         if (isNaN(newValue) || newValue < 0) {
@@ -194,7 +194,8 @@ const DetallePracticaDocente = () => {
     
     const fetchCalificacionesAlumno = async (matricula) => {
         try {
-            const response = await fetch('https://robe.host8b.me/WebServices/accionesAlumnos.php', {
+            setIsLoadingAlumn(true);
+            const response = await fetch(`${apiUrl}/accionesAlumnos.php`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
@@ -218,6 +219,9 @@ const DetallePracticaDocente = () => {
         } catch (error) {
             console.error('Error:', error.message);
         }
+        finally{
+            setIsLoadingAlumn(false);
+        }
     };
     
     const handleCalificarClick = async () => {
@@ -234,14 +238,11 @@ const DetallePracticaDocente = () => {
             title:`${detalleActividad.vchNombre} - ${detalleActividad.vchDescripcion}`,
             body:`Nueva calificacion: ${sumaCalificaciones}/10 \nDocente: ${userData.vchNombre} ${userData.vchAPaterno} ${userData.vchAMaterno}`,
             tokenUser: selectedAlumnoTokenFirebase,
-            url:`https://robe.host8b.me/actividades/detalleActividad/detallePractica/${vchClvMateria}/${chrGrupo}/${intPeriodo}/${intNumeroActi}/${intNumeroPractica}/${intIdActividadCurso}`
+            url:`${webUrl}/actividades/detalleActividad/detallePractica/${vchClvMateria}/${chrGrupo}/${intPeriodo}/${intNumeroActi}/${intNumeroPractica}/${intIdActividadCurso}`
         }
-
-    
         console.log(notificacion)
-
         try {
-        const response = await fetch('https://robe.host8b.me/WebServices/accionesAlumnos.php', {
+            const response = await fetch(`${apiUrl}/accionesAlumnos.php`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -252,7 +253,6 @@ const DetallePracticaDocente = () => {
             }),
         });
         const result = await response.json();
-    
         if (result.done) {
             sendNotification(notificacion)
             onloadAlumnos()
@@ -267,7 +267,7 @@ const DetallePracticaDocente = () => {
     
     const onloadAlumnos = async () => {
         try {
-        const response = await fetch('https://robe.host8b.me/WebServices/accionesAlumnos.php', {
+        const response = await fetch(`${apiUrl}/accionesAlumnos.php`, {
             method: 'POST',
             headers: {
             'Content-Type': 'application/json',
@@ -302,6 +302,9 @@ const DetallePracticaDocente = () => {
             alert('¡Ay caramba! Encontramos un pequeño obstáculo en el camino, pero estamos trabajando para superarlo. Gracias por tu paciencia mientras solucionamos este problemita.');
         }, 2000);
         }
+        finally{
+            setIsLoading(false);
+        }
     };
     useEffect(() => {
         onloadAlumnos();
@@ -311,7 +314,7 @@ const DetallePracticaDocente = () => {
         const fetchActividad = async () => {
         const requestData = { idPracticaDetalle: intNumeroPractica };
         try {
-            const response = await fetch('https://robe.host8b.me/WebServices/cargarMaterias.php', {
+            const response = await fetch(`${apiUrl}/cargarMaterias.php`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(requestData),
@@ -356,6 +359,11 @@ const DetallePracticaDocente = () => {
         setPuntajeTotalCal(totalMaximo);
         setPuntajeObtenido(totalObtenido);
     }, [rubricaCalAlumno]);
+
+
+    if (isLoading) {
+        return <DetailedPracticeSkeleton />;
+    }
 
     return (
         <section className='w-full flex flex-col'>
@@ -492,7 +500,7 @@ const DetallePracticaDocente = () => {
                                     <div className="flex items-center space-x-3">
                                     <img
                                         className="w-10 h-10 rounded-full object-cover"
-                                        src={alumno.FotoPerfil ? `https://robe.host8b.me/assets/imagenes/${alumno.FotoPerfil}` : 'https://robe.host8b.me/assets/imagenes/userProfile.png'}
+                                        src={alumno.FotoPerfil ? `${webUrl}assets/imagenes/${alumno.FotoPerfil}` : `${webUrl}assets/imagenes/userProfile.png`}
                                         alt={`Foto de ${alumno.AlumnoNombre}`}
                                     />
                                     <div>
@@ -522,13 +530,20 @@ const DetallePracticaDocente = () => {
                         <>
                         <div className="flex flex-col mb-4 md:mb-0">
                             <TitleSection label="Rúbrica de Evaluación" />
-                            <div className="mt-4">
-                                <p className="text-base font-medium text-gray-900 dark:text-gray-100">
-                                    {selectedAlumno.AlumnoNombre} {selectedAlumno.AlumnoApellidoPaterno} {selectedAlumno.AlumnoApellidoMaterno}
-                                </p>
-                                <p className="text-sm text-gray-500 dark:text-gray-300">
-                                    Matrícula: {selectedAlumno.AlumnoMatricula}
-                                </p>
+                            <div className="flex items-center space-x-4 mt-4">
+                                <img
+                                    className="w-10 h-10 rounded-full object-cover"
+                                    src={selectedAlumno.FotoPerfil ? `${webUrl}assets/imagenes/${selectedAlumno.FotoPerfil}` : `${webUrl}assets/imagenes/userProfile.png`}
+                                    alt={`Foto de ${selectedAlumno.AlumnoNombre}`}
+                                />
+                                <div>
+                                    <p className="text-base font-medium text-gray-900 dark:text-gray-100">
+                                        {selectedAlumno.AlumnoNombre} {selectedAlumno.AlumnoApellidoPaterno} {selectedAlumno.AlumnoApellidoMaterno}
+                                    </p>
+                                    <p className="text-sm text-gray-500 dark:text-gray-300">
+                                        Matrícula: {selectedAlumno.AlumnoMatricula}
+                                    </p>
+                                </div>
                             </div>
                         </div>
                         </>
@@ -539,40 +554,49 @@ const DetallePracticaDocente = () => {
                         )
                     }
                     </div>
-                    {rubricaCalAlumno.map((rubrica, index) => (
-                    <div key={index} className="py-4 border-b border-gray-300 dark:border-gray-700">
-                        <div className="grid grid-cols-10 gap-4 items-center">
-                        <div className="col-span-7 text-muted-foreground">
-                            <p className="text-gray-900 text-sm sm:text-base">{rubrica.criterioDescripcion}</p>
-                        </div>
-                        <div className="col-span-3 flex items-center justify-end gap-2">
-                            <CustomInputOnchange
-                            label={`Valor ${index + 1}`}
-                            type="number"
-                            name={`intCal_${index}`}
-                            value={rubrica.calificacionObtenida || ''}
-                            pattern={/^[0-9]+$/}
-                            errorMessage="El valor debe ser un número"
-                            errors={errors}
-                            register={register}
-                            onChange={(value) => handleInputChangeCal(index, 'calificacionObtenida', value || 0)}
-                            />
-                            <span className="font-semibold text-lg sm:text-xl">/{rubrica.valorMaximo}</span>
-                        </div>
-                        </div>
-                    </div>
-                    ))}
-
-                    {selectedAlumno && (
-                    <div className="mt-6 flex justify-between items-center">
-                        <div className="flex items-center gap-2">
-                            <span className="text-muted-foreground text-2xl font-semibold">Puntaje Total:</span>
-                            <span className="font-semibold text-2xl text-gray-700">{puntajeObtenido}</span>
-                            <span className="font-semibold text-2xl text-gray-900">/ {puntajeTotalCal}</span>
-                        </div>
-                        <LoadingButton Icon={FaCheckCircle} normalLabel="Calificar" className="w-28 h-10 text-white py-2 px-4 rounded-lg" onClick={handleCalificarClick} />
-                    </div>
+                    {isLoadingAlumn?(
+                        <RubricaSkeletonLoader count={5} />                    
+                    )
+                    :
+                    (
+                        <>
+                        {rubricaCalAlumno.map((rubrica, index) => (
+                            <div key={index} className="py-4 border-b border-gray-300 dark:border-gray-700">
+                                <div className="grid grid-cols-10 gap-4 items-center">
+                                <div className="col-span-7 text-muted-foreground">
+                                    <p className="text-gray-900 text-sm sm:text-base">{rubrica.criterioDescripcion}</p>
+                                </div>
+                                <div className="col-span-3 flex items-center justify-end gap-2">
+                                    <CustomInputOnchange
+                                    label={`Valor ${index + 1}`}
+                                    type="number"
+                                    name={`intCal_${index}`}
+                                    value={rubrica.calificacionObtenida || ''}
+                                    pattern={/^[0-9]+$/}
+                                    errorMessage="El valor debe ser un número"
+                                    errors={errors}
+                                    register={register}
+                                    onChange={(value) => handleInputChangeCal(index, 'calificacionObtenida', value || 0)}
+                                    />
+                                    <span className="font-semibold text-lg sm:text-xl">/{rubrica.valorMaximo}</span>
+                                </div>
+                                </div>
+                            </div>
+                            ))}
+        
+                            {selectedAlumno && (
+                            <div className="mt-6 flex justify-between items-center">
+                                <div className="flex items-center gap-2">
+                                    <span className="text-muted-foreground text-2xl font-semibold">Puntaje Total:</span>
+                                    <span className="font-semibold text-2xl text-gray-700">{puntajeObtenido}</span>
+                                    <span className="font-semibold text-2xl text-gray-900">/ {puntajeTotalCal}</span>
+                                </div>
+                                <LoadingButton Icon={FaCheckCircle} normalLabel="Calificar" className="w-28 h-10 text-white py-2 px-4 rounded-lg" onClick={handleCalificarClick} />
+                            </div>
+                            )}
+                        </>
                     )}
+      
                 </div>
                 </div>
             </div>

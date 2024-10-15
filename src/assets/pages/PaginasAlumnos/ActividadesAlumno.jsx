@@ -4,18 +4,21 @@ import { useParams } from 'react-router-dom';
 import { Tabs, Accordion } from "flowbite-react";
 import { HiClipboardList, HiUserGroup } from "react-icons/hi"; // Actualiza aquí
 import Components from '../../components/Components';
-const { TitlePage, ContentTitle, Paragraphs, Link, TitleSection, DescriptionActivity } = Components;
+const { TitlePage, ContentTitle, Paragraphs, Link, TitleSection, DescriptionActivity, ActivitiesSkeleton} = Components;
 
 const ActividadesAlumno = () => {
     const { userData } = useAuth(); // Obtén el estado de autenticación del contexto
     const [actividades, setActividades] = useState([]);
     const [alumnos, setAlumnosMaterias] = useState([]);
     const {vchClvMateria, chrGrupo, intPeriodo } = useParams();
-    
+    const [isLoading, setIsLoading] = useState(true);
+    const apiUrl = import.meta.env.VITE_API_URL;
+    const webUrl = import.meta.env.VITE_URL;
+
 
     const onloadActividades = async () => {
         try {
-        const response = await fetch('https://robe.host8b.me/WebServices/cargarMaterias.php', {
+            const response = await fetch(`${apiUrl}/cargarMaterias.php`, {
             method: 'POST',
             headers: {
             'Content-Type': 'application/json',
@@ -57,15 +60,16 @@ const ActividadesAlumno = () => {
         }
         } catch (error) {
         console.error('Error 500', error);
-        setTimeout(() => {
-            alert('¡Ay caramba! Encontramos un pequeño obstáculo en el camino, pero estamos trabajando para superarlo. Gracias por tu paciencia mientras solucionamos este problemita.');
-        }, 2000);
+        alert('Error 500: Ocurrió un problema en el servidor. Intenta nuevamente más tarde.');
+        }
+        finally{
+            setIsLoading(false)
         }
     };
 
     const onloadAlumnos = async () => {
         try {
-        const response = await fetch('https://robe.host8b.me/WebServices/accionesAlumnos.php', {
+            const response = await fetch(`${apiUrl}/accionesAlumnos.php`, {
             method: 'POST',
             headers: {
             'Content-Type': 'application/json',
@@ -95,9 +99,7 @@ const ActividadesAlumno = () => {
         }
         } catch (error) {
         console.error('Error 500', error);
-        setTimeout(() => {
-            alert('¡Ay caramba! Encontramos un pequeño obstáculo en el camino, pero estamos trabajando para superarlo. Gracias por tu paciencia mientras solucionamos este problemita.');
-        }, 2000);
+        alert('Error 500: Ocurrió un problema en el servidor. Intenta nuevamente más tarde.');
         }
     };
 
@@ -119,6 +121,9 @@ const ActividadesAlumno = () => {
 
     const groupedActivities = groupActivitiesByParcial(actividades);
 
+    if (isLoading) {
+        return <ActivitiesSkeleton />;
+    }
     return (
         <section className='w-full flex flex-col'>
         <TitlePage label="Trabajo de clase" />
@@ -160,8 +165,8 @@ const ActividadesAlumno = () => {
                         <img
                             className="w-12 h-12 rounded-full object-cover"
                             src={alumnos[0].DocenteFotoPerfil
-                                ? `https://robe.host8b.me/assets/imagenes/${alumnos[0].DocenteFotoPerfil}`
-                                : 'https://robe.host8b.me/assets/imagenes/userProfile.png'}
+                                ? `${webUrl}assets/imagenes/${alumnos[0].DocenteFotoPerfil}`
+                                : `${webUrl}assets/imagenes/userProfile.png`}
                             alt={`Foto de ${alumnos[0].DocenteNombre}`}
                         />
                         <div className="ml-3">
@@ -191,8 +196,8 @@ const ActividadesAlumno = () => {
                         <img
                             className="w-12 h-12 rounded-full object-cover"
                             src={alumno.FotoPerfil
-                            ? `https://robe.host8b.me/assets/imagenes/${alumno.FotoPerfil}`
-                            : 'https://robe.host8b.me/assets/imagenes/userProfile.png'}
+                            ? `${webUrl}assets/imagenes/${alumno.FotoPerfil}`
+                            : `${webUrl}assets/imagenes/userProfile.png`}
                             alt={`Foto de ${alumno.AlumnoNombre}`}
                         />
                         <div className="ml-3">

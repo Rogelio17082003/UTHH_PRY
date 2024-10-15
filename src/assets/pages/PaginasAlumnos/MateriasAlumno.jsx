@@ -4,16 +4,17 @@ import { useAuth } from '../../server/authUser'; // Importa el hook de autentica
 import { Card, Button } from 'flowbite-react';
 import { FaRegFrown } from 'react-icons/fa';
 import  Components from '../../components/Components'
-const {TitlePage} = Components;
+const {TitlePage, CardSkeleton} = Components;
 
 const MateriasAlumno = () => { 
     const {userData} = useAuth(); // Obtén el estado de autenticación del contexto
     const [materias, setMaterias] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const apiUrl = import.meta.env.VITE_API_URL;
 
     const onloadNaterias = async () => {
         try {
-
-        const response = await fetch('https://robe.host8b.me/WebServices/cargarMaterias.php', {
+            const response = await fetch(`${apiUrl}/cargarMaterias.php`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -24,7 +25,7 @@ const MateriasAlumno = () => {
         });
 
         const result = await response.json();
-    console.log(result);
+        console.log(result);
         if (result.done) {
             setMaterias(result.message);
 
@@ -33,12 +34,14 @@ const MateriasAlumno = () => {
             
         }
         
-    } catch (error) {
+    } 
+    catch (error) 
+    {
         console.error('Error 500', error);
-        setTimeout(() => {
-            alert('¡Ay caramba! Encontramos un pequeño obstáculo en el camino, pero estamos trabajando para superarlo. Gracias por tu paciencia mientras solucionamos este problemita.'); 
-            }, 2000);
-    } finally {
+        alert('¡Ay caramba! Encontramos un pequeño obstáculo en el camino, pero estamos trabajando para superarlo. Gracias por tu paciencia mientras solucionamos este problemita.'); 
+    } 
+    finally 
+    {
         setIsLoading(false);
     }
     };
@@ -49,6 +52,16 @@ const MateriasAlumno = () => {
         }
     }, []);
 
+    if (isLoading) {
+        return (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                {Array.from({ length: 3 }).map((_, index) => (
+                    <CardSkeleton key={index} />
+                ))}
+            </div>        
+        )
+    }
+
 return (
     <div className="container mx-auto px-4 py-8">
         <TitlePage label="Materias Asociadas" />
@@ -57,26 +70,30 @@ return (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                 {materias.map((materia) => (
                     <Card
-                    key={materia.vchClvMateria}
-                    href={`/actividades/${materia.vchClvMateria}/${userData.dataEstudiante.chrGrupo}/${materia.intPeriodo}`}
-                    className="rounded-lg overflow-hidden shadow-lg transform transition duration-300 hover:scale-105"
+                        key={materia.vchClvMateria}
+                        href={`/actividades/${materia.vchClvMateria}/${userData.dataEstudiante.chrGrupo}/${materia.intPeriodo}`}
+                        className="rounded-lg overflow-hidden shadow-lg transform transition duration-300 hover:scale-105 p-4"
                     >
-                        <div className="flex justify-end px-4 pt-4">
-                        {/* Aquí puedes agregar un menú desplegable si es necesario */}
-                        </div>
-                        <div className="flex flex-col items-center pb-6 px-4">
-                            <img alt={`Foto de perfil de ${materia.vchNombre}`} 
-                                src={materia.vchFotoPerfil ? `https://robe.host8b.me/assets/imagenes/${materia.vchFotoPerfil}` : 'https://robe.host8b.me/assets/imagenes/userProfile.png'}
-                                className="w-24 h-24 rounded-full shadow-lg mb-3" 
-                                data-testid="flowbite-avatar-img"
-                            />
-                            <h3 className="mb-1 text-xl font-medium text-gray-900">{materia.vchNombre} {materia.vchAPaterno} {materia.vchAMaterno}</h3>
-                            <p className="text-sm text-gray-500">{materia.vchClvMateria}: {materia.vchNomMateria} {materia.intHoras} Horas</p>
-                            <p className="mt-1 text-sm text-gray-500">{materia.intClvCuatrimestre}{materia.chrGrupo}</p>
-                            {/* Supongo que "Carrera" debería mostrar la carrera relacionada a la materia */}
-                            <p className="mt-1 text-sm text-gray-500">
-                                <strong>Periodo:</strong> {materia.vchPeriodo}
-                            </p>
+                        <div className="flex flex-col items-center text-center space-y-2">
+                        <img
+                            alt={`Foto de perfil de ${materia.vchNombre}`}
+                            src={materia.vchFotoPerfil 
+                                ? `https://robe.host8b.me/assets/imagenes/${materia.vchFotoPerfil}`
+                                : 'https://robe.host8b.me/assets/imagenes/userProfile.png'}
+                            className="w-24 h-24 rounded-full shadow-lg mb-3 object-cover"
+                        />
+                        <h3 className="text-xl font-medium text-gray-900">
+                            {materia.vchNombre} {materia.vchAPaterno} {materia.vchAMaterno}
+                        </h3>
+                        <p className="text-sm text-gray-500">
+                            {materia.vchClvMateria}: {materia.vchNomMateria} - {materia.intHoras} Horas
+                        </p>
+                        <p className="text-sm text-gray-500">
+                            {materia.intClvCuatrimestre}{materia.chrGrupo}
+                        </p>
+                        <p className="text-sm text-gray-500">
+                            <strong>Periodo:</strong> {materia.vchPeriodo}
+                        </p>
                         </div>
                     </Card>
                 ))}

@@ -22,6 +22,7 @@ const NavigationBar = ({ isSidebarOpen, toggleSidebar }) => {
   const [isInstallable, setIsInstallable] = useState(false); // Estado para saber si la PWA es instalable
   const [notifications, setNotifications] = useState([]);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const webUrl = import.meta.env.VITE_URL;
 
   // Función para alternar el menú de notificaciones
   const toggleNotifications = () => {
@@ -103,8 +104,8 @@ const NavigationBar = ({ isSidebarOpen, toggleSidebar }) => {
     };
   
   const profileImageUrl = isAuthenticated && userData?.vchFotoPerfil
-    ? `https://robe.host8b.me/assets/imagenes/${userData.vchFotoPerfil}`
-    : 'https://robe.host8b.me/assets/imagenes/userProfile.png'; // Enlace alternativo cuando vchFotoPerfil es null o usuario no está autenticado
+    ? `${webUrl}assets/imagenes/${userData.vchFotoPerfil}`
+    : `${webUrl}assets/imagenes/userProfile.png`; // Enlace alternativo cuando vchFotoPerfil es null o usuario no está autenticado
 
 // Usar profileImageUrl para el src de la imagen
 <img src={profileImageUrl} alt="Perfil" />
@@ -140,16 +141,6 @@ const handleInstallClick = () => {
   }
 };
 
-  const toggleMenu = () => {
-    setShowMenu(!showMenu);
-  };
-
-
-  const closeMenuOnMobile = () => {
-    if (window.innerWidth <= 1150) {
-      setShowMenu(false);
-    }
-  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -169,33 +160,6 @@ const handleInstallClick = () => {
 
   return (
     <>
-    <div>
-      {showSnackbar && (
-        <div  style={{ zIndex: 'var(--z-fixed)', '--z-fixed': 100 }} className="fixed bottom-6 right-6 bg-gradient-to-r from-gray-50 to-gray-100 py-4 px-6 flex items-center justify-between shadow-lg rounded-xl w-full max-w-md">
-          <div className="flex items-center">
-            <img src={logoPwa} alt="Logo UTHH Virtual" className="w-12 h-12 mr-4" />
-            <div>
-              <h2 className="text-lg font-semibold text-gray-800">App de UTHH Virtual</h2>
-              <p className="text-gray-600">Descarga la app para un acceso rápido</p>
-            </div>
-          </div>
-          <div className="flex items-center space-x-4">
-            <LoadingButton 
-            normalLabel="Instalar App" 
-            className="w-auto h-auto"
-            onClick={handleInstallClick} 
-          />
-            <button
-              onClick={handleCloseSnackbar}
-              className="text-gray-400 hover:text-gray-700 transition duration-300"
-              aria-label="Cerrar"
-            >
-              ✕
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
     <Navbar fluid rounded className="p-3 bg-white border border-gray-200 shadow dark:bg-gray-800 dark:border-gray-700 header">
       <div className="nav__section flex">
         <div className={`nav__toggle  ${isAuthenticated ? "block md:block mr-2" : "hidden "}`} id="nav-toggle" onClick={toggleSidebar}>
@@ -259,10 +223,10 @@ const handleInstallClick = () => {
             arrowIcon={false}
             inline
             label={
-              <Avatar
-                alt="User settings"
-                img={profileImageUrl}
-                rounded
+              <img 
+                src={profileImageUrl}
+                alt="User Avatar" 
+                class="w-10 h-10 rounded-full object-cover"
               />
             }
           >
@@ -276,13 +240,13 @@ const handleInstallClick = () => {
             </Dropdown.Item>
           </Dropdown>
 
-          <div className="flex flex-col text-right">
-          <span className="text-sm font-medium text-gray-900 dark:text-white capitalize">
-            {userData.vchNombre.toLowerCase()} {userData.vchAPaterno.toLowerCase()} {userData.vchAMaterno.toLowerCase()}
-          </span>
-            <span className="text-sm text-gray-500 dark:text-gray-400 truncate">{userData.vchNombreRol}</span>
+          <div className="flex flex-col text-right hidden-below-365">
+            <span className="text-sm font-medium text-gray-900 dark:text-white capitalize">
+              {userData.vchNombre.toLowerCase()} {userData.vchAPaterno.toLowerCase()} {userData.vchAMaterno.toLowerCase()}
+            </span>
+              <span className="text-start text-sm text-gray-500 dark:text-gray-400 truncate">{userData.vchNombreRol}</span>
+            </div>
           </div>
-        </div>
 
         )
         :

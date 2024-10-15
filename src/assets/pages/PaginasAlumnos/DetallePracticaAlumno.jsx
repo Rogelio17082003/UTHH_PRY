@@ -4,7 +4,7 @@ import Components from '../../components/Components';
 import { useAuth } from '../../server/authUser';
 import { useForm } from 'react-hook-form';
 
-const { TitlePage, Paragraphs, TitleSection, LoadingButton, CustomInputOnchange, ContentTitle, FloatingLabelInput } = Components;
+const { TitlePage, Paragraphs, TitleSection, DetailedPracticeSkeleton, CustomInputOnchange, ContentTitle, FloatingLabelInput } = Components;
 
 const DetallePracticaAlumno = () => {
     const { intNumeroPractica } = useParams();
@@ -18,12 +18,14 @@ const DetallePracticaAlumno = () => {
     const [editedData, setEditedData] = useState([]);
     const {vchClvMateria, chrGrupo, intPeriodo } = useParams();
     const [puntajeObtenido, setPuntajeObtenido] = useState(0);
+    const [isLoading, setIsLoading] = useState(true);
+    const apiUrl = import.meta.env.VITE_API_URL;
 
     const { register, handleSubmit, watch, trigger, formState: { errors } } = useForm();
 
     const fetchCalificacionesAlumno = async () => {
         try {
-        const response = await fetch('https://robe.host8b.me/WebServices/accionesAlumnos.php', {
+            const response = await fetch(`${apiUrl}/accionesAlumnos.php`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
@@ -53,7 +55,7 @@ const DetallePracticaAlumno = () => {
         const fetchActividad = async () => {
         const requestData = { idPracticaDetalle: intNumeroPractica };
         try {
-            const response = await fetch('https://robe.host8b.me/WebServices/cargarMaterias.php', {
+            const response = await fetch(`${apiUrl}/cargarMaterias.php`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(requestData),
@@ -71,6 +73,9 @@ const DetallePracticaAlumno = () => {
             }
         } catch (error) {
             console.error('Error:', error.message);
+        }
+        finally{
+            setIsLoading(false)
         }
         };
 
@@ -90,6 +95,12 @@ const DetallePracticaAlumno = () => {
         setPuntajeTotalCal(totalMaximo);
         setPuntajeObtenido(totalObtenido);
     }, [rubricaCalAlumno]);
+
+    
+    if (isLoading) {
+        return <DetailedPracticeSkeleton />;
+    }
+
     return (
         <section className='w-full flex flex-col'>
         <TitlePage label={detalleActividad.vchNombre} />

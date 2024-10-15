@@ -2,15 +2,18 @@
 import React, { useState, useEffect } from 'react';
 
 import {Table, Alert, Card} from 'flowbite-react';
-import {IoMdAdd } from 'react-icons/io';
-import {FaRegFrown } from 'react-icons/fa';
+import { MdAdd } from 'react-icons/md';
+import {FaRegFrown, FaDownload } from 'react-icons/fa';
 import {Button, Modal } from "flowbite-react"; // Importamos el componente Button
 import * as XLSX from 'xlsx';
 import  Components from '../../components/Components'
-const {IconButton, LoadingButton, TitlePage, Paragraphs, InfoAlert, LoadingOverlay} = Components;
+const {IconButton, LoadingButton, TitlePage, Paragraphs, InfoAlert, CardSkeleton} = Components;
 import {useAuth } from '../../server/authUser'; // Importa el hook de autenticación
+import { AiOutlineQuestionCircle } from 'react-icons/ai';
 
 const MateriasDocente = () => { 
+    const apiUrl = import.meta.env.VITE_API_URL;
+    const webUrl = import.meta.env.VITE_URL;
     const {userData} = useAuth(); // Obtén el estado de autenticación del contexto
     const [materias, setMaterias] = useState([]);
     const [actividades, setActividades] = useState([]);
@@ -236,7 +239,7 @@ const MateriasDocente = () => {
         try 
         {
             setIsLoading(true);
-            const response = await fetch('https://robe.host8b.me/WebServices/InsertarActividades.php',
+                const response = await fetch(`${apiUrl}/InsertarActividades.php`,
                 {
                 method: 'POST',
                 headers: 
@@ -280,7 +283,8 @@ const MateriasDocente = () => {
     {
         try 
         {
-            const response = await fetch('https://robe.host8b.me/WebServices/cargarMaterias.php', 
+            setIsLoading(true);
+            const response = await fetch(`${apiUrl}/cargarMaterias.php`, 
             {
                 method: 'POST',
                 headers: {
@@ -302,12 +306,13 @@ const MateriasDocente = () => {
         } 
         catch (error) 
         {
-            console.error('Error 500', error);
-            setTimeout(() => 
-            {
-            alert('¡Ay caramba! Encontramos un pequeño obstáculo en el camino, pero estamos trabajando para superarlo. Gracias por tu paciencia mientras solucionamos este problemita.'); 
-            }, 2000);
+            console.error('Error 500', error);            
+            alert('Error 500: Ocurrió un problema en el servidor. Intenta nuevamente más tarde.');
         } 
+        finally
+        {
+            setIsLoading(false);
+        }
     };
 
     useEffect(() => 
@@ -317,172 +322,244 @@ const MateriasDocente = () => {
         }
     }, []);
 
+    const handleDownload = async () => {
+        const response = await fetch(`${webUrl}assets/archivos/Formato-FDA05.xlsx`, {
+            method: 'GET',
+          headers: {
+            'Content-Type': 'application/octet-stream',
+          },
+        });
+    
+        if (!response.ok) {
+          throw new Error('Error al descargar el archivo');
+        }
+    
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'Formato-FDA05.xlsx';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      };
+
+      const handleHelpClick = () => {
+        alert('Aquí puedes añadir información de ayuda o abrir un modal.');
+      };
+
     return (
-    <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-4 py-8">
 
-        <InfoAlert
-            message={serverResponse}
-            type={serverResponse.includes('Éxito') ? 'success' : 'error'}
-            isVisible={!!serverResponse}
-            onClose={() => {
-            setServerResponse('');
-            }}
-            hasDuration={false} // El alert permanecerá visible hasta que el usuario lo cierre
-        />
-
-        <Modal className='h-0 mt-auto pt-16' size="4xl" show={openModal} onClose={() =>{setFile(null), setOpenModal(false)}}>
-            <Modal.Header>Agregar Materias</Modal.Header>
-            <Modal.Body className='max-h-60'>
-            <div className="space-y-6">
-                <h3 className="mt-4 mb-2 text-base font-bold text-gray-900 dark:text-white">Selecciona un archivo en formato excel</h3>
-                <input type="file" accept=".xlsx, .xls" onChange={handleFileUpload} />
-                {file !==null && (
-                <section>
-                    <h3 className="mt-4 mb-2 text-base font-bold text-gray-900 dark:text-white">Datos recibidos</h3>
-                    <div>
-                        <div className='grid grid-cols-2 grid-rows-2 gap-4 m-y-2 mb-4'>
-                        <div className='flex-row'>
-                            <div className="mt-4">Carrera:</div>
-                            <div className="mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                            {info.carrera}
-                            </div>
-                        </div>
-                        <div className="fle-row">
-                        <div className="mt-4">Materia:</div>
-                            <div className="mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                            {info.materia}
-                            </div>
-                        </div>
-                        <div className="fle-row">
-                        <div className="mt-4">Periodo:</div>
-                            <div className="mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                            {info.periodo}
-                            </div>
-                        </div>
-                        <div className="fle-row">
-                        <div className="mt-4">Grado:</div>
-                            <div className="mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                            {info.grado}
-                            </div>
-                        </div>
-                        <div className="fle-row">
-                        <div className="mt-4">Grupo:</div>
-                            <div className="mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                            {info.grupo}
-                            </div>
-                        </div>
-                        <div className="fle-row">
-                        <div className="mt-4">Parcial:</div>
-                            <div className="mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                            {info.parcial}
-                            </div>
-                        </div>
-                        </div>
-                    </div>
-                    <div className="overflow-x-auto">
-                    <Table hoverable>
-                        <Table.Head>
-                        <Table.HeadCell>No</Table.HeadCell>
-                        <Table.HeadCell>Actividad</Table.HeadCell>
-                        <Table.HeadCell>Descripción</Table.HeadCell>
-                        <Table.HeadCell>Puntuacion</Table.HeadCell>
-                        <Table.HeadCell>Tiempo estimado</Table.HeadCell>
-                        <Table.HeadCell>Modalidad</Table.HeadCell>
-                        <Table.HeadCell>Instrumento</Table.HeadCell>
-                        <Table.HeadCell>Fecha Solicitud</Table.HeadCell>
-                        <Table.HeadCell>Fecha de Entrega</Table.HeadCell>
-                        </Table.Head>
-                        <Table.Body className="divide-y">
-                        {data.map((sheet, sheetIndex) => {
-                            const activityData = extractActivityData(sheet.data);
-                            return activityData.map((actividad, index) => (
-                            <Table.Row key={index} className="bg-white dark:border-gray-700 dark:bg-gray-800">
-                            <Table.Cell>{index + 1}</Table.Cell>
-                            <Table.Cell>{actividad.actividad}</Table.Cell>
-                            <Table.Cell>{actividad.descripcion}</Table.Cell>
-                            <Table.Cell>{actividad.puntuacion}</Table.Cell>
-                            <Table.Cell>{actividad.tiempoEstimado}</Table.Cell>
-                            <Table.Cell>{actividad.modalidad}</Table.Cell>
-                            <Table.Cell>{actividad.instrumento}</Table.Cell>
-                            <Table.Cell>{actividad.fechaSolicitud}</Table.Cell>
-                            <Table.Cell>{actividad.fechaEntrega}</Table.Cell>
-                            </Table.Row>
-                            ))
-                        })}
-                        </Table.Body>
-                    </Table>
-                    </div>
-                </section>
-                )}
-            </div>
-            </Modal.Body>
-            {actividades.length > 0 && file !==null && (
-            <Modal.Footer>
-                <LoadingButton
-                    onClick={handleClickRegistrar} 
-                    isLoading={isLoading}
-                    className="max-w-32 max-h-11" 
-                    loadingLabel="Cargando..."
-                    normalLabel="Agregar"
-                />
-                <Button color="gray" onClick={() => {setOpenModal(false); setFile(null)}}>
-                    Cancelar
-                </Button>
-            </Modal.Footer>
-            )}
-        </Modal>
-        
-        <div className="flex items-center m-2">
-            <IconButton
-                className="ml-2 button"
-                Icon={IoMdAdd} // Pasa el componente de ícono
-                message="Añadir Materias con actividades"
-                onClick={() => setOpenModal(true)}
+            <InfoAlert
+                message={serverResponse}
+                type={serverResponse.includes('Éxito') ? 'success' : 'error'}
+                isVisible={!!serverResponse}
+                onClose={() => {
+                setServerResponse('');
+                }}
+                hasDuration={false} // El alert permanecerá visible hasta que el usuario lo cierre
             />
+
+            <Modal popup className='h-0 mt-auto ' size="4xl" show={openModal} onClose={() =>{setFile(null), setOpenModal(false)}}>
+                <div className="fixed inset-0 flex items-center justify-center z-50">
+                    <div className="relative w-full mx-12 bg-white rounded-lg shadow-lg">
+                        <Modal.Header>Agregar Materias</Modal.Header>
+                        <Modal.Body className='sm:max-h-60 h-96'>
+                        <div className="space-y-6">
+                            <h3 className="mt-4 mb-2 text-base font-bold text-gray-900 dark:text-white">Selecciona un archivo en formato excel</h3>
+                            <input type="file" accept=".xlsx, .xls" onChange={handleFileUpload} />
+                            {file !==null && (
+                            <section>
+                                <h3 className="mt-4 mb-2 text-base font-bold text-gray-900 dark:text-white">Datos recibidos</h3>
+                                <div>
+                                    <div className='grid grid-cols-2 grid-rows-2 gap-4 m-y-2 mb-4'>
+                                    <div className='flex-row'>
+                                        <div className="mt-4">Carrera:</div>
+                                        <div className="mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                                        {info.carrera}
+                                        </div>
+                                    </div>
+                                    <div className="fle-row">
+                                    <div className="mt-4">Materia:</div>
+                                        <div className="mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                                        {info.materia}
+                                        </div>
+                                    </div>
+                                    <div className="fle-row">
+                                    <div className="mt-4">Periodo:</div>
+                                        <div className="mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                                        {info.periodo}
+                                        </div>
+                                    </div>
+                                    <div className="fle-row">
+                                    <div className="mt-4">Grado:</div>
+                                        <div className="mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                                        {info.grado}
+                                        </div>
+                                    </div>
+                                    <div className="fle-row">
+                                    <div className="mt-4">Grupo:</div>
+                                        <div className="mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                                        {info.grupo}
+                                        </div>
+                                    </div>
+                                    <div className="fle-row">
+                                    <div className="mt-4">Parcial:</div>
+                                        <div className="mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                                        {info.parcial}
+                                        </div>
+                                    </div>
+                                    </div>
+                                </div>
+                                <div className="overflow-x-auto">
+                                <Table hoverable>
+                                    <Table.Head>
+                                    <Table.HeadCell>No</Table.HeadCell>
+                                    <Table.HeadCell>Actividad</Table.HeadCell>
+                                    <Table.HeadCell>Descripción</Table.HeadCell>
+                                    <Table.HeadCell>Puntuacion</Table.HeadCell>
+                                    <Table.HeadCell>Tiempo estimado</Table.HeadCell>
+                                    <Table.HeadCell>Modalidad</Table.HeadCell>
+                                    <Table.HeadCell>Instrumento</Table.HeadCell>
+                                    <Table.HeadCell>Fecha Solicitud</Table.HeadCell>
+                                    <Table.HeadCell>Fecha de Entrega</Table.HeadCell>
+                                    </Table.Head>
+                                    <Table.Body className="divide-y">
+                                    {data.map((sheet, sheetIndex) => {
+                                        const activityData = extractActivityData(sheet.data);
+                                        return activityData.map((actividad, index) => (
+                                        <Table.Row key={index} className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                                        <Table.Cell>{index + 1}</Table.Cell>
+                                        <Table.Cell>{actividad.actividad}</Table.Cell>
+                                        <Table.Cell>{actividad.descripcion}</Table.Cell>
+                                        <Table.Cell>{actividad.puntuacion}</Table.Cell>
+                                        <Table.Cell>{actividad.tiempoEstimado}</Table.Cell>
+                                        <Table.Cell>{actividad.modalidad}</Table.Cell>
+                                        <Table.Cell>{actividad.instrumento}</Table.Cell>
+                                        <Table.Cell>{actividad.fechaSolicitud}</Table.Cell>
+                                        <Table.Cell>{actividad.fechaEntrega}</Table.Cell>
+                                        </Table.Row>
+                                        ))
+                                    })}
+                                    </Table.Body>
+                                </Table>
+                                </div>
+                            </section>
+                            )}
+                        </div>
+                        </Modal.Body>
+                        {actividades.length > 0 && file !==null && (
+                        <Modal.Footer>
+                            <LoadingButton
+                                onClick={handleClickRegistrar} 
+                                isLoading={isLoading}
+                                className="max-w-32 max-h-11" 
+                                loadingLabel="Cargando..."
+                                normalLabel="Agregar"
+                            />
+                            <Button color="gray" onClick={() => {setOpenModal(false); setFile(null)}}>
+                                Cancelar
+                            </Button>
+                        </Modal.Footer>
+                        )}
+                    </div>
+                </div>     
+            </Modal>
+            
+    {/* Barra de Acciones */}
+    <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center space-x-4">
+          <IconButton
+            className="flex items-center px-4 py-2 text-white rounded-lg shadow-md transition-all duration-300 ease-in-out"
+            Icon={MdAdd}
+            message="Añadir Materias con actividades"
+            onClick={() => setOpenModal(true)}
+          />
+          
+          <IconButton
+            className="flex items-center px-4 py-2 text-white rounded-lg shadow-md transition-all duration-300 ease-in-out"
+            Icon={FaDownload}
+            message="Descargar Formato FDA05"
+            onClick={handleDownload}
+          />
         </div>
 
-        <TitlePage label="Materias Asociadas" />
-        {materias.length > 0 ? 
-        (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {materias.map((materia) => (
-                <Card
-                key={materia.vchClvMateria}
-                href={`/gruposMaterias/${materia.vchClvMateria}/${materia.intPeriodo}`}
-                className="rounded-lg overflow-hidden shadow-lg transform transition duration-300 hover:scale-105"
-                theme={{
-                    root: {
-                    children: "p-0",
-                    }
-                }}
-                >
-                <div className="relative h-60">
-                    <div className="bg-gray-200 p-2 h-1/2 flex flex-col items-center justify-center">
-                    <div className="relative w-full flex justify-center">
-                        {/* Puedes agregar algo aquí si lo necesitas */}
-                    </div>
-                    </div>
-                    <div className="pt-5 pb-6 px-4">
-                    <h3 className="text-xl font-bold text-gray-900 text-center">{materia.vchNomMateria}</h3>
-                    <p className="text-sm text-gray-500 text-center">{materia.vchClvMateria}: {materia.vchNomMateria} {materia.intHoras}</p>
-                    <p className="text-sm text-gray-500 text-center">{materia.NombreCuatrimestre}</p>
-                    <p className="mt-1 text-sm text-gray-500 text-center">
-                        <strong>Periodo:</strong> {materia.NombrePeriodo}
-                    </p>
-                    </div>
+        {/* Botón de Ayuda */}
+        <button 
+          onClick={handleHelpClick} 
+          className=" bg-white rounded-full p-2 shadow-md transition-all duration-300 ease-in-out"
+          aria-label="Ayuda"
+        >
+          <AiOutlineQuestionCircle size={24} />
+        </button>
+      </div>
+
+ 
+
+            <TitlePage label="Materias Asociadas" />
+            {isLoading ? 
+            (
+                // Mostrar 3 Skeletons mientras `isLoading` es true
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                    {Array.from({ length: 3 }).map((_, index) => (
+                        <CardSkeleton key={index} />
+                    ))}
                 </div>
-                </Card>
-            ))}
-            </div>
-        ) 
-        : 
-        (
-            <div className="flex flex-col items-center justify-center h-64">
-            <FaRegFrown className="text-gray-500 text-6xl" />
-            <Paragraphs label="No hay clases agregadas. Añade una clase para empezar." />
-            </div>
-        )}
-    </div>
+            ) 
+            : 
+            (
+                // Si hay datos en materias, renderiza las tarjetas
+                materias.length > 0 ? 
+                (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                        {materias.map((materia) => (
+                            <Card
+                                key={materia.vchClvMateria}
+                                href={`/gruposMaterias/${materia.vchClvMateria}/${materia.intPeriodo}`}
+                                className="rounded-lg overflow-hidden shadow-lg transform transition duration-300 hover:scale-105"
+                                theme={{
+                                    root: {
+                                        children: "p-0",
+                                    }
+                                }}
+                            >
+                                <div className="relative h-60">
+                                    <div className="bg-gray-200 p-2 h-1/2 flex flex-col items-center justify-center">
+                                        <div className="relative w-full flex justify-center">
+                                            {/* Puedes agregar algo aquí si lo necesitas */}
+                                        </div>
+                                    </div>
+                                    <div className="pt-5 pb-6 px-4">
+                                        <h3 className="text-xl font-bold text-gray-900 text-center">
+                                            {materia.vchNomMateria}
+                                        </h3>
+                                        <p className="text-sm text-gray-500 text-center">
+                                            {materia.vchClvMateria}: {materia.vchNomMateria} {materia.intHoras}
+                                        </p>
+                                        <p className="text-sm text-gray-500 text-center">
+                                            {materia.NombreCuatrimestre}
+                                        </p>
+                                        <p className="mt-1 text-sm text-gray-500 text-center">
+                                            <strong>Periodo:</strong> {materia.NombrePeriodo}
+                                        </p>
+                                    </div>
+                                </div>
+                            </Card>
+                        ))}
+                    </div>
+                ) 
+                : 
+                (
+                    // Si no hay datos en materias, muestra el mensaje de "No hay clases"
+                    <div className="flex flex-col items-center justify-center h-64">
+                        <FaRegFrown className="text-gray-500 text-6xl" />
+                        <Paragraphs label="No hay clases agregadas. Añade una clase para empezar." />
+                    </div>
+                )
+            )}
+        </div>
     );
 };
 

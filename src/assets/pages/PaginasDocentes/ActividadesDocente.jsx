@@ -6,19 +6,23 @@ import { HiClipboardList, HiUserGroup } from "react-icons/hi"; // Actualiza aqu�
 import Components from '../../components/Components';
 import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
-const { TitlePage, ContentTitle, Paragraphs, Link, TitleSection, LoadingButton, InfoAlert, DescriptionActivity, LoadingOverlay } = Components;
+const {ActivitiesSkeleton, TitlePage, ContentTitle, Paragraphs, Link, TitleSection, LoadingButton, InfoAlert, DescriptionActivity, LoadingOverlay } = Components;
 
 const ActividadesDocente = () => {
+    const webUrl = import.meta.env.VITE_URL;
+    const apiUrl = import.meta.env.VITE_API_URL;
     const { userData } = useAuth(); // Obtén el estado de autenticación del contexto
     const [actividades, setActividades] = useState([]);
     const [alumnos, setAlumnosMaterias] = useState([]);
     const { vchClvMateria, chrGrupo, intPeriodo } = useParams();
     const [loading, setLoading] = useState(false);
     const [serverResponse, setServerResponse] = useState('');
+    const [isLoading, setIsLoading] = useState(true);
+    const [loadingParcial, setLoadingParcial] = useState(null);
 
     const onloadActividades = async () => {
         try {
-        const response = await fetch('https://robe.host8b.me/WebServices/cargarMaterias.php', {
+            const response = await fetch(`${apiUrl}/cargarMaterias.php`, {
             method: 'POST',
             headers: {
             'Content-Type': 'application/json',
@@ -57,15 +61,16 @@ const ActividadesDocente = () => {
         }
         } catch (error) {
         console.error('Error 500', error);
-        setTimeout(() => {
-            alert('¡Ay caramba! Encontramos un pequeño obstáculo en el camino, pero estamos trabajando para superarlo. Gracias por tu paciencia mientras solucionamos este problemita.');
-        }, 2000);
+
+        }
+        finally{
+            setIsLoading(false);
         }
     };
 
     const onloadAlumnos = async () => {
         try {
-        const response = await fetch('https://robe.host8b.me/WebServices/accionesAlumnos.php', {
+            const response = await fetch(`${apiUrl}/accionesAlumnos.php`, {
             method: 'POST',
             headers: {
             'Content-Type': 'application/json',
@@ -95,9 +100,7 @@ const ActividadesDocente = () => {
         }
         } catch (error) {
         console.error('Error 500', error);
-        setTimeout(() => {
-            alert('¡Ay caramba! Encontramos un pequeño obstáculo en el camino, pero estamos trabajando para superarlo. Gracias por tu paciencia mientras solucionamos este problemita.');
-        }, 2000);
+
         }
     };
 
@@ -120,7 +123,7 @@ const ActividadesDocente = () => {
     const groupedActivities = groupActivitiesByParcial(actividades);
 
     const fetchAndGenerateExcel = async (parcial) => {
-        setLoading(true);
+        setLoadingParcial(parcial); // Establece el parcial que está en proceso de carga
 
         try {
         //const idActividades = actividades.map((actividad) => actividad.intClvActividad);
@@ -152,8 +155,7 @@ const ActividadesDocente = () => {
             };
             console.log("server ",requestData)
 
-
-        const responseInit = await fetch('https://robe.host8b.me/WebServices/obtenerCalificacionesParcial.php', 
+        const responseInit = await fetch(`${apiUrl}/obtenerCalificacionesParcial.php`, 
         {
             method: 'POST',
             headers: 
@@ -167,8 +169,8 @@ const ActividadesDocente = () => {
 
         if (resultInit.done) {
             console.log(resultInit.message)
-
-            const response = await fetch('https://robe.host8b.me/WebServices/obtenerCalificacionesParcial.php', 
+            
+            const response = await fetch(`${apiUrl}/obtenerCalificacionesParcial.php`, 
             {
                 method: 'POST',
                 headers: 
@@ -199,7 +201,7 @@ const ActividadesDocente = () => {
         } 
         finally 
         {
-        setLoading(false);
+            setLoadingParcial(null); // Restablece el estado de carga al finalizar
         }
     };
 
@@ -570,6 +572,11 @@ const ActividadesDocente = () => {
         saveAs(new Blob([buffer], { type: 'application/octet-stream' }), `Calificaciones ${info.Nombre_Materia} Parcial ${info.Parcial}.xlsx`);
     };
 
+    
+    if (isLoading) {
+        return <ActivitiesSkeleton />;
+    }
+
     return (
         <section className="w-full flex flex-col">
             <InfoAlert
@@ -595,12 +602,12 @@ const ActividadesDocente = () => {
                                     <TitleSection label={`Parcial ${parcial}`} />
                                     <div className="ml-4">
                                         <LoadingButton
-                                        className="h-9"
-                                            isLoading={loading}
+                                            className="h-9"
+                                            isLoading={loadingParcial === parcial} // Carga individual para cada parcial
                                             loadingLabel="Generando Excel..."
                                             normalLabel={`Generar Excel Parcial ${parcial}`}
                                             onClick={() => fetchAndGenerateExcel(parcial)} 
-                                            disabled={loading}
+                                            disabled={loadingParcial === parcial} // Desactiva el botón solo durante el proceso de carga
                                         />
                                     </div>
                                 </div>

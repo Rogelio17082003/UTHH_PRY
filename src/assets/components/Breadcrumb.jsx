@@ -7,7 +7,7 @@ import { AuthProvider, useAuth } from '../server/authUser';
 const BreadcrumbNav = () => {
     const { isAuthenticated, userData } = useAuth();
     const location = useLocation();
-    const { vchClvMateria, chrGrupo, intPeriodo, intNumeroActi, intNumeroPractica, intIdActividadCurso } = useParams();
+    const {matricula,  token, vchClvMateria, chrGrupo, intPeriodo, intNumeroActi, intNumeroPractica, intIdActividadCurso } = useParams();
     
     const getBreadcrumbs = () => {
         const path = location.pathname;
@@ -18,6 +18,9 @@ const BreadcrumbNav = () => {
         if (path.includes('/mi-perfil')) {
             breadcrumbs.push({ path: '/mi-perfil', alias: 'Mi Perfil' });
         }
+        if (path.includes(`/restablecer-contrasena/${matricula}/${token}`)) {
+            breadcrumbs.push({ path: `/restablecer-contrasena/${matricula}/${token}`, alias: 'Restablecer Contraseña' });
+        }
         if (path.includes('/recuperar-contrasena')) {
             breadcrumbs.push({ path: '/recuperar-contrasena', alias: 'Recuperar Contraseña' });
         }
@@ -27,6 +30,7 @@ const BreadcrumbNav = () => {
             if (path.includes(`/actividades/${vchClvMateria}/${chrGrupo}/${intPeriodo}`)) {
                 breadcrumbs.push({ path: `/actividades/${vchClvMateria}/${chrGrupo}/${intPeriodo}`, alias: 'Actividades' });
             }
+            
             if (path.includes(`/actividades/detalleActividad/${vchClvMateria}/${chrGrupo}/${intPeriodo}/${intNumeroActi}/${intIdActividadCurso}`)) {
                 breadcrumbs.push({ path: `/actividades/${vchClvMateria}/${chrGrupo}/${intPeriodo}`, alias: 'Actividades' });
                 breadcrumbs.push({ path: `/actividades/detalleActividad/${vchClvMateria}/${chrGrupo}/${intPeriodo}/${intNumeroActi}/${intIdActividadCurso}`, alias: 'Detalle de la Actividad' });
@@ -46,6 +50,13 @@ const BreadcrumbNav = () => {
             }
             if (path.includes(`/docentes`)) {
                 breadcrumbs.push({ path: `/docentes`, alias: 'Docentes' });
+            }
+            if (path.includes('/carreras')) {
+                breadcrumbs.push({ path: '/carreras', alias: 'Carreras' });
+            }
+
+            if (path.includes('/departamentos')) {
+                breadcrumbs.push({ path: '/departamentos', alias: 'Departamentos' });
             }
             if (path.includes(`/gruposMaterias/${vchClvMateria}/${intPeriodo}`)) {
                 breadcrumbs.push({ path: `/gruposMaterias/${vchClvMateria}/${intPeriodo}`, alias: 'Grupos' });
