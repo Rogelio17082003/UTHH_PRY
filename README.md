@@ -118,3 +118,47 @@ npm run dev
 ```bash
 npm run test
 ```
+# Issues y Tareas por Sprint
+
+## Sprint 1 - Planificación
+| **Descripción del Issue**                                   | **Responsable** | **Fecha de Inicio** | **Fecha de Fin** | **Sprint** | **Estado** |
+|-------------------------------------------------------------|-----------------|---------------------|------------------|------------|------------|
+| Investigación y Selección de la Pasarela de Pagos            | RA              | 29/09/2024          | 04/10/2024       | Sprint 1   | En progreso|
+| Definir Qué Partes Estarán Disponibles sin Conexión          | BA              | 01/10/2024          | 05/10/2024       | Sprint 1   | Pendiente  |
+
+## Sprint 2 - Diseño Responsivo
+| **Descripción del Issue**                                   | **Responsable** | **Fecha de Inicio** | **Fecha de Fin** | **Sprint** | **Estado** |
+|-------------------------------------------------------------|-----------------|---------------------|------------------|------------|------------|
+| Diseño Responsivo para Móviles y Tablets con Pruebas         | BA              | 01/09/2024          | 14/09/2024       | Sprint 2   | Completado |
+| Optimización de Elementos para Pantallas Grandes             | RA & BA           | 15/09/2024          | 25/09/2024       | Sprint 2   | Completado |
+| Pruebas de Responsividad en Múltiples Dispositivos           | RA & BA           | 27/09/2024          | 30/09/2024       | Sprint 2   | En progreso|
+| Interfaz para Gestión de Notificaciones en el Frontend          | RA & BA           | 30/09/2024          | 05/10/2024       | Sprint 2   | En progreso|
+
+## Sprint 3 - Notificaciones Push y en Tiempo Real
+| **Descripción del Issue**                                   | **Responsable** | **Fecha de Inicio** | **Fecha de Fin** | **Sprint** | **Estado** |
+|-------------------------------------------------------------|-----------------|---------------------|------------------|------------|------------|
+| Configuración del Backend para Notificaciones Push           | RA              | 28/09/2024          | 04/10/2024       | Sprint 3   | En progreso|
+| Redirección de Notificaciones en la Aplicación               | BA              | 06/10/2024          | 11/10/2024       | Sprint 3   | Pendiente  |
+| Pruebas de Notificaciones en Diferentes Dispositivos         | RA              | 12/10/2024          | 14/10/2024       | Sprint 3   | Pendiente  |
+
+## Sprint 4 - Funcionalidad Offline y PWA
+| **Descripción del Issue**                                   | **Responsable** | **Fecha de Inicio** | **Fecha de Fin** | **Sprint** | **Estado** |
+|-------------------------------------------------------------|-----------------|---------------------|------------------|------------|------------|
+| Implementar Instalación de la PWA                           | RA              | 16/10/2024          | 21/10/2024       | Sprint 4   | Pendiente  |
+| Implementación de Service Workers para Cache y IndexedDB    | RA & BH           | 18/10/2024          | 21/10/2024       | Sprint 4   | Pendiente  |
+| Sincronización de Datos al Recuperar la Conexión            | RA              | 22/10/2024          | 26/10/2024       | Sprint 4   | Pendiente  |
+| Pruebas del Modo Offline                                    | RA  & BH          | 22/10/2024          | 30/10/2024       | Sprint 4   | Pendiente  |
+
+## Sprint 5 - Pasarela de Pagos Segura
+| **Descripción del Issue**                                   | **Responsable** | **Fecha de Inicio** | **Fecha de Fin** | **Sprint** | **Estado** |
+|-------------------------------------------------------------|-----------------|---------------------|------------------|------------|------------|
+| Implementación de la Pasarela en el Backend                 | RA              | 01/11/2024          | 08/11/2024       | Sprint 5   | Pendiente  |
+| Desarrollo del Frontend para la Pasarela de Pagos            | BA              | 01/11/2024          | 08/11/2024       | Sprint 5   | Pendiente  |
+| Pruebas de la Pasarela de Pagos y Manejo de Errores         | RA & BH          | 09/11/2024          | 11/11/2024       | Sprint 5   | Pendiente  |
+
+## Sprint 6 - Sistema de Suscripciones
+| **Descripción del Issue**                                   | **Responsable** | **Fecha de Inicio** | **Fecha de Fin** | **Sprint** | **Estado** |
+|-------------------------------------------------------------|-----------------|---------------------|------------------|------------|------------|
+| Desarrollo del Backend para los Planes de Suscripción        | RA              | 12/11/2024          | 16/11/2024       | Sprint 6   | Pendiente  |
+| Manejo de Renovaciones y Cancelaciones Automáticas           | RA & BH          | 17/11/2024          | 22/11/2024       | Sprint 6   | Pendiente  |
+| Pruebas de Renovaciones y Cancelaciones                     | RA   BH        | 23/11/2024          | 30/11/2024       | Sprint 6   | Pendiente  |
