@@ -238,7 +238,7 @@ const DetallePracticaDocente = () => {
             title:`${detalleActividad.vchNombre} - ${detalleActividad.vchDescripcion}`,
             body:`Nueva calificacion: ${sumaCalificaciones}/10 \nDocente: ${userData.vchNombre} ${userData.vchAPaterno} ${userData.vchAMaterno}`,
             tokenUser: selectedAlumnoTokenFirebase,
-            url:`${webUrl}/actividades/detalleActividad/detallePractica/${vchClvMateria}/${chrGrupo}/${intPeriodo}/${intNumeroActi}/${intNumeroPractica}/${intIdActividadCurso}`
+            url:`${webUrl}actividades/detalleActividad/detallePractica/${vchClvMateria}/${chrGrupo}/${intPeriodo}/${intNumeroActi}/${intNumeroPractica}/${intIdActividadCurso}`
         }
         console.log(notificacion)
         try {

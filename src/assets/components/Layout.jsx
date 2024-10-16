@@ -13,8 +13,6 @@ const Layout = ({ children }) => {
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
-
-  
   return (
     <div className="flex">
       <SideNav isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar}/>
