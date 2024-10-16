@@ -34,5 +34,10 @@ jobs:
       - name: Directorio
         run: ls -al
 
+      - name: Tnstalar
+        run: |
+          cd .github/workflows
+          ls -al
+
 
 
