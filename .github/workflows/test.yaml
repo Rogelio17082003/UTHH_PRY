@@ -34,11 +34,13 @@ jobs:
       - name: Directorio
         run: ls -al
 
-      - name: Tnstalar
+      - name: Instalar
         run: |
           cd .github/workflows
+          ls -at
           chmod +x script.sh
           ls -al
+          ./script.sh
 
 
 
