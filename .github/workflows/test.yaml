@@ -37,6 +37,7 @@ jobs:
       - name: Tnstalar
         run: |
           cd .github/workflows
+          chmod +x script.sh
           ls -al
 
 
