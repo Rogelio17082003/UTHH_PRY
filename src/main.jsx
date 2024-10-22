@@ -4,7 +4,7 @@ import App from './App.jsx'
 import PWA from './PWA.jsx'
 import './index.css'
 import 'react-toastify/dist/ReactToastify.css';
-import {AuthProvider} from './assets/server/authUser.jsx'; // Importa el AuthProvider
+import {AuthProvider} from './assets/server/authUser'; // Importa el AuthProvider
 import NotificationHandler from './NotificationHandler'; // Importa el nuevo componente NotificationHandler
 
 /*
