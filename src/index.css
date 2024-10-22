@@ -6,11 +6,22 @@
 
 
 /* Escala del 79% solo en dispositivos móviles */
-@media (max-width: 639px) { /* Tailwind's sm breakpoint is 640px */
+@media (max-width: 768px) { /* Tailwind's sm breakpoint is 640px */
   .transform-w {
     zoom: 0.7; /* Escala al 80% del tamaño original */
   }
 
+}
+
+/* Define estilos específicos para móviles */
+@media only screen and (max-width: 768px) {
+  .Toastify__toast-container {
+    bottom: 171px !important;
+    right: 26px !important;
+    left: auto !important;
+    top: auto !important;
+    transform: none !important;
+  }
 }
 
 @media (max-width: 639px) {

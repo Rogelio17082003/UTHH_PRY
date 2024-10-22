@@ -68,10 +68,6 @@ function App() {
     return <LoadingOverlay />;
   }
 
-  if (!isOnline ) {
-    return <OfflineAlert/>;
-  }
-
   return (
     <AuthProvider>
       <Router>

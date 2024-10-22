@@ -4,6 +4,10 @@ import { getToken, onMessage } from 'firebase/messaging';
 import { messaging } from './assets/pages/notificaciones/firebase.jsx';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { FaBell } from 'react-icons/fa';
+import  Components from './assets/components/Components.jsx'
+
+const {TitlePage, TitleSection, LoadingButton, CustomInput, Paragraphs, CustomInputPassword, CustomRepeatPassword, InfoAlert} = Components;
 
 const NotificationHandler = () => {
   const { userData, isAuthenticated } = useAuth(); // Obtén el estado de autenticación del contexto
@@ -68,13 +72,20 @@ const NotificationHandler = () => {
       console.log('Mensaje recibido en primer plano:', message);
       toast(
         <div className="flex flex-col gap-1">
-          <strong className="text-lg font-semibold text-gray-800">{message.notification.title}</strong>
-          <span className="text-sm text-gray-600">{message.notification.body}</span>
+          <div className="flex items-center gap-2">
+            <span role="img" aria-label="notification-icon">🔔</span>
+            <TitleSection label={message.notification.title}/>
+          </div>
+          <Paragraphs label={message.notification.body}/>
         </div>,
         {
-          icon: "🔔", // Puedes agregar un ícono de notificación
+          className: 'custom-toast', // Clase personalizada para dispositivos móviles
+          position: "bottom-right",
+          progressStyle: {
+            background: '#02233a', // Color personalizado
+          },
         }
-      );     
+      );
     });
   }, []);
 

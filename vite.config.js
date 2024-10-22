@@ -57,8 +57,40 @@ export default defineConfig({
     react(),
     VitePWA({
       manifest: manifestForPlugin,
+      registerType: 'autoUpdate',
+      cleanupOutdatedCaches: true,  // Esto limpiará automáticamente las cachés obsoletas
       workbox: {
-        maximumFileSizeToCacheInBytes: 10 * 1024 * 1024, // 10 MB
+        runtimeCaching: [
+          {
+            urlPattern: ({ request }) => request.mode === 'navigate', // Caché para páginas
+            handler: 'NetworkFirst', // Intentar red, si falla usar caché
+            options: {
+              cacheName: 'pages-cache',
+              expiration: {
+                maxEntries: 15, // Máximo 10 páginas
+                maxAgeSeconds: 60 * 60 * 24 * 7, // Mantener en caché por 7 días
+              },
+            },
+          },
+          {
+            urlPattern: ({ request }) =>
+              request.destination === 'script' || 
+              request.destination === 'style' || 
+              request.destination === 'image', // Caché para JS, CSS, imágenes
+            handler: 'CacheFirst', // Usar caché primero, si no está, descargar
+            options: {
+              cacheName: 'assets-cache',
+              expiration: {
+                maxEntries: 50, // Máximo 50 activos estáticos
+                maxAgeSeconds: 60 * 60 * 24 * 30, // Mantener en caché por 30 días
+              },
+            },
+          },
+        ],
+        globDirectory: 'dist', // Donde están los archivos de compilación
+        globPatterns: ['**/*.{html,js,css,png,jpg,svg}'],
+        cleanupOutdatedCaches: true, // Limpiar cachés antiguas
+        maximumFileSizeToCacheInBytes: 50 * 1024 * 1024, // 10 MB
       },
     }),
   ],
